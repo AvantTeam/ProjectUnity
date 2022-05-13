@@ -43,7 +43,7 @@ public class EndSweepLaser extends AntiCheatBulletTypeBase{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return length;
     }
 

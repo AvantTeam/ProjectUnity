@@ -65,7 +65,7 @@ public class HealingShockWaveBulletType extends BulletType{
             for(int i = 0; i < data.posData.length; i++){
                 ShockWavePositionData ad = data.posData[i], bd = data.posData[Mathf.mod(i + 1, data.posData.length)];
                 Lines.linePoint(ad.x, ad.y);
-                Drawf.light(b.team, ad.x, ad.y, bd.x, bd.y, width * 3f, color, 0.3f * fout);
+                Drawf.light(ad.x, ad.y, bd.x, bd.y, width * 3f, color, 0.3f * fout);
             }
             Lines.endLine(true);
             Draw.color();

@@ -76,7 +76,7 @@ public class TractorBeamWeapon extends Weapon{
             tm.targetP.set(mount.target);
             if(mount.target instanceof Unit u){
                 tm.scl = Mathf.lerpDelta(tm.scl, 1f, 0.07f);
-                float scl = tm.scl * (pullStrength + (Mathf.clamp(1f - (Mathf.dst(wx, wy, tm.targetP.x, tm.targetP.y) / bullet.range())) * scaledForce)),
+                float scl = tm.scl * (pullStrength + (Mathf.clamp(1f - (Mathf.dst(wx, wy, tm.targetP.x, tm.targetP.y) / bullet.range)) * scaledForce)),
                 ang = mount.target.angleTo(wx, wy);
 
                 u.impulseNet(Tmp.v1.trns(ang, scl));
@@ -110,7 +110,7 @@ public class TractorBeamWeapon extends Weapon{
     }
 
     @Override
-    protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
+    protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
 
     }
 
@@ -129,10 +129,10 @@ public class TractorBeamWeapon extends Weapon{
 
             Draw.z(Layer.flyingUnit + 1f);
             Draw.color(laserColor);
-            Drawf.laser(unit.team, laser, laserEnd, ox, oy, tm.targetP.x, tm.targetP.y, tm.scl * beamWidth);
+            Drawf.laser(laser, laserEnd, ox, oy, tm.targetP.x, tm.targetP.y, tm.scl * beamWidth);
             Draw.z(Layer.flyingUnit + 1.1f);
             Draw.color(laserTopColor);
-            Drawf.laser(unit.team, laserTop, laserTopEnd, ox, oy, tm.targetP.x, tm.targetP.y, tm.scl * beamWidth);
+            Drawf.laser(laserTop, laserTopEnd, ox, oy, tm.targetP.x, tm.targetP.y, tm.scl * beamWidth);
             Draw.z(z);
         }
     }

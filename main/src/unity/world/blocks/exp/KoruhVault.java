@@ -26,7 +26,7 @@ public class KoruhVault extends StorageBlock {
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("exp", (KoruhCrafter.KoruhCrafterBuild entity) -> new Bar(() -> Core.bundle.get("bar.exp"), () -> UnityPal.exp, entity::expf));
+        addBar("exp", (KoruhCrafter.KoruhCrafterBuild entity) -> new Bar(() -> Core.bundle.get("bar.exp"), () -> UnityPal.exp, entity::expf));
     }
 
     public class KoruhVaultBuild extends StorageBuild implements ExpHolder{

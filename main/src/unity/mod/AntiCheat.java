@@ -7,6 +7,7 @@ import arc.util.*;
 import arc.util.pooling.*;
 import arc.util.pooling.Pool.*;
 import mindustry.*;
+import mindustry.audio.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -83,7 +84,7 @@ public class AntiCheat{
             }
 
             unit.team.data().updateCount(unit.type, -1);
-            unit.clearCommand();
+            //unit.clearCommand();
             unit.controller().removed(unit);
 
             Groups.unit.remove(unit);
@@ -109,8 +110,10 @@ public class AntiCheat{
                 building.x = building.y = Float.NaN;
             }
 
-            if(building.sound != null) building.sound.stop();
-            building.added = false;
+            //if(building.sound != null) building.sound.stop();
+            //building.added = false;
+            Reflect.<SoundLoop>get(Building.class, building, "sound").stop();
+            Reflect.set(Building.class, building, "added", false);
         }
     }
 

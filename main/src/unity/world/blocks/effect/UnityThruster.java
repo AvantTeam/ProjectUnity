@@ -30,7 +30,7 @@ public class UnityThruster extends Block{
 
         @Override public void updateTile(){
             super.updateTile();
-            if(consValid()){
+            if(canConsume()){
                 if(timer(timerUse, itemDuration / timeScale())){
                     consume();
                 }

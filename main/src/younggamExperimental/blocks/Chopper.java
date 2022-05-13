@@ -282,7 +282,7 @@ public class Chopper extends GraphBlock{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Tex.whiteui, Styles.clearTransi, 50f, () -> {
+            table.button(Tex.whiteui, Styles.cleari, 50f, () -> {
                 BaseDialog dialog = new BaseDialog("Edit Blueprint");
                 dialog.setFillParent(false);
                 ModularConstructorUI mtd = ModularConstructorUI.applyModularConstructorUI(dialog.cont, partsRegion, Math.round(partsRegion.width / 32f), Math.round(partsRegion.height / 32f),

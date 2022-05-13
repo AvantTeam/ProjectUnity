@@ -75,7 +75,7 @@ abstract class WormComp implements Unitc{
                 UnitController con = controller();
                 other.head().controller(con);
                 con.unit(other.head());
-                controller(type.createController());
+                controller(type.createController(self()));
             }
         }
     }
@@ -220,7 +220,7 @@ abstract class WormComp implements Unitc{
         if(!isHead()) return 0f;
         float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
         float boost = Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation);
-        return (isCommanding() ? minFormationSpeed * 0.98f : type.speed) * strafePenalty * boost * floorSpeedMultiplier();
+        return /*(isCommanding() ? minFormationSpeed * 0.98f : type.speed) * */strafePenalty * boost * floorSpeedMultiplier();
     }
 
     @Override

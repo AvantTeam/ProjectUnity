@@ -65,7 +65,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.alpha(0.5f);
         Draw.rect(region, req.drawx(), req.drawy(), req.rotation * 90f);
     }
@@ -168,7 +168,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         public void updatePre(){
             float flow = flowRate * 40f;
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
-            if(liquids.total() > 0.001f && timer(timerFlow, 1f)) flowRate = moveLiquidForward(leaks, liquids.current());
+            if(liquids.currentAmount() > 0.001f && timer(timerFlow, 1f)) flowRate = moveLiquidForward(leaks, liquids.current());
             float mul = flow / 100f;
             if(mul < 0.4f) mul = 0f;
             if(mul > 1f) mul = 0.5f * Mathf.log2(mul) + 1f;
@@ -179,7 +179,7 @@ public class WaterTurbine extends ArmoredConduit implements GraphBlockBase{
         public void draw(){
             float rot = torque().getRotation();
             Draw.rect(bottomRegions[rotation % 2], x, y);
-            if(liquids.total() > 0.001f) Drawf.liquid(liquidRegions[rotation % 2], x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            if(liquids.currentAmount() > 0.001f) Drawf.liquid(liquidRegions[rotation % 2], x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
             Drawf.shadow(rotorRegion, x - size / 2f, y - size / 2f, rot);
             Draw.rect(rotorRegion, x, y, rot);
             Draw.rect(topRegions[rotation], x, y);

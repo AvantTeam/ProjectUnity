@@ -30,7 +30,7 @@ public class HeatPipe extends GraphBlock{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
         float scl = tilesize * req.animScale;
         Draw.rect(region, req.drawx(), req.drawy(), scl, scl, req.rotation * 90f);
     }

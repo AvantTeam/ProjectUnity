@@ -44,7 +44,7 @@ public class AbsorberTurret extends GenericTractorBeamTurret<Teamc>{
     public void setBars(){
         super.setBars();
 
-        bars.add("power", (AbsorberTurretBuild entity) -> new Bar(() ->
+        addBar("power", (AbsorberTurretBuild entity) -> new Bar(() ->
             Core.bundle.format("bar.poweroutput",
             Strings.fixed(entity.getPowerProduction() * 60f * entity.timeScale(), 1)),
             () -> Pal.powerBar,

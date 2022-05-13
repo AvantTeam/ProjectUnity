@@ -27,6 +27,7 @@ import unity.util.*;
     "supernova-wing-left-bottom", "supernova-wing-right-bottom",
     "supernova-bottom"
 }, outline = true)
+@Deprecated
 public class SupernovaTurret extends SoulLaserTurret{
     public float chargeWarmup = 0.002f;
     public float chargeCooldown = 0.01f;
@@ -52,6 +53,7 @@ public class SupernovaTurret extends SoulLaserTurret{
     public SupernovaTurret(String name){
         super(name);
 
+        /*
         drawer = b -> {
             if(b instanceof SupernovaTurretBuild tile){
                 //core
@@ -130,12 +132,7 @@ public class SupernovaTurret extends SoulLaserTurret{
             Draw.color();
             Draw.blend();
         };
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        baseRegion = Core.atlas.find("unity-block-" + size);
+         */
     }
 
     public class SupernovaTurretBuild extends SoulLaserTurretBuild{
@@ -145,9 +142,10 @@ public class SupernovaTurret extends SoulLaserTurret{
 
         protected PitchedSoundLoop sound = new PitchedSoundLoop(chargeSound, chargeSoundVolume);
 
+        /*
         @Override
         public void updateTile(){
-            if(!isShooting() || !validateTarget() || !consValid()){
+            if(!isShooting() || !validateTarget() || !canConsume()){
                 charge = Mathf.lerpDelta(charge, 0f, chargeCooldown);
                 charge = charge > 0.001f ? charge : 0f;
             }
@@ -284,13 +282,14 @@ public class SupernovaTurret extends SoulLaserTurret{
         protected void updateShooting(){
             if(bulletLife > 0f && bullet != null) return;
 
-            if(charge >= 1f && phase >= 1f && (consValid() || cheating())){
+            if(charge >= 1f && phase >= 1f && (canConsume() || cheating())){
                 BulletType type = peekAmmo();
 
                 shoot(type);
                 charge = 0f;
             }
         }
+         */
 
         @Override
         public void remove(){

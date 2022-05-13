@@ -58,7 +58,7 @@ public class ContinuousSingularityLaserBulletType extends AntiCheatBulletTypeBas
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return maxRange > 0 ? maxRange : maxLength / 1.5f;
     }
 
@@ -72,8 +72,7 @@ public class ContinuousSingularityLaserBulletType extends AntiCheatBulletTypeBas
     public void update(Bullet b){
         boolean timer = b.timer(0, 5f);
 
-        if(b.data instanceof LaserData){
-            LaserData vec = (LaserData)b.data;
+        if(b.data instanceof LaserData vec){
             if(vec.restartTime >= 5f){
                 if(accel > 0.01f){
                     vec.velocity = Mathf.clamp((vec.velocityTime / accel) + vec.velocity, 0f, laserSpeed);
@@ -96,8 +95,7 @@ public class ContinuousSingularityLaserBulletType extends AntiCheatBulletTypeBas
         if(timer){
             boolean p = pierceCap > 0;
             Tmp.v1.trns(b.rotation(), b.fdata).add(b);
-            if(b.data instanceof LaserData){
-                LaserData data = (LaserData)b.data;
+            if(b.data instanceof LaserData data){
                 if(p){
                     data.pierceScore = 0f;
                     data.pierceOffset = 0f;
@@ -149,8 +147,7 @@ public class ContinuousSingularityLaserBulletType extends AntiCheatBulletTypeBas
                 }, (ex, ey) -> hit(b, ex, ey));
             }
         }
-        if(b.data instanceof VoidLaserData){
-            VoidLaserData data = (VoidLaserData)b.data;
+        if(b.data instanceof VoidLaserData data){
             Tmp.v1.trns(b.rotation(), b.fdata).add(b);
 
             if(timer){
@@ -207,7 +204,7 @@ public class ContinuousSingularityLaserBulletType extends AntiCheatBulletTypeBas
             }
         }
         Tmp.v2.trns(b.rotation(), b.fdata + tipHeight).add(b);
-        Drawf.light(b.team, b.x, b.y, Tmp.v2.x, Tmp.v2.y, width * 2f, colors[0], 0.5f);
+        Drawf.light(b.x, b.y, Tmp.v2.x, Tmp.v2.y, width * 2f, colors[0], 0.5f);
         Draw.reset();
     }
 

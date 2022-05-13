@@ -81,7 +81,7 @@ public class GluonOrbBulletType extends BasicBulletType{
         if(b.data instanceof GluonOrbData d){
             d.units.each(u -> {
                 if(u != null){
-                    Drawf.laser(b.team, laser, laserEnd, b.x, b.y, u.x, u.y, beamStroke);
+                    Drawf.laser(laser, laserEnd, b.x, b.y, u.x, u.y, beamStroke);
                 }
             });
         }

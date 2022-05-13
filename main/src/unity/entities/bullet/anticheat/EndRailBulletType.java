@@ -19,7 +19,7 @@ public class EndRailBulletType extends AntiCheatBulletTypeBase{
     public float length = 340f;
     public float collisionWidth = 4f;
     public Effect updateEffect = TrailFx.endRailTrail;
-    public float updateEffectSeg = 20f;
+    public float pointEffectSpace = 20f;
     public float pierceDamageFactor = 1f;
 
     static float len, dam;
@@ -38,7 +38,7 @@ public class EndRailBulletType extends AntiCheatBulletTypeBase{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return length;
     }
 
@@ -85,7 +85,7 @@ public class EndRailBulletType extends AntiCheatBulletTypeBase{
         }, (ex, ey) -> hit(b, ex, ey), true);
 
         Vec2 nor = Tmp.v1.trns(b.rotation(), 1f).nor();
-        for(float i = 0; i <= len; i += updateEffectSeg){
+        for(float i = 0; i <= len; i += pointEffectSpace){
             updateEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation());
         }
         b.fdata = len;

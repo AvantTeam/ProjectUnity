@@ -61,7 +61,7 @@ public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
             if(Mathf.chanceDelta((0.1f + Mathf.clamp(angDst / 25f)) * b.fout()) && Mathf.round(lenRanged / 8f) >= 1) Lightning.create(b, UnityPal.scarColor, 6f + angDst * 1.7f + damageC * 2f, b.x, b.y, b.rotation(), Mathf.round(lenRanged / 8f));
             if(Mathf.chanceDelta(0.12f * b.fout())) UnityFx.falseLightning.at(b.x, b.y, b.rotation(), UnityPal.scarColor, baseLen);
             temp.rot = b.rotation();
-            Tmp.v1.trns(b.rotation(), (baseLen * lenscales[lenscales.length - 1]) / 2f);
+            //Tmp.v1.trns(b.rotation(), (baseLen * lenscales[lenscales.length - 1]) / 2f);
             temp.fT.update(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation() + 90f);
         }else{
             temp.f = length;
@@ -76,18 +76,18 @@ public class SaberContinuousLaserBulletType extends ContinuousLaserBulletType{
         float realLength = Damage.findLaserLength(b, temp.f);
         float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
         float baseLen = realLength * fout;
-        temp.fT.draw(UnityPal.scarColor, baseLen * lenscales[lenscales.length - 1] * 0.5f);
+        //temp.fT.draw(UnityPal.scarColor, baseLen * lenscales[lenscales.length - 1] * 0.5f);
         Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
         for(int s = 0; s < colors.length; s++){
             Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(1f, 0.1f)));
-            for(int i = 0; i < tscales.length; i++){
+            /*for(int i = 0; i < tscales.length; i++){
                 Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * spaceMag);
                 Lines.stroke((width + Mathf.absin(oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
                 Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
-            }
+            }*/
         }
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
-        Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
+        Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
         Draw.reset();
     }
 }

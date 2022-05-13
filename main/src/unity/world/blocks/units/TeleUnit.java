@@ -56,8 +56,8 @@ public class TeleUnit extends Block{
 
         @Override
         public void updateTile(){
-            warmup = Mathf.lerpDelta(warmup, consValid() ? 1f : 0f, 0.05f);
-            warmup2 = Mathf.lerpDelta(warmup2, consValid() && enabled ? 1f : 0f, 0.05f);
+            warmup = Mathf.lerpDelta(warmup, canConsume() ? 1f : 0f, 0.05f);
+            warmup2 = Mathf.lerpDelta(warmup2, canConsume() && enabled ? 1f : 0f, 0.05f);
             if(isTeamChanged()){
                 onRemoved();
                 created();
@@ -86,7 +86,7 @@ public class TeleUnit extends Block{
 
         @Override
         public void drawSelect(){
-            Draw.color(consValid() ? inRange(player) ? UnityPal.dirium : Pal.accent : Pal.darkMetal);
+            Draw.color(canConsume() ? inRange(player) ? UnityPal.dirium : Pal.accent : Pal.darkMetal);
             float length = tilesize * size / 2f + 3f + Mathf.absin(5f, 2f);
             Draw.rect(arrowRegion, x + length, y, 180f);
             Draw.rect(arrowRegion, x, y + length, 270f);
@@ -97,7 +97,7 @@ public class TeleUnit extends Block{
 
         @Override
         public boolean shouldAmbientSound(){
-            return consValid();
+            return canConsume();
         }
 
         @Override
@@ -153,12 +153,12 @@ public class TeleUnit extends Block{
 
         @Override
         public boolean shouldShowConfigure(Player player){
-            return consValid() && inRange(player);
+            return canConsume() && inRange(player);
         }
 
         @Override
         public boolean configTapped(){
-            if(!consValid() || !inRange(player)) return false;
+            if(!canConsume() || !inRange(player)) return false;
             configure(null);
             Sounds.click.at(this);
             return false;
@@ -198,21 +198,21 @@ public class TeleUnit extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(!consValid()) return;
+            if(!canConsume()) return;
             if(unit.hasEffect(UnityStatusEffects.tpCoolDown) || unit.isPlayer()) return;
             tpUnit(unit, false);
             unit.apply(UnityStatusEffects.tpCoolDown, 120f);
         }
 
         @Override
-        public boolean consValid(){
+        public boolean canConsume(){
             return power.status > 0.98f;
         }
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             TeleUnitBuild dest = getDest();
-            if(!consValid() || !dest.enabled) return false;
+            if(!canConsume() || !dest.enabled) return false;
             int ntrns = 1 + size / 2;
             Building nextBuild = dest.nearby(Geometry.d4x(source.rotation) * ntrns, Geometry.d4y(source.rotation) * ntrns);
             boolean result = nextBuild != null && (

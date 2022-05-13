@@ -9,7 +9,7 @@ public class BurstChargePowerTurret extends ExpPowerTurret {
         super(name);
     }
 
-    public class BurstChargeTurretBuild extends ExpPowerTurretBuild {
+    /*public class BurstChargeTurretBuild extends ExpPowerTurretBuild {
 
         protected void shootCharge(BulletType type, float rotation){
             float rx = Mathf.range(xRand);
@@ -81,5 +81,5 @@ public class BurstChargePowerTurret extends ExpPowerTurret {
                 shotCounter++;
             }
         }
-    }
+    }*/
 }

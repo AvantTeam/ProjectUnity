@@ -8,6 +8,8 @@ import mindustry.game.EventType.*;
 import mindustry.type.*;
 import unity.graphics.*;
 
+import static mindustry.Vars.*;
+
 public class UnityLiquids{
     private static final Color temp = new Color(0f, 0f, 0f, 1f), temp2 = temp.cpy();
     public static Liquid lava;
@@ -22,7 +24,7 @@ public class UnityLiquids{
         }};
 
         //endregion
-        if(!mindustry.Vars.headless){
+        if(!headless){
             Events.run(Trigger.update, () -> {
                 lava.color = temp.set(UnityPal.lava).lerp(UnityPal.lava2, Mathf.absin(Time.globalTime, 25f, 1f));
                 lava.lightColor = temp2.set(temp).mul(1, 1, 1, 0.55f);

@@ -110,7 +110,8 @@ public class ClassicProjector extends ExpForceProjector{
 
         @Override
         public void updateTile(){
-            boolean phaseValid = hasItems && consumes.get(ConsumeType.item).valid(this);
+            //boolean phaseValid = hasItems && consumes.get(ConsumeType.item).valid(this);
+            boolean phaseValid = hasItems && findConsumer(e -> e instanceof ConsumeItems).efficiency(this) > 0f;
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
@@ -130,8 +131,8 @@ public class ClassicProjector extends ExpForceProjector{
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
 
                 if(hasLiquids){
-                    ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
-                    if(cons.valid(this)){
+                    ConsumeLiquidFilter cons = findConsumer(e -> e instanceof ConsumeLiquidBase);
+                    if(cons.efficiency(this) > 0f){
                         cons.update(this);
                         scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
                     }

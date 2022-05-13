@@ -268,7 +268,7 @@ public class ChargeFx{
         });
     }),
 
-    ephmeronCharge = new Effect(80f, e -> {
+    ephemeronCharge = new Effect(80f, e -> {
         color(Pal.lancerLaser);
         UnityDrawf.shiningCircle(e.id, Time.time, e.x, e.y, e.fin() * 9.5f, 6, 25f, 20f, 3f * e.fin());
         color(Color.white);

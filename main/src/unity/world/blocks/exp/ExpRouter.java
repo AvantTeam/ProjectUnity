@@ -1,9 +1,7 @@
 package unity.world.blocks.exp;
 
 import arc.math.*;
-import arc.util.*;
 import arc.util.io.*;
-import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.production.*;
@@ -15,7 +13,7 @@ import static arc.math.geom.Geometry.d4y;
 
 /** Items pass through, but exp is distributed */
 public class ExpRouter extends Junction {
-    public float reloadTime = 15f;
+    public float reload = 15f;
 
     public ExpRouter(String name){
         super(name);
@@ -25,11 +23,11 @@ public class ExpRouter extends Junction {
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.speed, "stat.unity.exppersec", 60f / reloadTime);
+        stats.add(Stat.speed, "stat.unity.exppersec", 60f / reload);
     }
 
     public class ExpRouterBuild extends JunctionBuild implements ExpHolder{
-        public float reload = reloadTime;
+        public float reload = ExpRouter.this.reload;
 
         @Override
         public void updateTile(){
@@ -49,7 +47,7 @@ public class ExpRouter extends Junction {
 
         @Override
         public boolean acceptOrb(){
-            return enabled && reload >= reloadTime;
+            return enabled && reload >= ExpRouter.this.reload;
         }
 
         @Override

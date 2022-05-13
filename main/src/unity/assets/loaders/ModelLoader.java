@@ -58,7 +58,7 @@ public class ModelLoader extends SynchronousAssetLoader<Model, ModelLoader.Model
 
                 JsonValue attributes = mesh.require("attributes");
                 data.attributes = parseAttributes(attributes);
-                data.vertices = mesh.require("vertices").asFloatSeq();
+                data.vertices = mesh.require("vertices").asFloatArray();
 
                 JsonValue meshParts = mesh.require("parts");
                 Seq<ModelMeshPart> parts = new Seq<>(ModelMeshPart.class);

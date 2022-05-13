@@ -72,7 +72,7 @@ public class UnderPiper extends Block {
             piping.cont.table(t -> {
                 t.center().bottom();
 
-                ScrollPane pane = t.pane(Styles.nonePane, p -> {
+                ScrollPane pane = t.pane(Styles.noBarPane, p -> {
                     UnderworldMap map = new UnderworldMap();
                     p.add(map).grow();
                 }).fill().padRight(5f).get();
@@ -109,7 +109,7 @@ public class UnderPiper extends Block {
 
                                 p.button(b -> b.image(bloc.region).size(32), () -> {
 
-                                }).size(34f).pad(2f).style(Styles.clearTransi).tooltip(bloc.localizedName);
+                                }).size(34f).pad(2f).style(Styles.cleari).tooltip(bloc.localizedName);
 
                                 if ((i + 1) % 4 == 0) p.row();
                             }

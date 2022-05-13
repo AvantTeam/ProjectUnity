@@ -85,7 +85,7 @@ public class LoreMessageBlock extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, this, 4f * tilesize, color, 0.5f);
+            Drawf.light(this, 4f * tilesize, color, 0.5f);
         }
 
         @Override

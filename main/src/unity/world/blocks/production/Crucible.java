@@ -58,8 +58,8 @@ public class Crucible extends GraphBlock{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Tex.whiteui, Styles.clearTransi, 50f, new CrucibleDialog(this)::show).size(50f).get().getStyle().imageUp = Icon.chartBar;
-            table.button(Tex.whiteui, Styles.clearTransi, 50f, () -> configure(0)).size(50f).get().getStyle().imageUp = Icon.eye;
+            table.button(Tex.whiteui, Styles.cleari, 50f, new CrucibleDialog(this)::show).size(50f).get().getStyle().imageUp = Icon.chartBar;
+            table.button(Tex.whiteui, Styles.cleari, 50f, () -> configure(0)).size(50f).get().getStyle().imageUp = Icon.eye;
         }
 
         @Override

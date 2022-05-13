@@ -1,6 +1,7 @@
 package unity.world.blocks.exp.turrets;
 
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.struct.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -25,7 +26,7 @@ public class ExpLiquidTurret extends ExpTurret {
 
     public ExpLiquidTurret(String name){
         super(name);
-        acceptCoolant = false;
+        //acceptCoolant = false;
         hasLiquids = true;
         loopSound = Sounds.spray;
         shootSound = Sounds.none;
@@ -48,10 +49,15 @@ public class ExpLiquidTurret extends ExpTurret {
 
     @Override
     public void init(){
-        consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
+        consume(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
+            //@Override
+            //public boolean valid(Building entity){
+                //return entity.liquids.currentAmount() > 0.001f;
+            //}
+
             @Override
-            public boolean valid(Building entity){
-                return entity.liquids.total() > 0.001f;
+            public float efficiencyMultiplier(Building build){
+                return build.liquids.currentAmount() > 0.001f ? 1f : 0f;
             }
 
             @Override
@@ -77,17 +83,17 @@ public class ExpLiquidTurret extends ExpTurret {
 
     @Override
     public TextureRegion[] icons(){
-        if(topRegion.found()) return new TextureRegion[]{baseRegion, region, topRegion};
+        if(topRegion.found()) return new TextureRegion[]{region, topRegion};
         return super.icons();
     }
 
-    public class ExpLiquidTurretBuild extends ExpTurretBuild{
+    /*public class ExpLiquidTurretBuild extends ExpTurretBuild{
         @Override
         public void draw(){
             super.draw();
 
             if(liquidRegion.found()){
-                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
+                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.currentAmount() / liquidCapacity, liquids.current().color, rotation - 90);
             }
             if(topRegion.found()) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
         }
@@ -167,7 +173,7 @@ public class ExpLiquidTurret extends ExpTurret {
 
         @Override
         public boolean hasAmmo(){
-            return ammoTypes.get(liquids.current()) != null && liquids.total() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            return ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
         }
 
         @Override
@@ -181,5 +187,5 @@ public class ExpLiquidTurret extends ExpTurret {
                     && (liquids.current() == liquid || (ammoTypes.containsKey(liquid)
                     && (!ammoTypes.containsKey(liquids.current()) || liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f)));
         }
-    }
+    }*/
 }

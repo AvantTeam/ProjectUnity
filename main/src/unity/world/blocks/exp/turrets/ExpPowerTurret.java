@@ -8,7 +8,7 @@ import unity.world.blocks.exp.*;
 
 public class ExpPowerTurret extends ExpTurret {
     public BulletType shootType;
-    public float powerUse = 1f;
+    //public float powerUse = 1f;
 
     public ExpPowerTurret(String name){
         super(name);
@@ -22,11 +22,11 @@ public class ExpPowerTurret extends ExpTurret {
         stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
     }
 
-    @Override
+    /*@Override
     public void init(){
         consumes.powerCond(powerUse, TurretBuild::isActive);
         super.init();
-    }
+    }*/
 
     public class ExpPowerTurretBuild extends ExpTurretBuild{
 

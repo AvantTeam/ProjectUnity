@@ -48,8 +48,7 @@ public class FragmentationShaderEffect extends Effect{
 
         @Override
         public void draw(){
-            if(data instanceof Drawc){
-                Drawc draw = (Drawc)data;
+            if(data instanceof Drawc draw){
                 Unit unit = draw instanceof Unit ? (Unit)draw : null;
 
                 float z = Layer.flyingUnitLow;

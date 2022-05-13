@@ -740,14 +740,14 @@ public class UnityFx{
     }),
 
     waitFx = new Effect(30f, e -> {
-        // if(!isArray(e.data)) return; (I don't know how to translate this)
+        // if(!isArray(e.data)) return; (I don't know how to translate this) <- words deranged by the utterly deranged
         Object[] data = (Object[])e.data;
         float whenReady = (float)data[0];
         Unit u = (Unit)data[1];
         if(u == null || !u.isValid() || u.dead) return;
         color(e.color);
         stroke(e.fout() * 1.5f);
-        polySeg(60, 0, (int)(60 * (1 - (e.rotation - Time.time) / whenReady)), u.x, u.y, 8f, 0f);
+        //polySeg(60, 0, (int)(60 * (1 - (e.rotation - Time.time) / whenReady)), u.x, u.y, 8f, 0f);
     }).layer(Layer.effect - 0.00001f),
 
     //^ this but better
@@ -757,7 +757,7 @@ public class UnityFx{
 
             color(e.color);
             stroke(e.fout() * 1.5f);
-            polySeg(60, 0, (int)(60f * data.progress()), data.unit().x, data.unit().y, 8f, 0f);
+            //polySeg(60, 0, (int)(60f * data.progress()), data.unit().x, data.unit().y, 8f, 0f);
         }
     }).layer(Layer.effect - 0.00001f),
 
@@ -767,7 +767,7 @@ public class UnityFx{
 
             color(e.color);
             stroke(e.fout() * 1.5f);
-            polySeg(90, 0, (int)(90f * data.progress()), data.unit().x, data.unit().y, 12f, 0f);
+            //polySeg(90, 0, (int)(90f * data.progress()), data.unit().x, data.unit().y, 12f, 0f);
         }
     }).layer(Layer.effect - 0.00001f),
 
@@ -1220,19 +1220,19 @@ public class UnityFx{
     }),
 
     distSplashFx = new Effect(80, e -> {
-        if(!(e.data instanceof Float[])) return;
+        if(!(e.data instanceof Float[] data)) return;
+        e.lifetime = data[1];
+
         color(Pal.lancerLaser, Pal.place, e.fin());
         Lines.stroke(2 * e.fout());
-        Lines.circle(e.x, e.y, ((Float[])e.data)[0] * e.fin());
-    }){
+        Lines.circle(e.x, e.y, data[0] * e.fin());
+    }){/*
         @Override
         public void at(float x, float y, float rotation, Object data){
-            Effect effect = this;
-            if((data instanceof Float[])) effect.lifetime = ((Float[])data)[1];
-
-            create(effect, x, y, rotation, Color.white, data);
+            if((data instanceof Float[])) lifetime = ((Float[])data)[1];
+            create(x, y, rotation, Color.white, data);
         }
-    },
+    */},
 
     distStart = new Effect(45, e -> {
         if(!(e.data instanceof Float)) return;

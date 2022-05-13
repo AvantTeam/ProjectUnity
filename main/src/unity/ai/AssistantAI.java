@@ -111,7 +111,7 @@ public class AssistantAI extends FlyingAI{
                 moveTo(target, unit.type.range * 0.8f);
                 unit.lookAt(target);
             }else{
-                attack(120f);
+                circleAttack(120f);
             }
         }else if(current != null && current.updateMovement.get(this)){
             if(current.preserveMovement){
@@ -120,7 +120,7 @@ public class AssistantAI extends FlyingAI{
                         moveTo(target, unit.type.range * 0.8f);
                         unit.lookAt(target);
                     }else{
-                        attack(120f);
+                        circleAttack(120f);
                     }
                 }else if(userValid()){
                     moveTo(user, unit.type.range * 0.8f);
@@ -237,7 +237,7 @@ public class AssistantAI extends FlyingAI{
                         mountX = ai.unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                         mountY = ai.unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 
-                    boolean shoot = tile.within(mountX, mountY, weapon.bullet.range()) && ai.shouldShoot();
+                    boolean shoot = tile.within(mountX, mountY, weapon.bullet.range) && ai.shouldShoot();
 
                     Vec2 to = Predict.intercept(ai.unit, tile, weapon.bullet.speed);
                     mount.aimX = to.x;

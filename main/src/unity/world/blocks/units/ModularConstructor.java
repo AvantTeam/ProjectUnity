@@ -60,7 +60,7 @@ public class ModularConstructor extends Block{
             tile.progress = 0;
         });
 
-        consumes.add(new ConsumeItemDynamic((ModularConstructorBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
+        consume(new ConsumeItemDynamic((ModularConstructorBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
     }
 
     @Override
@@ -183,8 +183,8 @@ public class ModularConstructor extends Block{
                     table.add(cont);
                 }
                 if(cont != null){
-                    ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () ->
-                    Vars.control.input.frag.config.hideConfig()).group(group).get();
+                    ImageButton button = cont.button(Tex.whiteui, Styles.clearTogglei, 24, () ->
+                    Vars.control.input.config.hideConfig()).group(group).get();
                     button.changed(() -> currentPlan = button.isChecked() ? plan.index : -1);
                     button.getStyle().imageUp = new TextureRegionDrawable(plan.unit.uiIcon);
                     button.update(() -> button.setChecked(currentPlan == plan.index));
@@ -255,20 +255,21 @@ public class ModularConstructor extends Block{
             module.update();
 
             for(int i = 0; i < occupied.length; i++){
-                if(occupied[i] != null && !occupied[i].added) occupied[i] = null;
+                if(occupied[i] != null && !occupied[i].isAdded()) occupied[i] = null;
             }
 
             ModularConstructorPlan plan = currentPlan != -1 ? plans.get(currentPlan) : null;
             if(plan != null && plan.tier <= tier){
                 float time = progressTime(plan);
                 if(progress >= time){
-                    if(Units.canCreate(team, plan.unit) && consValid()){
+                    if(Units.canCreate(team, plan.unit) && canConsume()){
                         Unit unit = plan.unit.spawn(team, x, y);
                         unit.rotation = 90f;
-                        cons.trigger();
+                        //cons.trigger();
+                        consume();
                         progress = 0f;
                     }
-                }else if(consValid()){
+                }else if(canConsume()){
                     progress += Time.delta;
                 }
                 topOffset = Mathf.lerpDelta(topOffset, Math.max(0f, (plan.unit.hitSize / 2f) - minSize), 0.1f);
@@ -278,18 +279,20 @@ public class ModularConstructor extends Block{
         }
 
         @Override
-        public boolean consValid(){
+        public boolean canConsume(){
             boolean valid = true;
             for(ModularConstructorPartBuild build : module.graph.all){
-                valid &= build.cons.canConsume();
+                valid &= build.canConsume();
             }
-            return super.consValid() && valid;
+            return super.canConsume() && valid;
         }
 
         @Override
         public boolean shouldConsume(){
             if(currentPlan == -1) return false;
-            return enabled && (!consumes.has(ConsumeType.item) || consumes.get(ConsumeType.item).valid(this));
+            ConsumeItems cons = findConsumer(e -> e instanceof ConsumeItems);
+            return enabled && (cons == null || cons.efficiency(this) > 0f);
+            //return enabled && (!consumes.has(ConsumeType.item) || consumes.get(ConsumeType.item).valid(this));
         }
 
         @Override

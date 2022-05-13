@@ -14,7 +14,10 @@ sourceCompatibility = 16
 targetCompatibility = 8
 
 dependencies{
-    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    //compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    //compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
+    //compileOnly files("$rootDir/Mindustry.jar")
+    compileOnly "com.github.Anuken.MindustryJitpack:core:$mindustryVersion"
     compileOnly "com.github.Anuken.Arc:arc-core:$arcVersion"
 
     compileOnly project(':annotations')
@@ -107,12 +110,35 @@ class Fetcher{
                 error = null
             }catch(Throwable e){
                 error = e
+                Log.err(e)
             }
 
             return error != null
         }
 
         while(exec.get(run)){}
+    }
+}
+
+String processComp(String source){
+    return source
+        .replace('mindustry.entities.comp', fetchPackage.replace('/', '.'))
+        .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
+        .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
+        .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
+        .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
+        .replaceAll('@CallSuper\n*', '')
+        .replaceAll('@Final\n*', '')
+        .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
+}
+
+task procComps{
+    doFirst{
+        Fi dir = new Fi(fetchDir)
+        for(Fi fi : dir.list()){
+            if(!fi.extEquals("java")) continue;
+            fi.writeString(processComp(fi.readString()))
+        }
     }
 }
 
@@ -138,17 +164,11 @@ task fetchComps{
                             Http.get(fileurl)
                                 .error({ final t -> throw new RuntimeException(t) })
                                 .block({ final comp ->
-                                    final def content = comp.getResultAsString()
-                                        .replace('mindustry.entities.comp', fetchPackage.replace('/', '.'))
-                                        .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-                                        .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, write = false)\n')
-                                        .replaceAll('@Component\n*', '@EntityComponent(write = false)\n')
-                                        .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
-                                        .replaceAll('@CallSuper\n*', '')
-                                        .replaceAll('@Final\n*', '')
-                                        .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
-
-                                    if(content.isEmpty()) throw new IllegalStateException()
+                                    final def content = processComp(comp.getResultAsString())
+                                    if(content.isEmpty()){
+                                        Log.err("Source @ is empty!!/1/1/1/?!?!??!?!??/111?/?", filename)
+                                        throw new IllegalStateException()
+                                    }
 
                                     final def fi = Fi.get("$fetchDir/$filename")
                                     fi.writeString(content, false)
@@ -199,8 +219,8 @@ tasks.withType(JavaCompile){
         dependsOn fetchComps
     }else{
         String[] content = fetchTemp.text.split('/')
-        String ver = content[0]
-        String rev = content[1]
+        String ver = content[0].strip()
+        String rev = content[1].strip()
 
         if(ver != "$mindustryVersion" as String || rev != Integer.toString(fetchRevision as int)){
             dependsOn fetchComps

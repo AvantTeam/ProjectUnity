@@ -22,7 +22,7 @@ import unity.world.blocks.exp.ExpHolder;
 import static mindustry.Vars.tilesize;
 import static mindustry.type.ItemStack.with;
 
-public class BlockOverdriveTurret extends ReloadTurret {
+public class BlockOverdriveTurret extends ReloadTurret{
     public final int timerBullet = timers++;
 
     public float buffRange = 50f;
@@ -34,7 +34,7 @@ public class BlockOverdriveTurret extends ReloadTurret {
     public TextureRegion baseRegion, laserRegion, laserEndRegion;
     public BlockStatusEffectBulletType bullet = (BlockStatusEffectBulletType) UnityBullets.statusEffect;
 
-    public BlockOverdriveTurret(String name) {
+    public BlockOverdriveTurret(String name){
         super(name);
 
         hasPower = hasItems = update = solid = outlineIcon = true;
@@ -77,23 +77,27 @@ public class BlockOverdriveTurret extends ReloadTurret {
         public void drawSelect(){
             Drawf.circles(x, y, buffRange, Pal.accent);
 
-            if (buffing) Drawf.selected(target, isExp ? UnityPal.exp.a(Mathf.absin(6f, 1f)) : Tmp.c1.set(Pal.heal).lerp(Color.valueOf("feb380"), Mathf.absin(9f, 1f)).a(Mathf.absin(6f, 1f)));
+            if(buffing)
+                Drawf.selected(target, isExp ? UnityPal.exp.a(Mathf.absin(6f, 1f)) :
+                    Tmp.c1.set(Pal.heal).lerp(Color.valueOf("feb380"), Mathf.absin(9f, 1f)).a(Mathf.absin(6f, 1f)));
         }
 
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.z(Layer.turret);
-            Drawf.shadow(region, x - (size/2f), y - (size/2f), rotation - 90);
+            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
 
-            if (buffing){
+            if(buffing){
                 float angle = angleTo(target);
                 float len = 5;
-                Draw.color(isExp ? UnityPal.exp : Tmp.c2.set(Color.valueOf("feb380")).lerp(Pal.heal, Mathf.absin(10f, 1f)));
+                Draw.color(isExp ? UnityPal.exp : Tmp.c2.set(Color.valueOf("feb380")).lerp(Pal.heal, Mathf.absin(10f,
+                    1f)));
                 Draw.alpha(1f);
                 Draw.z(Layer.block + 1);
-                Drawf.laser(team, laserRegion, laserEndRegion, x + Angles.trnsx(angle, len), y + Angles.trnsy(angle, len), target.x, target.y, bullet.strength / 4f);
+                Drawf.laser(laserRegion, laserEndRegion, x + Angles.trnsx(angle, len), y + Angles.trnsy(angle, len),
+                    target.x, target.y, bullet.strength / 4f);
                 Draw.color();
             }
         }
@@ -104,12 +108,12 @@ public class BlockOverdriveTurret extends ReloadTurret {
             float radius = buffRange + phaseHeat * phaseRangeBoost;
             buffing = false;
 
-            if (target != null){
+            if(target != null){
                 isExp = target instanceof ExpHolder;
-                if (!targetValid(target)){
+                if(!targetValid(target)){
                     target = null;
-                }else if (consValid() && enabled){
-                    if (timer(timerBullet, buffReload)){
+                }else if(canConsume() && enabled){
+                    if(timer(timerBullet, buffReload)){
                         bullet.create(this, target.x, target.y, 0f);
                         timer.reset(timerBullet, 0);
                     }
@@ -119,17 +123,17 @@ public class BlockOverdriveTurret extends ReloadTurret {
                 targetTime = 0f;
             }
 
-            if (cons.optionalValid() && efficiency() > 0){
+            if(optionalEfficiency > 0f && efficiency > 0f){
                 buffingTime += edelta();
-                if (buffingTime >= buffReload) {
+                if(buffingTime >= buffReload){
                     consume();
                     buffingTime = 0f;
                 }
             }
 
-            if (consValid()){
+            if(canConsume()){
                 targetTime += edelta();
-                if (targetTime >= buffReload){
+                if(targetTime >= buffReload){
                     target = Units.closestBuilding(team, x, y, radius, this::targetValid);
                     targetTime = 0f;
                 }
@@ -148,7 +152,7 @@ public class BlockOverdriveTurret extends ReloadTurret {
         public boolean isBeingBuffed(Building b){
             Seq<Bullet> bullets = Groups.bullet.intersect(b.x, b.y, b.block.size * 8, b.block.size * 8);
 
-            if (bullets.size > 0){
+            if(bullets.size > 0){
                 return bullets.get(0).owner != this;
             }
 

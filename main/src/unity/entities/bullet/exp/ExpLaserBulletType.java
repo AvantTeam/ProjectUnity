@@ -53,7 +53,7 @@ public class ExpLaserBulletType extends ExpBulletType {
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return Math.max(length, maxRange);
     }
 
@@ -107,10 +107,10 @@ public class ExpLaserBulletType extends ExpBulletType {
             }
             Draw.reset();
 
-            Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * 10 * b.fout(), Color.white, 0.6f);
+            Drawf.light(b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * 10 * b.fout(), Color.white, 0.6f);
         }
     }
-    
+
 
     @Override
     public void drawLight(Bullet b){

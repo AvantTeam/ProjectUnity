@@ -20,7 +20,7 @@ import static mindustry.Vars.*;
 
 public class ExpTower extends ExpTank {
     public int range = 5;
-    public float reloadTime = 10f;
+    public float reload = 10f;
     public float manualReload = 20f;
     public boolean buffer = false;
     public int bufferExp = 20;
@@ -74,7 +74,7 @@ public class ExpTower extends ExpTank {
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(topRegion, req.drawx(), req.drawy());
         Draw.rect(region, req.drawx(), req.drawy(), req.rotation * 90 - 90);
     }
@@ -105,7 +105,7 @@ public class ExpTower extends ExpTank {
         public int handleTower(int amount, float angle){
             if(buffer && exp > 0) return 0;
             int a = handleExp(amount);
-            if(a > 0 && reload >= reloadTime && !Angles.near(angle + 180, laserRotation(), 1f)) shoot();
+            if(a > 0 && reload >= ExpTower.this.reload && !Angles.near(angle + 180, laserRotation(), 1f)) shoot();
             return a;
         }
 

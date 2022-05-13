@@ -18,13 +18,7 @@ public class WavefrontTurret extends PowerTurret{
 
     public WavefrontTurret(String name){
         super(name);
-        recoilAmount = 6f;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        baseRegion = Core.atlas.find(name + "-base");
+        recoil = 6f;
     }
 
     public class WavefrontTurretBuild extends PowerTurretBuild{
@@ -48,10 +42,10 @@ public class WavefrontTurret extends PowerTurret{
         @Override
         public void updateTile(){
             super.updateTile();
-            if(isShooting() && consValid()){
+            if(isShooting() && canConsume()){
                 gap = Math.min(0.5f, gap + (0.005f * Time.delta));
-                angle += (reload / reloadTime) * objectRotationSpeed;
-                offset = (reload / reloadTime) * 0.25f;
+                angle += (reloadCounter / reload) * objectRotationSpeed;
+                offset = (reloadCounter / reload) * 0.25f;
 
                 animTime = Mathf.approach(animTime, 40f, Time.delta);
             }else{
@@ -67,12 +61,14 @@ public class WavefrontTurret extends PowerTurret{
                 waitTime -= Time.delta;
             }
 
+            /*
             tr2.trns(rotation, -recoil);
             inst.transform.set(
                 Tmp.v31.set(x + tr2.x, y + tr2.y, gap),
                 Utils.q1.set(Vec3.Z, rotation - 90f),
                 Tmp.v33.set(scale, scale, scale)
             );
+             */
 
             /*cont.begin();
             cont.apply("node-outer|outer-fold", animTime);
@@ -97,7 +93,7 @@ public class WavefrontTurret extends PowerTurret{
 
         @Override
         public void draw(){
-            Draw.rect(baseRegion, x, y);
+            Draw.rect(region, x, y);
             Draw.color();
 
             Draw.draw(Draw.z(), inst::render);

@@ -101,9 +101,9 @@ abstract class WorldComp implements Unitc{
         tmp.clear();
         tmpr.clear();
         TeamData data = team().data();
-        if(data.buildings != null){
+        if(data.buildingTree != null){
             Tmp.r1.setCentered(x, y, w * Vars.tilesize, h * Vars.tilesize);
-            data.buildings.intersect(Tmp.r1, tmp);
+            data.buildingTree.intersect(Tmp.r1, tmp);
         }
 
         tmpLinks.clear();

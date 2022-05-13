@@ -29,9 +29,9 @@ public class TrailingEmpBulletType extends EmpBulletType{
             Vars.indexer.allBuildings(b.x, b.y, empRadius, other -> {
                 if(!zapped.contains(other.id)){
                     if(other.team == b.team){
-                        if(other.block.hasPower && other.block.canOverdrive && other.timeScale < timeIncrease){
-                            other.timeScale = Math.max(other.timeScale, timeIncrease);
-                            other.timeScaleDuration = Math.max(other.timeScaleDuration, timeDuration);
+                        if(other.block.hasPower && other.block.canOverdrive && other.timeScale() < timeIncrease){
+                            //other.timeScale = Math.max(other.timeScale, timeIncrease);
+                            //other.timeScaleDuration = Math.max(other.timeScaleDuration, timeDuration);
                             chainEffect.at(b.x, b.y, 0, hitColor, other);
                             applyEffect.at(other, other.block.size * 7f);
                             zapEffect.at(b.x, b.y, b.angleTo(other));
@@ -50,8 +50,8 @@ public class TrailingEmpBulletType extends EmpBulletType{
                         }
 
                         if(other.power != null && other.power.graph.getLastPowerProduced() > 0f){
-                            other.timeScale = Math.min(other.timeScale, powerSclDecrease);
-                            other.timeScaleDuration = timeDuration;
+                            //other.timeScale = Math.min(other.timeScale, powerSclDecrease);
+                            //other.timeScaleDuration = timeDuration;
                             other.damage(damage * powerDamageScl);
                             hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
                             chainEffect.at(b.x, b.y, 0, hitColor, other);

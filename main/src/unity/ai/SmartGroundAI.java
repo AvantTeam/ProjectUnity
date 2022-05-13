@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -66,11 +67,11 @@ public class SmartGroundAI extends AIController{
                         }else if(h instanceof Building){
                             Building b = (Building)h;
                             float sc = b.health;
-                            //float sc = b instanceof TurretBuild tr && tr.hasAmmo() ? ((tr.peekAmmo().estimateDPS() / ((Turret)tr.block).reloadTime) * ((Turret)tr.block).shots) : 0f;
+                            //float sc = b instanceof TurretBuild tr && tr.hasAmmo() ? ((tr.peekAmmo().estimateDPS() / ((Turret)tr.block).reload) * ((Turret)tr.block).shots) : 0f;
                             if(b instanceof TurretBuild){
                                 TurretBuild tr = (TurretBuild)b;
                                 Turret tt = (Turret)b.block;
-                                sc += tr.hasAmmo() ? ((tr.peekAmmo().estimateDPS() / tt.reloadTime) * tt.shots) : 0f;
+                                sc += tr.hasAmmo() ? ((tr.peekAmmo().estimateDPS() / tt.reload) * tt.shoot.shots) : 0f;
                             }else if(b instanceof WallBuild){
                                 sc *= -1f;
                             }else if(b instanceof CoreBuild){
@@ -138,7 +139,7 @@ public class SmartGroundAI extends AIController{
                 weaponRotation = unit.rotation + m.rotation,
                 mountX = unit.x + Angles.trnsx(unit.rotation - 90, w.x, w.y),
                 mountY = unit.y + Angles.trnsy(unit.rotation - 90, w.x, w.y),
-                range = w.bullet.range();
+                range = w.bullet.range;
 
                 Rect r = Tmp.r1.setCentered(mountX, mountY, range * 2f);
 
@@ -172,7 +173,7 @@ public class SmartGroundAI extends AIController{
             float
             mountX = unit.x + Angles.trnsx(unit.rotation - 90, w.x, w.y),
             mountY = unit.y + Angles.trnsy(unit.rotation - 90, w.x, w.y);
-            if(Units.invalidateTarget(m.target, unit.team, mountX, mountY, m.weapon.bullet.range())) m.target = null;
+            if(Units.invalidateTarget(m.target, unit.team, mountX, mountY, m.weapon.bullet.range)) m.target = null;
             if(m.target != null){
                 if(w.predictTarget){
                     Vec2 to = Predict.intercept(unit, m.target, w.bullet.speed);
@@ -240,8 +241,7 @@ public class SmartGroundAI extends AIController{
     public void updateMovement(){
         if(!targeting){
             Building core = unit.closestEnemyCore();
-
-            if((core == null || !unit.within(core, unit.type.range * 0.5f)) && command() == UnitCommand.attack){
+            if((core == null || !unit.within(core, unit.type.range * 0.5f))/* && command() == UnitCommand.attack*/){
                 boolean move = true;
 
                 if(state.rules.waves && unit.team == state.rules.defaultTeam){
@@ -252,13 +252,13 @@ public class SmartGroundAI extends AIController{
                 if(move) pathfind(Pathfinder.fieldCore);
             }
 
-            if(command() == UnitCommand.rally){
+            /*if(command() == UnitCommand.rally){
                 Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
 
                 if(target != null && !unit.within(target, 70f)){
                     pathfind(Pathfinder.fieldRally);
                 }
-            }
+            }*/
         }
 
         if(unit.type.canBoost && unit.elevation > 0.001f && !unit.onSolid()){
@@ -284,7 +284,7 @@ public class SmartGroundAI extends AIController{
             for(WeaponMount m : unit.mounts){
                 if(!m.weapon.rotate || m.weapon.rotateSpeed <= 1f){
                     mainMounts.add(m);
-                    if(mainMountsRange < 0 || m.weapon.bullet.range() < mainMountsRange) mainMountsRange = m.weapon.bullet.range();
+                    if(mainMountsRange < 0 || m.weapon.bullet.range < mainMountsRange) mainMountsRange = m.weapon.bullet.range;
                 }
             }
         });

@@ -32,9 +32,9 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
 
     public TextureRegion baseRegion;
     public float shootCone = 6f;
-    public float shootLength = -1f;
+    public float shootY = -1f;
 
-    public float powerUse = 1f;
+    //public float powerUse = 1f;
     public float powerUseThreshold = 0f;
 
     public Sound shootSound = Sounds.tractorbeam;
@@ -55,20 +55,20 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
         rotateSpeed = 20f;
         hasItems = hasLiquids = false;
         hasPower = consumesPower = true;
-        acceptCoolant = false;
+        //acceptCoolant = false;
     }
 
     public <E extends GenericTractorBeamTurretBuild> void laserAlpha(Floatf<E> laserAlpha){
-        this.laserAlpha = (Floatf<GenericTractorBeamTurretBuild>) laserAlpha;
+        this.laserAlpha = (Floatf<GenericTractorBeamTurretBuild>)laserAlpha;
     }
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, (GenericTractorBeamTurretBuild build) -> build.target != null);
+        //consumes.powerCond(powerUse, (GenericTractorBeamTurretBuild build) -> build.target != null);
         clipSize = Math.max(clipSize, range * 2f + size * tilesize);
 
         super.init();
-        if(shootLength < 0) shootLength = size * tilesize / 2f;
+        if(shootY < 0) shootY = size * tilesize / 2f;
     }
 
     @Override
@@ -241,14 +241,14 @@ public abstract class GenericTractorBeamTurret<T extends Teamc> extends BaseTurr
             Draw.rect(region, x, y, rotation - 90);
 
             if(strength > 0.1f){
-                tr.trns(rotation, shootLength);
+                tr.trns(rotation, shootY);
 
                 Draw.z(Layer.bullet);
 
                 Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
                 Draw.alpha(laserAlpha());
 
-                Drawf.laser(team, laser, laserEnd,
+                Drawf.laser(laser, laserEnd,
                 x + tr.x,
                 y + tr.y,
                 drawTargetPos.x,

@@ -49,7 +49,7 @@ public class AcceleratingLaserBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return maxRange > 0 ? maxRange : maxLength / 1.5f;
     }
 
@@ -83,7 +83,7 @@ public class AcceleratingLaserBulletType extends BulletType{
             }
         }
         Tmp.v2.trns(b.rotation(), b.fdata + tipHeight).add(b);
-        Drawf.light(b.team, b.x, b.y, Tmp.v2.x, Tmp.v2.y, width * 2f, colors[0], 0.5f);
+        Drawf.light(b.x, b.y, Tmp.v2.x, Tmp.v2.y, width * 2f, colors[0], 0.5f);
         Draw.reset();
     }
 
@@ -101,7 +101,7 @@ public class AcceleratingLaserBulletType extends BulletType{
     @Override
     public void update(Bullet b){
         boolean timer = b.timer(0, 5f);
-        
+
         if(b.data instanceof LaserData){
             LaserData vec = (LaserData)b.data;
             if(vec.restartTime >= 5f){

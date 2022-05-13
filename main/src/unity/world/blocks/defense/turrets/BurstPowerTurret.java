@@ -11,6 +11,7 @@ import mindustry.world.blocks.defense.turrets.*;
 
 import static mindustry.Vars.*;
 
+@Deprecated
 public class BurstPowerTurret extends PowerTurret{
     protected BulletType subShootType;
     protected int subShots = 1;
@@ -23,15 +24,16 @@ public class BurstPowerTurret extends PowerTurret{
     }
 
     public class BurstPowerTurretBuild extends PowerTurretBuild{
+        /*
         @Override
         public void shoot(BulletType type){
             if(chargeTime > 0f){
                 useAmmo();
                 tr.trns(rotation, size * tilesize / 2f);
-                
+
                 chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
                 chargeSound.at(x + tr.x, y + tr.y, 1f);
-                
+
                 for(int i = 0; i < chargeEffects; i++){
                     Time.run(Mathf.random(chargeMaxDelay), () -> {
                         if(!isValid()) return;
@@ -40,13 +42,13 @@ public class BurstPowerTurret extends PowerTurret{
                     });
                 }
                 charging = true;
-                
+
                 Time.run(chargeTime, () -> {
                     if(!isValid()) return;
                     tr.trns(rotation, size * tilesize / 2f);
                     recoil = recoilAmount;
                     heat = 1f;
-                    
+
                     for(int i = 0; i < shots; i++){
                         Time.run(burstSpacing * 2f, () -> {
                             bullet(type, rotation + Mathf.range(inaccuracy));
@@ -70,5 +72,6 @@ public class BurstPowerTurret extends PowerTurret{
             subShootEffect.at(x + tr.x, y + tr.y, rotation);
             subShootSound.at(x + tr.x, y + tr.y, 1f);
         }
+         */
     }
 }

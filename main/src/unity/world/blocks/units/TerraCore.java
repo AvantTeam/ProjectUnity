@@ -30,7 +30,7 @@ public class TerraCore extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.units, Styles.clearTransi, () -> {
+            table.button(Icon.units, Styles.cleari, () -> {
                 Unit u = type.create(team);
                 if(u instanceof Worldc){
                     u.x = x;

@@ -20,7 +20,7 @@ public class SlowLightningBulletType extends AntiCheatBulletTypeBase{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return range * 0.8f;
     }
 

@@ -1,7 +1,6 @@
 package unity.mod;
 
 import arc.util.*;
-import arc.util.async.*;
 import unity.util.*;
 
 import java.util.*;

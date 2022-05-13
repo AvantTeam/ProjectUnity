@@ -60,7 +60,7 @@ public class PrismTurret extends SoulPowerTurret{
             super.updateTile();
 
             boolean act = isActive();
-            prismHeat = Mathf.lerpDelta(prismHeat, act ? efficiency() : 0f, act ? warmup : cooldown);
+            prismHeat = Mathf.lerpDelta(prismHeat, act ? efficiency() : 0f, act ? warmup : cooldownTime);
             prismRotation += prismHeat * prismRotateSpeed * Mathf.signs[id % 2];
 
             inst.transform.set(
@@ -118,7 +118,7 @@ public class PrismTurret extends SoulPowerTurret{
 
                     type.hitEffect.at(u.x(), u.y(), angle);
 
-                    effects();
+                    //effects();
                 });
             }
         }

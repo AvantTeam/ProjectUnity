@@ -143,7 +143,7 @@ abstract class ExpComp extends Block implements Stemc{
 
     @Override
     public void setBars(){
-        bars.add("level", b -> {
+        addBar("level", b -> {
             if(b instanceof ExpBuildc build){
                 return new Bar(
                     () -> Core.bundle.get("explib.level") + " " + build.level(),
@@ -155,7 +155,7 @@ abstract class ExpComp extends Block implements Stemc{
             }
         });
 
-        bars.add("exp", b -> {
+        addBar("exp", b -> {
             if(b instanceof ExpBuildc build){
                 return new Bar(
                     () -> build.exp() < maxExp
@@ -231,8 +231,8 @@ abstract class ExpComp extends Block implements Stemc{
                     checked = false;
                 }
 
-                if(!headless && control.input.frag.config.getSelectedTile() == this){
-                    control.input.frag.config.hideConfig();
+                if(!headless && control.input.config.getSelected() == this){
+                    control.input.config.hideConfig();
                 }
             }
         }
@@ -348,7 +348,7 @@ abstract class ExpComp extends Block implements Stemc{
         private void upgradeButton(Table table, int index, int level){
             Integer i = index;
             table.button(Icon.up, Styles.emptyi, () -> {
-                control.input.frag.config.hideConfig();
+                control.input.config.hideConfig();
                 configure(i);
             }).size(40);
         }

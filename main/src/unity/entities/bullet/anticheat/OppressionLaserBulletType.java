@@ -78,7 +78,7 @@ public class OppressionLaserBulletType extends AntiCheatBulletTypeBase{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return length / 3f;
     }
 

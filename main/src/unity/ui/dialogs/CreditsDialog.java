@@ -127,7 +127,7 @@ public class CreditsDialog extends BaseDialog{
                                 }
 
                                 bt.add(new FLabel("{wave}{rainbow}[lightgray]" + c)).left().pad(3f).padLeft(6f).padRight(6f);
-                            }, Styles.transt, () -> {
+                            }, Styles.cleart, () -> {
                                 String name = noLang;
                                 if(ContributorList.githubAliases.containsKey(name)){
                                     name = ContributorList.githubAliases.get(name);

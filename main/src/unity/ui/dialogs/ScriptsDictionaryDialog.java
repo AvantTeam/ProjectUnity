@@ -18,7 +18,7 @@ public class ScriptsDictionaryDialog extends BaseDialog{
 
     public ScriptsDictionaryDialog(){
         super("@root.cinematic.scripts");
-        cont.pane(Styles.nonePane, t -> {
+        cont.pane(Styles.noBarPane, t -> {
             content = t;
             content.defaults().pad(3f);
         }).grow();

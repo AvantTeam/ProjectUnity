@@ -58,8 +58,9 @@ abstract class KamiLaserComp implements Bulletc{
         Tmp.r1.merge(Tmp.r2);
 
         for(TeamData data : Vars.state.teams.present){
-            if(data.team != team && data.tree != null){
-                data.tree.intersect(Tmp.r1, e -> {
+            if(data.team != team){
+                QuadTree<Unit> tree = data.tree();
+                tree.intersect(Tmp.r1, e -> {
                     if(collided.contains(e.id)) return;
                     float size = e.hitSize / 2f;
                     if(ellipseCollision){

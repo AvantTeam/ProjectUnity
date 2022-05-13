@@ -56,7 +56,7 @@ public class EndPointBlastLaserBulletType extends AntiCheatBulletTypeBase implem
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return length;
     }
 
@@ -123,7 +123,7 @@ public class EndPointBlastLaserBulletType extends AntiCheatBulletTypeBase implem
             Draw.reset();
             Tmp.v1.trns(b.rotation(), baseLen + (width / 1.5f)).add(b);
         }
-        Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * 1.4f * b.fout(), laserColors[0], 0.5f);
+        Drawf.light(b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * 1.4f * b.fout(), laserColors[0], 0.5f);
     }
 
     @Override

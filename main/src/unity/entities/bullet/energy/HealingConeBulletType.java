@@ -36,7 +36,7 @@ public class HealingConeBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return length;
     }
 
@@ -124,7 +124,7 @@ public class HealingConeBulletType extends BulletType{
         float z = Draw.z();
         Draw.z(Layer.buildBeam);
         float fout = Mathf.clamp(b.time > b.lifetime - 16f ? 1f - (b.time - (b.lifetime - 16f)) / 16f : 1f) * Mathf.clamp(b.time / 16f) * length;
-        
+
         Tmp.v1.trns(b.rotation() - cone, Math.min(Mathf.sqrt(data[0]), fout)).add(b);
         Draw.color(color);
         if(!Vars.renderer.animateShields) Draw.alpha(0.3f);

@@ -38,8 +38,8 @@ public class RicochetBulletType extends BasicBulletType{
     }
 
     @Override
-    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
-        super.hitTile(b, build, initialHealth, direct);
+    public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
+        super.hitTile(b, build, x, y, initialHealth, direct);
         if(direct){
             ricochet(b, build);
         }
@@ -101,7 +101,7 @@ public class RicochetBulletType extends BasicBulletType{
         protected RicochetBulletData(){}
 
         protected void findEnemy(Bullet b){
-            target = Units.closestTarget(b.team, b.x, b.y, range() * b.fout(),
+            target = Units.closestTarget(b.team, b.x, b.y, range * b.fout(),
                 u -> u.isValid() && u.id != hit && ((u.isFlying() && collidesAir) || (u.isGrounded() && collidesGround)),
                 t -> t.isValid() && t.id != hit && collidesGround
             );

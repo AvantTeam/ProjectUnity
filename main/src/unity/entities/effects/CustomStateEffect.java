@@ -1,11 +1,7 @@
 package unity.entities.effects;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.math.geom.*;
-import arc.util.*;
-import mindustry.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
@@ -25,6 +21,7 @@ public class CustomStateEffect extends Effect{
         this.stateProvider = prov;
     }
 
+    /*
     @Override
     public void at(Position pos){
         create(pos.getX(), pos.getY(), 0, Color.white, null);
@@ -76,6 +73,28 @@ public class CustomStateEffect extends Effect{
         if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, clip))){
             inst(x, y, rotation, color, data).add();
         }
+    }
+
+    protected EffectState inst(float x, float y, float rotation, Color color, Object data){
+        EffectState e = stateProvider.get();
+        e.effect = this;
+        e.rotation = baseRotation + rotation;
+        e.data = data;
+        e.lifetime = lifetime;
+        e.set(x, y);
+        e.color.set(color);
+        if(followParent && data instanceof Posc p){
+            e.parent = p;
+            e.rotWithParent = rotWithParent;
+        }
+
+        return e;
+    }
+     */
+
+    @Override
+    protected void add(float x, float y, float rotation, Color color, Object data){
+        inst(x, y, rotation, color, data).add();
     }
 
     protected EffectState inst(float x, float y, float rotation, Color color, Object data){

@@ -40,7 +40,7 @@ public class Absorber extends PowerGenerator {
     }
 
     @Override
-    protected TextureRegion[] icons() {
+    public TextureRegion[] icons() {
         return new TextureRegion[]{baseRegion, region};
     }
 
@@ -110,7 +110,7 @@ public class Absorber extends PowerGenerator {
             Draw.color(unit.team.color);
             Lines.circle(unit.x, unit.y, unit.hitSize + Mathf.sin(time * 2f));
             Draw.color(Color.white);
-            Drawf.laser(team, laserRegion, laserEndRegion, x + Tmp.v1.x + Mathf.sin(time * 2), y + Tmp.v1.y + Mathf.cos(time * 2), unit.x, unit.y, 0.6f);
+            Drawf.laser(laserRegion, laserEndRegion, x + Tmp.v1.x + Mathf.sin(time * 2), y + Tmp.v1.y + Mathf.cos(time * 2), unit.x, unit.y, 0.6f);
 
             Draw.reset();
         }

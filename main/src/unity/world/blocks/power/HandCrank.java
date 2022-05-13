@@ -39,7 +39,7 @@ public class HandCrank extends GraphBlock{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Tex.whiteui, Styles.clearTransi, 50f, () -> configure(0))
+            table.button(Tex.whiteui, Styles.cleari, 50f, () -> configure(0))
                 .size(50f).disabled(b -> cooldown < 30f)
                 .get().getStyle().imageUp = Icon.redo;
         }

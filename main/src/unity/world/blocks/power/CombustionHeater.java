@@ -26,8 +26,8 @@ public class CombustionHeater extends HeatGenerator{
 
     @Override
     public void init(){
-        consumes.add(new ConsumeItemFilter(item -> item.flammability >= 0.1f)).update(false).optional(true, false);
-       
+        consume(new ConsumeItemFilter(item -> item.flammability >= 0.1f)).update(false).optional(true, false);
+
         super.init();
     }
 
@@ -41,24 +41,24 @@ public class CombustionHeater extends HeatGenerator{
 
         @Override
         public void updatePost(){
-            if(!consValid()){
+            if(!canConsume()){
                 productionEfficiency = 0f;
                 return;
             }
-            
+
             if(generateTime <= 0f && items.total() > 0f){
                 Fx.generatespark.at(x + Mathf.range(3f), y + Mathf.range(3f));
                 Item item = items.take();
                 productionEfficiency = item.flammability;
                 generateTime = 1f;
             }
-            
+
             if(generateTime > 0f){
                 generateTime -= Math.min(0.01f * delta(), generateTime);
             }else{
                 productionEfficiency = 0f;
             }
-            
+
             generateHeat(productionEfficiency);
         }
 
@@ -66,7 +66,7 @@ public class CombustionHeater extends HeatGenerator{
         public void draw(){
             Draw.rect(baseRegions[rotation], x, y);
             UnityDrawf.drawHeat(heatRegion, x, y, rotdeg(), heat().getTemp());
-            
+
             drawTeamTop();
         }
 

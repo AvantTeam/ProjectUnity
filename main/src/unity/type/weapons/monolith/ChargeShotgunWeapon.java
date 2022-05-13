@@ -17,7 +17,7 @@ import unity.util.*;
 import static mindustry.Vars.*;
 
 /**
- * Charges up {@linkplain #shots some} bullets over time, and shoots them all at once when signaled.
+ * Charges up some bullets over time, and shoots them all at once when signaled.
  * {@link #continuous} isn't supported (yet).
  * @author GlennFolker
  */
@@ -92,7 +92,7 @@ public class ChargeShotgunWeapon extends Weapon{
 
         if(!m.releasing){
             if(!m.adding){
-                if(m.loaded() < shots && (m.add += Time.delta * unit.reloadMultiplier) >= addTime){
+                if(m.loaded() < shoot.shots && (m.add += Time.delta * unit.reloadMultiplier) >= addTime){
                     m.adding = true;
 
                     m.added.add(new Vec2(Float.NaN, Float.NaN), new Vec2(shootX, shootY));
@@ -143,17 +143,17 @@ public class ChargeShotgunWeapon extends Weapon{
 
         if(!controllable && autoTarget){
             if((m.retarget -= Time.delta) <= 0f){
-                m.target = findTarget(unit, mountX, mountY, bullet.range(), bullet.collidesAir, bullet.collidesGround);
+                m.target = findTarget(unit, mountX, mountY, bullet.range, bullet.collidesAir, bullet.collidesGround);
                 m.retarget = m.target == null ? targetInterval : targetSwitchInterval;
             }
 
-            if(m.target != null && checkTarget(unit, m.target, mountX, mountY, bullet.range())){
+            if(m.target != null && checkTarget(unit, m.target, mountX, mountY, bullet.range)){
                 m.target = null;
             }
 
             boolean shoot = false;
             if(m.target != null){
-                shoot = m.target.within(mountX, mountY, bullet.range() + Math.abs(shootY) + (m.target instanceof Sized s ? s.hitSize() / 2f : 0f)) && can;
+                shoot = m.target.within(mountX, mountY, bullet.range + Math.abs(shootY) + (m.target instanceof Sized s ? s.hitSize() / 2f : 0f)) && can;
 
                 if(predictTarget){
                     Vec2 to = Predict.intercept(unit, m.target, bullet.speed);
@@ -195,7 +195,8 @@ public class ChargeShotgunWeapon extends Weapon{
             !m.releasing &&
             Angles.within(rotate ? m.rotation : unit.rotation, m.targetRotation, shootCone)
         ){
-            shoot(unit, m, bulletX, bulletY, m.aimX, m.aimY, mountX, mountY, shootAngle, Mathf.sign(x));
+            //shoot(unit, m, bulletX, bulletY, m.aimX, m.aimY, mountX, mountY, shootAngle, Mathf.sign(x));
+            shoot(unit, m, bulletX, bulletY, shootAngle);
             if(otherSide != -1 && alternate && m.side == flipSprite){
                 unit.mounts[otherSide].side = !unit.mounts[otherSide].side;
                 m.side = !m.side;
@@ -208,6 +209,7 @@ public class ChargeShotgunWeapon extends Weapon{
         }
     }
 
+    /*
     @Override
     protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
         ChargeShotgunMount m = (ChargeShotgunMount)mount;
@@ -236,7 +238,7 @@ public class ChargeShotgunWeapon extends Weapon{
                     bullet(
                         unit, pos.x, pos.y,
                         rot + Mathf.range(inaccuracy),
-                        ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(pos.x, pos.y, aimX, aimY) / ammo.range()) : 1f
+                        ammo.scaleLife ? Mathf.clamp(Mathf.dst(pos.x, pos.y, aimX, aimY) / ammo.range()) : 1f
                     );
 
                     shootSound.at(pos.x, pos.y, Mathf.random(soundPitchMin, soundPitchMax));
@@ -277,7 +279,7 @@ public class ChargeShotgunWeapon extends Weapon{
                     bullet(
                         unit, pos.x, pos.y,
                         rot + Mathf.range(inaccuracy),
-                        ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(pos.x, pos.y, aimX, aimY) / ammo.range()) : 1f
+                        ammo.scaleLife ? Mathf.clamp(Mathf.dst(pos.x, pos.y, aimX, aimY) / ammo.range()) : 1f
                     );
 
                     shootSound.at(pos.x, pos.y, Mathf.random(soundPitchMin, soundPitchMax));
@@ -298,6 +300,7 @@ public class ChargeShotgunWeapon extends Weapon{
         ejectEffect.at(mountX, mountY, rotation * side);
         unit.apply(shootStatus, shootStatusDuration);
     }
+     */
 
     public static class ChargeShotgunMount extends WeaponMount{
         public Trns transform = Trns.create();

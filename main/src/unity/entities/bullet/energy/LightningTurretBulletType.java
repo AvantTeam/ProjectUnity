@@ -24,7 +24,7 @@ public class LightningTurretBulletType extends BulletType{
 
     public LightningTurretBulletType(float speed, float damage){
         super(speed, damage);
-        scaleVelocity = true;
+        scaleLife = true;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class LightningTurretBulletType extends BulletType{
             if(fragBullet != null){
                 for(int i = 0; i < fragBullets; i++){
                     float len = Mathf.random(1f, 7f);
-                    float a = b.rotation() + Mathf.range(fragCone / 2) + fragAngle;
+                    float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle;
                     fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
                 }
             }

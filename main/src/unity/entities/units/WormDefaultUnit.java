@@ -440,7 +440,7 @@ public class WormDefaultUnit extends UnitEntity{
             temp.hovering = type.hovering;
             temp.setupWeapons(type);
             temp.resetController();
-            temp.abilities = type.abilities.map(Ability::copy);
+            temp.abilities = type.abilities.map(Ability::copy).toArray(Ability.class);
             temp.setTrueParent(this);
             temp.setParent(parent);
 
@@ -487,7 +487,7 @@ public class WormDefaultUnit extends UnitEntity{
     		segments[i].y = read.f();
     	}
     }
-    
+
     @Override
     public void write(Writes write){
     	super.write(write);

@@ -8,7 +8,7 @@ import arc.math.*;
 public class CLegType<T extends CLeg>{
     public float targetX, targetY, x, y;
 
-    public float legSplashDamage = 0f, legSplashRange = 5, legTrns = 1f;
+    public float legSplashDamage = 0f, legSplashRange = 5, legForwardScl = 1f;
     public boolean flipped = false;
 
     public Prov<T> prov;

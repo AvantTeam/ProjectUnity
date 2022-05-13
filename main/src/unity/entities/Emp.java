@@ -244,10 +244,10 @@ public class Emp{
                 irb.warmup = Mathf.clamp(irb.warmup - (duration * r.warmupSpeed));
             }
         }
-        if(build.block.consumes.hasPower() && build instanceof ReloadTurretBuild rtb){
-            rtb.reload = 0f;
+        if(build.block.consPower != null && build instanceof ReloadTurretBuild rtb){
+            rtb.reloadCounter = 0f;
         }
         build.enabled = false;
-        build.enabledControlTime = Math.max(duration, build.enabledControlTime);
+        //build.enabledControlTime = Math.max(duration, build.enabledControlTime);
     }
 }

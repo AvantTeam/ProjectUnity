@@ -30,7 +30,7 @@ public class ObjectivesDialog extends BaseDialog{
 
         addCloseButton();
 
-        cont.pane(Styles.nonePane, t -> content = t).growY().width(750f);
+        cont.pane(Styles.noBarPane, t -> content = t).growY().width(750f);
         buttons.button("@add", Icon.add, () -> {
             ObjectiveModel model = new ObjectiveModel();
             model.name = lastName();
@@ -141,7 +141,7 @@ public class ObjectivesDialog extends BaseDialog{
                         BaseDialog dialog = new BaseDialog("@root.cinematic.objectives.select");
                         dialog.addCloseButton();
 
-                        dialog.cont.pane(Styles.nonePane, s -> {
+                        dialog.cont.pane(Styles.noBarPane, s -> {
                             for(Class<? extends Objective> type : datas.keys()){
                                 ObjectiveData data = data(type);
 

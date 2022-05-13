@@ -35,7 +35,7 @@ public class MeltingCrafter extends KoruhCrafter{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("heat", (MeltingCrafterBuild entity) -> new Bar(() -> Core.bundle.get("bar.heat"), () -> Pal.ammo, () -> Mathf.clamp(entity.melt)));
+        addBar("heat", (MeltingCrafterBuild entity) -> new Bar(() -> Core.bundle.get("bar.heat"), () -> Pal.ammo, () -> Mathf.clamp(entity.melt)));
     }
 
     public class MeltingCrafterBuild extends KoruhCrafterBuild{

@@ -32,7 +32,7 @@ public class OmniLiquidTurret extends ExpTurret {
 
     public OmniLiquidTurret(String name){
         super(name);
-        acceptCoolant = false;
+        //acceptCoolant = false;
         hasLiquids = true;
         loopSound = Sounds.spray;
         shootSound = Sounds.none;
@@ -54,11 +54,11 @@ public class OmniLiquidTurret extends ExpTurret {
         topRegion = atlas.find(name + "-top");
     }
 
-    @Override
+    /*@Override
     public TextureRegion[] icons(){
         if(topRegion.found()) return new TextureRegion[]{baseRegion, region, topRegion};
         return super.icons();
-    }
+    }*/
 
     public static boolean friendly(Liquid l){
         return l.effect != StatusEffects.none && l.effect.damage <= 0.1f && (l.effect.damage < -0.01f || l.effect.healthMultiplier > 1.01f || l.effect.damageMultiplier > 1.01f);
@@ -114,12 +114,13 @@ public class OmniLiquidTurret extends ExpTurret {
     }
 
     public class OmniLiquidTurretBuild extends ExpTurretBuild{
+        /*
         @Override
         public void draw(){
             super.draw();
 
             if(liquidRegion.found()){
-                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
+                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.currentAmount() / liquidCapacity, liquids.current().color, rotation - 90);
             }
             if(topRegion.found()) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
         }
@@ -203,7 +204,7 @@ public class OmniLiquidTurret extends ExpTurret {
 
         @Override
         public boolean hasAmmo(){
-            return liquids.total() >= shootAmount;
+            return liquids.currentAmount() >= shootAmount;
         }
 
         @Override
@@ -220,9 +221,10 @@ public class OmniLiquidTurret extends ExpTurret {
         @Override
         protected void bullet(BulletType type, float angle){
             Log.info("Shoot with " + liquids.current().name);
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
+            float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
 
             type.create(this, team, x + tr.x, y + tr.y, angle, -1f, 1f + Mathf.range(velocityInaccuracy), lifeScl, liquids.current());
         }
+         */
     }
 }

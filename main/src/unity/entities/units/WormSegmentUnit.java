@@ -72,7 +72,7 @@ public class WormSegmentUnit extends UnitEntity{
         hitSize = type.hitSize;
         hovering = type.hovering;
 
-        if(controller == null) controller(type.createController());
+        if(controller == null) controller(type.createController(self()));
         if(mounts().length != type.weapons.size) setupWeapons(type);
         if(type instanceof UnityUnitType w) wormType = w;
         else throw new ClassCastException("you set this unit's type in sneaky way");
@@ -94,8 +94,8 @@ public class WormSegmentUnit extends UnitEntity{
     public void damage(float amount){
         if(wormType.splittable) segmentHealth -= amount * wormType.segmentDamageScl;
         trueParentUnit.damage(amount);
-        if(trueParentUnit.controller instanceof WormAI){
-            ((WormAI)trueParentUnit.controller).setTarget(x, y, amount);
+        if(trueParentUnit.controller() instanceof WormAI){
+            ((WormAI)trueParentUnit.controller()).setTarget(x, y, amount);
         }
     }
 
@@ -109,32 +109,32 @@ public class WormSegmentUnit extends UnitEntity{
             controller = next;
             if(controller.unit() != this) controller.unit(this);
         }else if(trueParentUnit != null){
-            trueParentUnit.controller = next;
-            if(trueParentUnit.controller.unit() != trueParentUnit) trueParentUnit.controller.unit(trueParentUnit);
+            trueParentUnit.controller(next);
+            if(trueParentUnit.controller().unit() != trueParentUnit) trueParentUnit.controller().unit(trueParentUnit);
         }
     }
 
     @Override
     public boolean isPlayer(){
         if(trueParentUnit == null) return false;
-        return trueParentUnit.controller instanceof Player;
+        return trueParentUnit.controller() instanceof Player;
     }
 
     @Override
     public boolean isAI(){
         if(trueParentUnit == null) return true;
-        return trueParentUnit.controller instanceof AIController;
+        return trueParentUnit.controller() instanceof AIController;
     }
 
-    @Override
-    public boolean isCounted(){
-        return false;
-    }
+    //@Override
+    //public boolean isCounted(){
+        //return false;
+    //}
 
     @Override
     public Player getPlayer(){
         if(trueParentUnit == null) return null;
-        return isPlayer() ? (Player)trueParentUnit.controller : null;
+        return isPlayer() ? (Player)trueParentUnit.controller() : null;
     }
 
     @Override
@@ -318,17 +318,17 @@ public class WormSegmentUnit extends UnitEntity{
 
     protected void shoot(WeaponMount mount, float x, float y, float aimX, float aimY, float mountX,
                        float mountY, float rotation, int side){
-        Weapon weapon = mount.weapon;
+        /*Weapon weapon = mount.weapon;
         float baseX = this.x;
         float baseY = this.y;
         boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
         (delay ? weapon.chargeSound : weapon.continuous ? Sounds.none : weapon.shootSound).at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
         BulletType ammo = weapon.bullet;
-        float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
+        float lifeScl = ammo.scaleLife ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
         //sequenceNum = 0;
         if(delay){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, (f)->{
-                Time.run(/*sequenceNum * */weapon.shotDelay + weapon.firstShotDelay, ()->{
+                Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, ()->{
                     if(!isAdded()) return;
                     mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
                 });
@@ -356,7 +356,7 @@ public class WormSegmentUnit extends UnitEntity{
         weapon.ejectEffect.at(mountX, mountY, rotation * side);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);
-        apply(weapon.shootStatus, weapon.shootStatusDuration);
+        apply(weapon.shootStatus, weapon.shootStatusDuration);*/
     }
 
     protected Bullet bullet(Weapon weapon, float x, float y, float angle, float lifescl){
@@ -388,7 +388,7 @@ public class WormSegmentUnit extends UnitEntity{
     public void drawShadow(){
         TextureRegion region = segmentType == 0 ? wormType.segmentRegion : wormType.tailRegion;
         Draw.color(Pal.shadow); //seems to not exist in v106
-        float e = Math.max(elevation, type.visualElevation);
+        float e = Math.max(elevation, type.shadowElevation);
         Draw.rect(region, x + (UnitType.shadowTX * e), y + UnitType.shadowTY * e, rotation - 90f);
         Draw.color();
     }

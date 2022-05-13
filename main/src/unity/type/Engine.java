@@ -13,6 +13,7 @@ import unity.gen.*;
  * Objectified unit engines.
  * @author GlennFolker
  */
+@Deprecated
 public class Engine{
     public float offset = 5f;
     public float size = 2.5f;
@@ -24,7 +25,7 @@ public class Engine{
     public Engine apply(UnitType type){
         type.engineOffset = offset;
         type.engineSize = size;
-        type.trailScl = trailScale;
+        //type.trailScl = trailScale;
         type.engineColor = color;
         type.engineColorInner = Color.white;
         return this;
@@ -38,12 +39,12 @@ public class Engine{
         float scale = unit.elevation;
         float offset = this.offset / 2f + this.offset / 2f * scale;
 
-        Trail trail = !drawTrail ? null : unit instanceof Trailc t ? t.trail() : unit instanceof CTrailc t ? t.trail() : null;
+        /*Trail trail = unit.trail;
         if(trail != null){
             float trailSize = (size + Mathf.absin(Time.time, 2f, size / 4f) * scale) * trailScale;
             trail.drawCap(unit.team.color, trailSize);
             trail.draw(unit.team.color, trailSize);
-        }
+        }*/
 
         Draw.color(color == null ? unit.team.color : color);
         Fill.circle(
@@ -72,12 +73,12 @@ public class Engine{
 
         @Override
         public void draw(Unit unit, float x, float y){
-            Trail trail = !drawTrail ? null : unit instanceof Trailc t ? t.trail() : unit instanceof CTrailc t ? t.trail() : null;
+            /*Trail trail = unit.trail;
             if(trail != null){
                 float trailSize = (size + Mathf.absin(Time.time, 2f, size / 4f) * unit.elevation) * trailScale;
                 trail.drawCap(unit.team.color, trailSize);
                 trail.draw(unit.team.color, trailSize);
-            }
+            }*/
 
             for(EngineHold engine : engines){
                 float

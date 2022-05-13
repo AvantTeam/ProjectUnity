@@ -23,7 +23,7 @@ public class RampupPowerTurret extends PowerTurret{
     public TextureRegion topRegion;
 
     protected Vec2 tr3 = new Vec2();
-    
+
     public RampupPowerTurret(String name){
         super(name);
     }
@@ -39,22 +39,23 @@ public class RampupPowerTurret extends PowerTurret{
 
         @Override
         public void updateTile(){
-            if(!isShooting() || !consValid()){
+            if(!isShooting() || !canConsume()){
                 changeSpeed(-speedDec * Time.delta);
             }
             super.updateTile();
         }
 
+        /*
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
-            
+
             Draw.z(Layer.turret);
 
             tr2.trns(rotation, -recoil);
 
             Drawf.shadow(region, x + tr2.x - elevation, y + tr2.y - elevation, rotation - 90);
-            
+
             Draw.rect(region, x + tr2.x, y + tr2.y, rotation - 90);
 
             if(speed > 1.001f){
@@ -75,7 +76,7 @@ public class RampupPowerTurret extends PowerTurret{
         @Override
         public void shoot(BulletType type){
             changeSpeed(speedInc);
-            
+
             //when charging is enabled, use the charge shoot pattern
             if(chargeTime > 0){
                 useAmmo();
@@ -149,6 +150,7 @@ public class RampupPowerTurret extends PowerTurret{
                 useAmmo();
             }
         }
+         */
 
         @Override
         protected float baseReloadSpeed(){

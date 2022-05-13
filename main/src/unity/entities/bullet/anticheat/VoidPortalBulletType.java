@@ -42,7 +42,7 @@ public class VoidPortalBulletType extends AntiCheatBulletTypeBase{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return length;
     }
 

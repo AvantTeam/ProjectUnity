@@ -490,12 +490,12 @@ public final class Utils{
 
     public static void inTriangleBuilding(Team team, boolean enemy, float x1, float y1, float x2, float y2, float x3, float y3, Boolf<Building> filter, Cons<Building> cons){
         if(team != null && !enemy){
-            if(team.data().buildings != null){
+            if(team.data().buildingTree != null){
                 Rect r = rect.setCentered(x1, y1, 0f);
                 r.merge(x2, y2);
                 r.merge(x3, y3);
 
-                team.data().buildings.intersect(r, b -> {
+                team.data().buildingTree.intersect(r, b -> {
                     if(filter.get(b)){
                         b.hitbox(rectAlt);
                         int sz = b.block.size;
@@ -509,8 +509,8 @@ public final class Utils{
             r.merge(x2, y2);
             r.merge(x3, y3);
             for(TeamData data : state.teams.present){
-                if(data.team != team && data.buildings != null){
-                    data.buildings.intersect(r, b -> {
+                if(data.team != team && data.buildingTree != null){
+                    data.buildingTree.intersect(r, b -> {
                         if(filter.get(b)){
                             b.hitbox(rectAlt);
                             int sz = b.block.size;
@@ -531,7 +531,7 @@ public final class Utils{
         collidedEntities.clear();
         hitEffects.clear();
         for(TeamData data : state.teams.present){
-            if(data.team != team && data.buildings != null){
+            if(data.team != team && data.buildingTree != null){
                 for(int i = 0; i < segments; i++){
                     float ofs = 1f / segments;
                     float f = i / (float)segments;
@@ -539,7 +539,7 @@ public final class Utils{
                     float sx2 = Mathf.lerp(x, x2, f + ofs), sy2 = Mathf.lerp(y, y2, f + ofs);
                     rect.set(sx, sy, 0f, 0f).merge(sx2, sy2).grow(width * 2f);
                     rectAlt.set(sx2, sy2, 0f, 0f).merge(Mathf.lerp(x, x2, f + ofs * 2f), Mathf.lerp(y, y2, f + ofs * 2f)).grow(width * 2f);
-                    data.buildings.intersect(rect, b -> {
+                    data.buildingTree.intersect(rect, b -> {
                         Vec2 v = Intersector.nearestSegmentPoint(x, y, x2, y2, b.x, b.y, tV);
                         if(within.get(b, v) && !collidedEntities.contains(b.id)){
                             if(sort){

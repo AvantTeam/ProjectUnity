@@ -31,7 +31,7 @@ public class HealingNukeBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return radius;
     }
 

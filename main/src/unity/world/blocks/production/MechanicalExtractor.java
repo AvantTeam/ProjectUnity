@@ -176,7 +176,7 @@ public class MechanicalExtractor extends SolidPump implements GraphBlockBase{
             Draw.rect(bottomRegions[variant], x, y);
 
             //liquid
-            Drawf.liquid(liquidRegions[variant], x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            Drawf.liquid(liquidRegions[variant], x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
 
             //bottom rotors
             Draw.rect(rotorRegion, x + offset.x * 4f, y + offset.y * 4f, rev, 24,-deg/2);

@@ -100,7 +100,7 @@ public class ContentScoreProcess implements AsyncProcess{
                     for(Content c : content.getContentMap()[type.ordinal()]){
                         ContentScore cs = get(c);
                         if(cs == null) continue;
-                        builder.append("  ").append(cs.toString()).append("\n");
+                        builder.append("  ").append(cs).append("\n");
                     }
                 }
             }
@@ -128,7 +128,7 @@ public class ContentScoreProcess implements AsyncProcess{
 
     ContentScore get(Content content){
         if(content.id >= scores[content.getContentType().ordinal()].length){
-            Log.warn("[scarlet]Array out of bounds for "+content.toString()+"![]");
+            Log.warn("[scarlet]Array out of bounds for "+ content +"![]");
             Log.warn("[scarlet]Bad mod: " + (content.minfo != null && content.minfo.mod != null ? content.minfo.mod.name : "VANILLA") + "[]");
             return scores[content.getContentType().ordinal()][0]; //okay this is horrible but this is far better than a crash
         }
@@ -195,11 +195,10 @@ public class ContentScoreProcess implements AsyncProcess{
     }
 
     void processContent(ContentScore c){
-        if(c.content instanceof Block){
-            Block b = (Block)c.content;
+        if(c.content instanceof Block b){
             c.outputs.add(new BlockOutput(b));
 
-            if(b.consumes.has(ConsumeType.item)){
+            /*if(b.consumes.has(ConsumeType.item)){
                 Consume con = b.consumes.get(ConsumeType.item);
                 if(con instanceof ConsumeItemFilter){
                     ConsumeItemFilter cons = (ConsumeItemFilter)con;
@@ -228,10 +227,29 @@ public class ContentScoreProcess implements AsyncProcess{
                     c.setPower(((ConsumePower)con).usage);
                 }
                 if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 4 : 0;
-            }
+            }*/
+            Structs.each(con -> {
+                if(con instanceof ConsumeItemFilter cons){
+                    if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 1 : 0;
+                    c.itemFilter(cons.filter);
+                }else if(con instanceof ConsumeItems cons){
+                    if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 1 : 0;
+                    for(ItemStack stack : cons.items){
+                        c.addItemConsumes(stack.item, stack.amount);
+                    }
+                }else if(con instanceof ConsumeLiquidFilter cons){
+                    if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 2 : 0;
+                    c.liquidFilter(cons.filter, cons.amount);
+                }else if(con instanceof ConsumeLiquid cons){
+                    if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 2 : 0;
+                    c.addLiquidConsume(cons.liquid, cons.amount);
+                }else if(con instanceof ConsumePower cons){
+                    c.setPower(cons.usage);
+                    if(c.consumesScore != null) c.consumesScore.optional |= con.optional ? 4 : 0;
+                }
+            }, b.consumers);
 
-            if(c.content instanceof GenericCrafter){
-                GenericCrafter g = (GenericCrafter)c.content;
+            if(c.content instanceof GenericCrafter g){
                 float output = 0;
 
                 if(g.outputItems != null){
@@ -384,8 +402,7 @@ public class ContentScoreProcess implements AsyncProcess{
 
             if(artificial){
                 float ns = 0f;
-                if(content instanceof Block){
-                    Block block = (Block)content;
+                if(content instanceof Block block){
                     for(ItemStack stack : block.requirements){
                         ns += getItemStackScore(stack, block.size);
                     }
@@ -543,53 +560,51 @@ public class ContentScoreProcess implements AsyncProcess{
                 score += block.liquidCapacity * block.liquidPressure * (1f + block.baseExplosiveness);
             }
 
-            if(block instanceof Wall){
-                Wall w = (Wall)block;
+            if(block instanceof Wall w){
                 float ls = score;
                 score /= 4f;
+
                 if(w.chanceDeflect > 0f) score += ls * w.chanceDeflect;
                 if(w.lightningChance > 0f) score += w.lightningChance * (w.lightningLength / 4f) * w.lightningDamage;
-            }else if(block instanceof Turret){
-                Turret t = (Turret)block;
-                int shots = t.alternate ? 1 : t.shots;
+            }else if(block instanceof Turret t){
+                //int shots = t.alternate ? 1 : t.shots;
+                int shots = t.shoot.shots;
                 float inaccuracy = 1f - ((t.inaccuracy / 180f) / (shots * shots));
 
-                if(block instanceof ItemTurret){
-                    ItemTurret it = (ItemTurret)block;
+                if(block instanceof ItemTurret it){
                     float bs = 0f;
                     for(Entry<Item, BulletType> entry : it.ammoTypes){
                         bs = Math.max(bs, get(entry.value).loadOutputScore());
                     }
-                    score += (bs * shots * inaccuracy) / t.reloadTime;
-                }else if(block instanceof PowerTurret){
-                    PowerTurret pt = (PowerTurret)block;
-                    if(pt.shootType != null) score += (get(pt.shootType).loadOutputScore() * shots * inaccuracy) / t.reloadTime;
+
+                    score += (bs * shots * inaccuracy) / t.reload;
+                }else if(block instanceof PowerTurret pt){
+                    if(pt.shootType != null) score += (get(pt.shootType).loadOutputScore() * shots * inaccuracy) / t.reload;
                 }
-            }else if(block instanceof MendProjector){
-                MendProjector mp = (MendProjector)block;
+            }else if(block instanceof MendProjector mp){
                 float rr = (mp.range + mp.phaseRangeBoost) / 8f;
-
                 score += ((((mp.healPercent + mp.phaseBoost) / 100f) * score) * rr * rr) / mp.reload;
-            }else if(block instanceof OverdriveProjector){
-                OverdriveProjector op = (OverdriveProjector)block;
+            }else if(block instanceof OverdriveProjector op){
                 float rr = (op.range + op.phaseRangeBoost) / 8f;
-
                 score += ((((op.speedBoostPhase + op.speedBoostPhase) / 100f) * score) * rr * rr) / op.reload;
             }else if(block instanceof PowerGenerator){
                 float power = ((PowerGenerator)block).powerProduction;
 
-                if(block instanceof ItemLiquidGenerator){
+                /*if(block instanceof ItemLiquidGenerator){
                     ItemLiquidGenerator ilg = (ItemLiquidGenerator)block;
                     consTime = (ilg.itemDuration + ilg.maxLiquidGenerate);
+                }*/
+                if(block instanceof ConsumeGenerator gen){
+                    consTime = gen.itemDuration;
                 }
                 score += power;
-            }else if(block instanceof GenericCrafter){
-                GenericCrafter gc = (GenericCrafter)block;
+            }else if(block instanceof GenericCrafter gc){
                 if(gc.outputItems != null){
                     for(ItemStack item : gc.outputItems){
                         score += get(item.item).loadScore();
                     }
                 }
+
                 if(gc.outputLiquid != null){
                     score += get(gc.outputLiquid.liquid).loadScore();
                 }

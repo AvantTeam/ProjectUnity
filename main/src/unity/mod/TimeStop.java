@@ -194,7 +194,7 @@ public class TimeStop{
         }
 
         float mouseAngle = Angles.mouseAngle(unit.x, unit.y);
-        boolean aimCursor = omni && Vars.player.shooting && unit.type.hasWeapons() && unit.type.faceTarget && !boosted && unit.type.rotateShooting;
+        boolean aimCursor = omni && Vars.player.shooting && unit.type.hasWeapons() && unit.type.faceTarget && !boosted;// && unit.type.rotateShooting;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);

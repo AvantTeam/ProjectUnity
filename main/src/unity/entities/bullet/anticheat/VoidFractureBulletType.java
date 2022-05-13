@@ -48,14 +48,14 @@ public class VoidFractureBulletType extends AntiCheatBulletTypeBase{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return trueSpeed * nextLifetime;
     }
 
     @Override
     public void init(){
         super.init();
-        drawSize = (range() * 2f) + 30f;
+        drawSize = Math.max((range * 2f) + 30f, drawSize);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class VoidFractureBulletType extends AntiCheatBulletTypeBase{
                     return false;
                 },
                 h -> Intersector.distanceSegmentPoint(d.x, d.y, d.x2, d.y2, h.getX(), h.getY()), null, false);
-                
+
                 if(!d.spikes.isEmpty()) spikesSound.at((d.x + d.x2) / 2f, (d.y + d.y2) / 2f, Mathf.random(0.9f, 1.1f));
             }
             SpecialFx.voidFractureEffect.at((d.x + d.x2) / 2f, (d.y + d.y2) / 2f, 0f, d);

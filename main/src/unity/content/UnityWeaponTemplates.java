@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.pattern.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import unity.entities.bullet.anticheat.*;
@@ -19,14 +20,15 @@ public class UnityWeaponTemplates{
         apocalypseSmall = new CloneableSetWeapon("unity-ravager-small-turret"){{
             reload = 2f * 60f;
             shootY = 6.5f;
-            shots = 3;
-            spacing = 15f;
+            //shots = 3;
+            //spacing = 15f;
             shootCone = 10f;
             shadow = 15f;
             mirror = true;
             alternate = true;
             rotate = true;
 
+            shoot = new ShootSpread(3, 15f);
             bullet = new EndBasicBulletType(6f, 140f){{
                 lifetime = 70f;
                 width = 15f;
@@ -46,8 +48,8 @@ public class UnityWeaponTemplates{
             reload = 3.5f * 60f;
             rotateSpeed = 6f;
             shootY = 6.5f;
-            shots = 12;
-            shotDelay = 6f;
+            //shots = 12;
+            //shotDelay = 6f;
             inaccuracy = 20f;
             shootCone = 10f;
             shadow = 24f;
@@ -55,6 +57,10 @@ public class UnityWeaponTemplates{
             alternate = true;
             rotate = true;
 
+            shoot = new ShootPattern(){{
+                shots = 12;
+                shotDelay = 6f;
+            }};
             bullet = new EndBasicBulletType(6f, 220f, "missile"){{
                 lifetime = 80f;
                 width = 15f;
@@ -151,12 +157,15 @@ public class UnityWeaponTemplates{
         plagueSmallMount = new CloneableSetWeapon("unity-small-plague-launcher"){{
             shootY = 4.75f;
             reload = 1.5f * 60f;
-            shots = 4;
+            //shots = 4;
             inaccuracy = 15f;
             mirror = false;
             alternate = true;
             rotate = true;
 
+            shoot = new ShootPattern(){{
+                shots = 4;
+            }};
             bullet = new MissileBulletType(3.8f, 9f){{
                 width = height = 8f;
                 lifetime = 45f;

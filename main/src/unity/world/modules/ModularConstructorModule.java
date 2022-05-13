@@ -75,7 +75,7 @@ public class ModularConstructorModule extends BlockModule{
                 queueAdded = false;
             }
             for(ModularConstructorPartBuild build : all){
-                if(!build.added) build.removePart();
+                if(!build.isAdded()) build.removePart();
             }
             all.removeAll(toRemove);
             toRemove.clear();

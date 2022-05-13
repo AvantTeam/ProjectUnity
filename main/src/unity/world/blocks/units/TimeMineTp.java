@@ -106,7 +106,7 @@ public class TimeMineTp extends Block {
 
         /* adding links */
         @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             if (tpValid(this, other)){
                 configure(other.pos());
                 return false;

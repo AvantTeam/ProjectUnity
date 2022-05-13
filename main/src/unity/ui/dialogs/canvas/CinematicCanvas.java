@@ -10,6 +10,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.gen.*;
@@ -152,7 +153,9 @@ public class CinematicCanvas extends WidgetGroup{
 
         private void connection(boolean accept){
             float size = 30f, pad = size / 2f - 3f;
-            Cell<ImageButton> c = button(accept ? acceptor : distributor, Styles.colori, () -> {}).size(size);
+            Cell<ImageButton> c = button(accept ? acceptor : distributor, new ImageButtonStyle(){{
+                imageUpColor = Color.white;
+            }}, () -> {}).size(size);
 
             ImageButton button = c.get();
             if(accept){

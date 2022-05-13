@@ -45,7 +45,7 @@ public class InvisibleUnitType extends UnityUnitType{
         return super.cellColor(unit);
     }
 
-    @Override
+    /*@Override
     public void drawEngine(Unit unit){
         if(!unit.isFlying()) return;
 
@@ -72,7 +72,7 @@ public class InvisibleUnitType extends UnityUnitType{
         (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
         );
         Draw.color();
-    }
+    }*/
 
     @Override
     public void drawSoftShadow(Unit unit){
@@ -96,7 +96,7 @@ public class InvisibleUnitType extends UnityUnitType{
 
         Draw.color(Pal.shadow);
         Draw.alpha(Pal.shadow.a * fade(e));
-        float el = Math.max(unit.elevation, visualElevation);
+        float el = Math.max(unit.elevation, shadowElevation);
         Draw.rect(shadowRegion, unit.x + shadowTX * el, unit.y + shadowTY * el, unit.rotation - 90);
         Draw.color();
     }
@@ -108,7 +108,7 @@ public class InvisibleUnitType extends UnityUnitType{
             return;
         }
         if(lightRadius > 0){
-            Drawf.light(unit.team, unit.x, unit.y, lightRadius, lightColor, lightOpacity * (1f - e.alphaLerp()));
+            Drawf.light(unit.x, unit.y, lightRadius, lightColor, lightOpacity * (1f - e.alphaLerp()));
         }
     }
 

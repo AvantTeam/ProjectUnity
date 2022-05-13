@@ -37,7 +37,7 @@ public class TentacleBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float calculateRange(){
         return length / 1.4f;
     }
 

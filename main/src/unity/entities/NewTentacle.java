@@ -48,7 +48,7 @@ public class NewTentacle{
     }
 
     float rootRange(){
-        return (type.segments * type.segmentLength) + (type.bullet != null ? type.bullet.range() : 0f);
+        return (type.segments * type.segmentLength) + (type.bullet != null ? type.bullet.range : 0f);
     }
 
     void updateMovement(){

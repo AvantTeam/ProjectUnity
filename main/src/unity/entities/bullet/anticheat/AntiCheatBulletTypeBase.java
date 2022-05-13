@@ -127,9 +127,9 @@ public abstract class AntiCheatBulletTypeBase extends BulletType{
     }
 
     @Override
-    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
+    public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
         hitBuildingAntiCheat(b, build);
-        super.hitTile(b, build, initialHealth, direct);
+        super.hitTile(b, build, x, y, initialHealth, direct);
     }
 
     @Override

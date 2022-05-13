@@ -19,7 +19,7 @@ public class EndLaserTurret extends PowerTurret{
 
     public EndLaserTurret(String name){
         super(name);
-        drawer = tile -> {
+        /*drawer = tile -> {
             Draw.rect(Regions.tenmeikiriBaseOutlineRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90f);
             Draw.blend(Blending.additive);
             for(int i = 0; i < lightRegions.length; i++){
@@ -31,14 +31,14 @@ public class EndLaserTurret extends PowerTurret{
             }
             Draw.blend();
             Draw.color();
-        };
+        };*/
         unitSort = (e, x, y) -> e.dst2(x, y) + (float)Math.pow(Angles.angleDist(e.rotation, turretRotation), 2);
     }
 
     @Override
     public void load(){
         super.load();
-        baseRegion = Core.atlas.find("unity-block-" + size);
+        //baseRegion = Core.atlas.find("unity-block-" + size);
         lightRegions = new TextureRegion[7];
         for(int i = 0; i < 7; i++){
             lightRegions[i] = Core.atlas.find(name + "-lights-" + i);
@@ -53,6 +53,7 @@ public class EndLaserTurret extends PowerTurret{
         Bullet bullet;
         private float invFrame = 0f;
 
+        /*
         @Override
         protected void shoot(BulletType type){
             if(chargeTime > 0){
@@ -109,6 +110,18 @@ public class EndLaserTurret extends PowerTurret{
         }
 
         @Override
+        protected void bullet(BulletType type, float angle){
+            bullet = type.create(tile.build, team, x + tr.x, y + tr.y, angle);
+        }
+
+        @Override
+        protected void updateShooting(){
+            if(canConsume() && !charging){
+                super.updateShooting();
+            }
+        }
+         */
+        @Override
         protected void findTarget(){
             turretRotation = rotation;
             super.findTarget();
@@ -148,11 +161,6 @@ public class EndLaserTurret extends PowerTurret{
         }
 
         @Override
-        protected void bullet(BulletType type, float angle){
-            bullet = type.create(tile.build, team, x + tr.x, y + tr.y, angle);
-        }
-
-        @Override
         protected void turnToTarget(float targetRot){
             float speed = rotate ? rotateSpeed * delta() * baseReloadSpeed() : 0f;
             rotation = Angles.moveToward(rotation, targetRot, speed);
@@ -161,13 +169,6 @@ public class EndLaserTurret extends PowerTurret{
         @Override
         protected void updateCooling(){
             if(bullet == null) super.updateCooling();
-        }
-
-        @Override
-        protected void updateShooting(){
-            if(consValid() && !charging){
-                super.updateShooting();
-            }
         }
 
         @Override

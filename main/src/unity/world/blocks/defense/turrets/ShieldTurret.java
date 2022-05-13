@@ -17,12 +17,14 @@ public class ShieldTurret extends PowerTurret{
     public class ShieldTurretBuild extends PowerTurretBuild{
         public boolean shield;
 
+        /*
         @Override
         public void bullet(BulletType type, float angle){
             float spdScl = Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / range, 0, 1);
 
             type.create(this, team, x + tr.x, y + tr.y, angle, spdScl, 1);
         }
+         */
 
         @Override
         public void findTarget(){

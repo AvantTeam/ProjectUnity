@@ -23,7 +23,8 @@ public class DebrisWeather extends ParticleWeather{
         if(Mathf.chanceDelta(state.intensity * spawnChance)){
             float x = Mathf.random(world.unitWidth()), y = Mathf.random(world.unitHeight());
             Fx.blockExplosionSmoke.at(x, y);
-            Fx.blockExplosion.at(x, y);
+            //Fx.blockExplosion.at(x, y);
+            Fx.explosion.at(x, y); //idk
             Damage.damage(x, y, Mathf.random(minSplashRadius, maxSplashRadius), Mathf.random(minDamage, maxDamage));
         }
         Groups.unit.each(u -> {

@@ -79,7 +79,7 @@ public class ShieldWall extends LevelLimitWall{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("shield", (ShieldWallBuild e) -> new Bar("stat.shieldhealth", Pal.accent, () -> e.shieldBroke ? 0f : 1f - e.gotDamage / shieldHealth));
+        addBar("shield", (ShieldWallBuild e) -> new Bar("stat.shieldhealth", Pal.accent, () -> e.shieldBroke ? 0f : 1f - e.gotDamage / shieldHealth));
     }
 
     public class ShieldWallBuild extends LevelLimitWallBuild{

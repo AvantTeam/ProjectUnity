@@ -18,7 +18,7 @@ public class ObjPowerTurret extends PowerTurret{
     @Override
     public void load(){
         super.load();
-        baseRegion = region;
+        //baseRegion = region;
     }
 
     public class ObjPowerTurretBuild extends PowerTurretBuild{
@@ -29,7 +29,7 @@ public class ObjPowerTurret extends PowerTurret{
         public void updateTile(){
             super.updateTile();
             if(Float.isNaN(time)) time = 0f;
-            time += efficiency() * (1f + ((reload * 2.5f) / reloadTime)) * Time.delta;
+            time += efficiency() * (1f + ((reloadCounter * 2.5f) / reload)) * Time.delta;
             distortionTime = Math.max(0f, distortionTime - (Time.delta * 0.2f));
         }
 
@@ -45,7 +45,7 @@ public class ObjPowerTurret extends PowerTurret{
 
         @Override
         public void draw(){
-            Draw.rect(baseRegion, x, y);
+            Draw.rect(region, x, y);
             Draw.color();
 
             Cons<Vec3> distort = v -> {

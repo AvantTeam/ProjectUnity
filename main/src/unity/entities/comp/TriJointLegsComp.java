@@ -71,7 +71,7 @@ abstract class TriJointLegsComp implements Unitc{
         moveSpace = legLength / 2.4f / (div / 2f) * type.legMoveSpace;
         totalLength += Mathf.dst(deltaX, deltaY);
 
-        float trns = moveSpace * 0.85f * type.legTrns;
+        float trns = moveSpace * 0.85f * type.legForwardScl;
 
         Vec2 moveOffset = Tmp.v4.trns(rot, trns);
         boolean moving = moving();
@@ -103,8 +103,8 @@ abstract class TriJointLegsComp implements Unitc{
                         Fx.unitLandSmall.at(l.joints[2].x, l.joints[2].y, type.rippleScale, floor.mapColor);
                     }
 
-                    if(type.landShake > 0){
-                        Effect.shake(type.landShake, type.landShake, l.joints[2]);
+                    if(type.stepShake > 0){
+                        Effect.shake(type.stepShake, type.stepShake, l.joints[2]);
                     }
 
                     if(type.legSplashDamage > 0){
@@ -124,7 +124,7 @@ abstract class TriJointLegsComp implements Unitc{
 
             Vec2 legDest = Tmp.v6;
             if(!baseOffset.within(legDest, legLength)){
-                float scl = ((Math.min(baseOffset.dst(legDest), type.legLength * type.maxStretch) / legLength) - 1f);
+                float scl = ((Mathf.clamp(baseOffset.dst(legDest), type.legLength * type.legMinLength, type.legLength * type.legMaxLength) / legLength) - 1f);
                 if(move){
                     float moveFract = stageF % 1f;
                     //l.legScl = Mathf.lerpDelta(l.legScl, 1f + scl, Mathf.lerp(type.legSpeed / 4f, 1f, moveFract));

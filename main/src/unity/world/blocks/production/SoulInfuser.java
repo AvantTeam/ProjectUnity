@@ -57,7 +57,7 @@ public class SoulInfuser extends SoulFloorExtractor{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             if(other instanceof SoulContainerBuild && Intersector.overlaps(Tmp.cr1.set(x, y, range * tilesize), other.tile().getHitbox(Tmp.r1))){
                 configure(other.pos());
                 return false;

@@ -30,7 +30,7 @@ abstract class TurretComp extends Turret implements Stemc{
 
     /** Whether to accept ammo type of all kinds */
     boolean omni = false;
-    BulletType defaultBullet = Bullets.standardCopper;
+    BulletType defaultBullet = Bullets.placeholder;
 
     float basicFieldRadius = -1f;
 
@@ -88,7 +88,7 @@ abstract class TurretComp extends Turret implements Stemc{
         @Replace
         public boolean hasAmmo(){
             if(self() instanceof LiquidTurretBuild && omni){
-                return liquids.total() >= 1f / peekAmmo().ammoMultiplier;
+                return liquids.currentAmount() >= 1f / peekAmmo().ammoMultiplier;
             }else{
                 return super.hasAmmo();
             }
@@ -100,6 +100,7 @@ abstract class TurretComp extends Turret implements Stemc{
             Drawf.dashCircle(x, y, range, rangeColor == null ? team.color : rangeColor);
         }
 
+        /*
         @Override
         @Replace
         public void shoot(BulletType type){
@@ -171,7 +172,7 @@ abstract class TurretComp extends Turret implements Stemc{
                 this, team,
                 x + tr.x, y + tr.y, angle,
                 type.damage, 1f + Mathf.range(velocityInaccuracy),
-                type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f,
+                type.scaleLife ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f,
                 bulletData()
             );
 
@@ -181,6 +182,7 @@ abstract class TurretComp extends Turret implements Stemc{
                 laser.bulletLife = turret.shootDuration;
             }
         }
+        */
 
         public Object bulletData(){
             return bulletData.get(self());

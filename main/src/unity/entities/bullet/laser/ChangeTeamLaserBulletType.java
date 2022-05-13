@@ -29,8 +29,8 @@ public class ChangeTeamLaserBulletType extends ContinuousLaserBulletType{
     }
 
     @Override
-    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
-        super.hitTile(b, build, initialHealth, direct);
+    public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
+        super.hitTile(b, build, x, y, initialHealth, direct);
         if(convertBlocks && (build.healthf() <= minimumHealthPercent || build.health < minimumHealthOverride)){
             build.team(b.team);
             damageOwner(b, initialHealth * ownerDamageRatio);

@@ -32,7 +32,7 @@ public class TentacleType implements Cloneable{
     }
 
     public float range(){
-        return ((segmentLength * segments) - 5f) + (bullet != null ? (bullet.range() * 0.75f) : 0f);
+        return ((segmentLength * segments) - 5f) + (bullet != null ? (bullet.range * 0.75f) : 0f);
     }
 
     public static void set(Seq<TentacleType> seq){

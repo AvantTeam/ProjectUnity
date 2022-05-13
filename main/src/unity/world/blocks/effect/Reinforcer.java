@@ -70,7 +70,7 @@ public class Reinforcer extends Block {
 
         @Override
         public void updateTile(){
-            if(consValid()){
+            if(canConsume()){
                 unit = Units.closest(this.team, x, y, range, u -> u != null && !u.hasEffect(UnityStatusEffects.plated) && !u.spawnedByCore);
 
                 if(unit != null) {
@@ -86,7 +86,8 @@ public class Reinforcer extends Block {
                         unit.apply(UnityStatusEffects.plated);
                         load = 0f;
                         laserWidth = 0f;
-                        items.remove(consumes.getItem().items);
+                        //items.remove(consumes.getItem().items);
+                        consume();
                     }
                 }
             }
@@ -112,7 +113,7 @@ public class Reinforcer extends Block {
                 Draw.color(laserColor);
                 Draw.z(Layer.effect);
                 if(laserLength > 0f) posOffset.trns(rotation, laserLength);
-                Drawf.laser(this.team, laserRegion, laserEndRegion, x + posOffset.x, y + posOffset.y, prevUnit.x, prevUnit.y, (0.3f - laserWidth) / 0.3f);
+                Drawf.laser(laserRegion, laserEndRegion, x + posOffset.x, y + posOffset.y, prevUnit.x, prevUnit.y, (0.3f - laserWidth) / 0.3f);
                 Draw.color();
             }
         }

@@ -38,7 +38,7 @@ abstract class CLeg{
         int stage = (int)stageF;
         int group = stage % div;
 
-        float trns = g.moveSpace * 0.85f * type.legTrns;
+        float trns = g.moveSpace * 0.85f * type.legForwardScl;
 
         moving = id % div == group;
         this.stage = uMoving ? stageF % 1f : Mathf.lerpDelta(stage, 0f, 0.1f);
@@ -70,8 +70,8 @@ abstract class CLeg{
             Fx.unitLandSmall.at(foot.x, foot.y, unit.type.rippleScale, floor.mapColor);
         }
 
-        if(unit.type.landShake > 0f){
-            Effect.shake(unit.type.landShake, unit.type.landShake, foot);
+        if(unit.type.stepShake > 0f){
+            Effect.shake(unit.type.stepShake, unit.type.stepShake, foot);
         }
     }
 
@@ -91,8 +91,8 @@ abstract class CLeg{
 
         Drawf.shadow(foot.x, foot.y, ssize, invDrown);
 
-        if(moving && unit.type.visualElevation > 0){
-            float scl = unit.type.visualElevation * invDrown;
+        if(moving && unit.type.shadowElevation > 0){
+            float scl = unit.type.shadowElevation * invDrown;
             float elev = Mathf.slope(1f - Mathf.clamp(stage)) * scl;
             Draw.color(Pal.shadow);
             Draw.rect(type.footRegion, foot.x + UnitType.shadowTX * elev, foot.y + UnitType.shadowTY * elev, ang);

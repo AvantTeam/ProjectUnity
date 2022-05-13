@@ -46,12 +46,20 @@ public class AcceleratingWeapon extends Weapon{
     }
 
     @Override
+    protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
+        AcceleratingMount aMount = (AcceleratingMount)mount;
+        aMount.accel = Mathf.clamp(aMount.accel + accelPerShot, 0f, minReload);
+        aMount.waitTime = accelCooldownWaitTime;
+        super.shoot(unit, mount, shootX, shootY, rotation);
+    }
+
+    /*@Override
     protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
         AcceleratingMount aMount = (AcceleratingMount)mount;
         aMount.accel = Mathf.clamp(aMount.accel + accelPerShot, 0f, minReload);
         aMount.waitTime = accelCooldownWaitTime;
         super.shoot(unit, mount, shootX, shootY, aimX, aimY, mountX, mountY, rotation, side);
-    }
+    }*/
 
     public static class AcceleratingMount extends WeaponMount{
         float accel = 0f;

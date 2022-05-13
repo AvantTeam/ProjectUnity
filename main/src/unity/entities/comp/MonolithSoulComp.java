@@ -21,9 +21,9 @@ import unity.mod.*;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
-@EntityDef({Unitc.class, MonolithSoulc.class, CTrailc.class, Factionc.class})
+@EntityDef({Unitc.class, MonolithSoulc.class, Factionc.class})
 @EntityComponent
-abstract class MonolithSoulComp implements Unitc, CTrailc, Factionc{
+abstract class MonolithSoulComp implements Unitc, Factionc{
     @Import UnitType type;
     @Import Team team;
     @Import float x, y, rotation, health, maxHealth, elevation;
@@ -100,7 +100,7 @@ abstract class MonolithSoulComp implements Unitc, CTrailc, Factionc{
     @Override
     public void destroy(){
         if(!isAdded()) return;
-        TrailFx.trailFadeLow.at(x, y, (type.engineSize + Mathf.absin(Time.time, 2f, type.engineSize / 4f) * elevation) * type.trailScl, trail.copy());
+        TrailFx.trailFadeLow.at(x, y, (type.engineSize + Mathf.absin(Time.time, 2f, type.engineSize / 4f) * elevation) * type.tailScl, trail.copy());
     }
 
     void join(Teamc other){

@@ -36,7 +36,7 @@ public class EphemeronPairBulletType extends BasicBulletType{
     public void update(Bullet b){
         super.update(b);
 
-        if(b.data instanceof Bullet n && n.added){
+        if(b.data instanceof Bullet n && n.isAdded()){
             float dst = hitSize / Math.max(b.dst(n) / 2f, hitSize);
             Tmp.v1.set(n).sub(b).nor().scl(dst);
             b.vel.add(Tmp.v1);

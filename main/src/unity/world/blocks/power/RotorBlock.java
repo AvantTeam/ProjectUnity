@@ -160,7 +160,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
             float mTorque = flux().getNetwork().flux() * torqueEfficiency * baseTorque;
 
             table.add(new Bar(
-                () -> bundle.format("bar.poweroutput", Strings.fixed((getPowerProduction() - consumes.getPower().usage) * 60f * timeScale, 1)),
+                () -> bundle.format("bar.poweroutput", Strings.fixed((getPowerProduction() - consPower.usage) * 60f * timeScale, 1)),
                 () -> Pal.powerBar,
                 () -> productionEfficiency
             )).growX().row();
@@ -180,7 +180,7 @@ public class RotorBlock extends PowerGenerator implements GraphBlockBase{
         public void updatePre(){
             float flux = flux().getNetwork().flux();
             topSpeed = baseTopSpeed / (1f + flux / fluxEfficiency);
-            float breakEven = consumes.getPower().usage / powerProduction;
+            float breakEven = consPower.usage / powerProduction;
 
             GraphTorqueModule<?> tGraph = torque();
             float rotNeg = Mathf.clamp(tGraph.getNetwork().lastVelocity / topSpeed, 0f, 2f / breakEven);

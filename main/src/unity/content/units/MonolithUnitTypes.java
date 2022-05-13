@@ -11,7 +11,8 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.units.*;
+import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -53,8 +54,8 @@ public final class MonolithUnitTypes{
     public static @FactionDef("monolith") @EntityDef({Unitc.class, Assistantc.class, Monolithc.class})
     UnitType adsect, comitate/*, praesid*/;
 
-    // monolith unit + trail
-    public static @FactionDef("monolith") @EntityDef({Unitc.class, CTrailc.class, Monolithc.class})
+    // monolith unit
+    public static @FactionDef("monolith") @EntityDef({Unitc.class, Monolithc.class})
     UnitType stray, tendence, liminality, calenture, hallucination, escapism, fantasy;
 
     private MonolithUnitTypes(){
@@ -64,7 +65,7 @@ public final class MonolithUnitTypes{
     public static void load(){
         monolithSoul = new UnityUnitType("monolith-soul"){
             {
-                defaultController = MonolithSoulAI::new;
+                aiController = MonolithSoulAI::new;
 
                 health = 300f;
                 speed = 2.4f;
@@ -74,7 +75,7 @@ public final class MonolithUnitTypes{
                 flying = true;
                 lowAltitude = true;
                 fallSpeed = 1f;
-                range = maxRange = miningRange = 96f;
+                range = maxRange = 96f;
                 hitSize = 12f;
                 omniMovement = false;
                 engineColor = UnityPal.monolithLight;
@@ -94,7 +95,7 @@ public final class MonolithUnitTypes{
                 if(unit instanceof MonolithSoul soul){
                     if(!(soul.trail instanceof MultiTrail trail)) return;
 
-                    float width = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * trailScl;
+                    float width = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation);
                     if(trail.trails.length == 3 && soul.corporeal()){
                         MultiTrail copy = trail.copy();
                         copy.rotation = MultiTrail::calcRot;
@@ -132,7 +133,7 @@ public final class MonolithUnitTypes{
                     float z = Draw.z();
                     Draw.z(Layer.flyingUnitLow);
 
-                    float trailSize = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * trailScl;
+                    float trailSize = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * tailScl;
                     soul.trail.drawCap(engineColor, trailSize);
                     soul.trail.draw(engineColor, trailSize);
 
@@ -305,8 +306,8 @@ public final class MonolithUnitTypes{
                     y = 4f;
                     shootX = 0f;
                     shootY = 24f;
-                    shots = 5;
-                    shotDelay = 3f;
+                    //shots = 5;
+                    //shotDelay = 3f;
                     reload = 72f;
                     addSequenceTime = 25f;
                     shootCone = 90f;
@@ -315,6 +316,10 @@ public final class MonolithUnitTypes{
                     addedEffect = HitFx.monolithHitBig;
                     shootSound = UnitySounds.chainyShot;
 
+                    shoot = new ShootPattern(){{
+                        shots = 5;
+                        shotDelay = 3f;
+                    }};
                     bullet = new BasicBulletType(6f, 32f, "unity-twisting-shell"){{
                         width = 12f;
                         height = 16f;
@@ -403,7 +408,7 @@ public final class MonolithUnitTypes{
                         height = 20f;
                         shrinkY = 0f;
                         lifetime = 54f;
-                        scaleVelocity = true;
+                        scaleLife = true;
 
                         frontColor = UnityPal.monolith;
                         backColor = UnityPal.monolithDark;
@@ -574,20 +579,20 @@ public final class MonolithUnitTypes{
             rotateSpeed = 1.48f;
             hitSize = 36f;
             armor = 23f;
-            commandLimit = 8;
+            //commandLimit = 8;
             maxSouls = 7;
 
             allowLegStep = hovering = true;
-            visualElevation = 0.2f;
+            shadowElevation = 0.2f;
             legCount = 4;
             legExtension = 8f;
             legSpeed = 0.08f;
             legLength = 16f;
             legMoveSpace = 1.2f;
-            legTrns = 0.5f;
+            legForwardScl = 0.5f;
             legBaseOffset = 11f;
 
-            ammoType = new PowerAmmoType(2000);
+            ammoType = new PowerAmmoType(2000f);
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
@@ -606,8 +611,10 @@ public final class MonolithUnitTypes{
                 shootStatus = StatusEffects.unmoving;
                 shootSound = Sounds.laserblast;
                 chargeSound = Sounds.lasercharge;
-                firstShotDelay = UnityFx.pylonLaserCharge.lifetime / 2f;
 
+                shoot = new ShootPattern(){{
+                    firstShotDelay = UnityFx.pylonLaserCharge.lifetime / 2f;
+                }};
                 bullet = UnityBullets.pylonLaser;
             }}, new Weapon("unity-monolith-large2-weapon-mount"){{
                 x = 14f;
@@ -631,23 +638,23 @@ public final class MonolithUnitTypes{
             rotateSpeed = 1.4f;
             hitSize = 48f;
             armor = 32f;
-            commandLimit = 8;
+            //commandLimit = 8;
             maxSouls = 9;
 
-            visualElevation = 0.3f;
+            shadowElevation = 0.3f;
             allowLegStep = hovering = true;
             legCount = 6;
             legLength = 30f;
             legExtension = 8f;
             legSpeed = 0.1f;
-            legTrns = 0.5f;
+            legForwardScl = 0.5f;
             legBaseOffset = 15f;
             legMoveSpace = 1.2f;
             legPairOffset = 3f;
             legSplashDamage = 64f;
             legSplashRange = 48f;
 
-            ammoType = new PowerAmmoType(2000);
+            ammoType = new PowerAmmoType(2000f);
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
@@ -701,23 +708,23 @@ public final class MonolithUnitTypes{
             rotateSpeed = 1.2f;
             hitSize = 64f;
             armor = 45f;
-            commandLimit = 8;
+            //commandLimit = 8;
             maxSouls = 12;
 
-            visualElevation = 0.5f;
+            shadowElevation = 0.5f;
             allowLegStep = hovering = true;
             legCount = 6;
             legLength = 48f;
             legExtension = 12f;
             legSpeed = 0.1f;
-            legTrns = 0.5f;
+            legForwardScl = 0.5f;
             legBaseOffset = 15f;
             legMoveSpace = 0.82f;
             legPairOffset = 3f;
             legSplashDamage = 84f;
             legSplashRange = 48f;
 
-            ammoType = new PowerAmmoType(2000);
+            ammoType = new PowerAmmoType(2000f);
             groundLayer = Layer.legUnit;
             outlineColor = UnityPal.darkOutline;
 
@@ -731,12 +738,17 @@ public final class MonolithUnitTypes{
 
                 reload = 144f;
                 recoil = 8f;
-                spacing = 1f;
+                //spacing = 1f;
                 inaccuracy = 6f;
-                shots = 5;
-                shotDelay = 3f;
+                //shots = 5;
+                //shotDelay = 3f;
                 shootSound = Sounds.laserblast;
 
+                shoot = new ShootSpread(){{
+                    spread = 1f;
+                    shots = 5;
+                    shotDelay = 3f;
+                }};
                 bullet = new LaserBulletType(1920f){{
                     width = 45f;
                     length = 400f;
@@ -759,16 +771,16 @@ public final class MonolithUnitTypes{
             rotateSpeed = 1.2f;
             hitSize = 67f;
             armor = 100f;
-            commandLimit = 8;
+            //commandLimit = 8;
             maxSouls = 15;
 
-            visualElevation = 0.7f;
+            shadowElevation = 0.7f;
             allowLegStep = hovering = true;
             legCount = 6;
             legLength = 72f;
             legExtension = 16f;
             legSpeed = 0.12f;
-            legTrns = 0.6f;
+            legForwardScl = 0.6f;
             legBaseOffset = 18f;
             legMoveSpace = 0.6f;
             legPairOffset = 3f;
@@ -815,11 +827,15 @@ public final class MonolithUnitTypes{
 
                 reload = 24f;
                 recoil = 6f;
-                shots = 8;
+                //shots = 8;
                 velocityRnd = 0.3f;
-                spacing = 5f;
+                //spacing = 5f;
                 shootSound = UnitySounds.energyBolt;
 
+                shoot = new ShootSpread(){{
+                    shots = 8;
+                    spread = 5f;
+                }};
                 bullet = energy;
             }}, new Weapon(name + "-mount"){{
                 x = 23.5f;
@@ -831,11 +847,15 @@ public final class MonolithUnitTypes{
 
                 reload = 15f;
                 recoil = 6f;
-                shots = 5;
+                //shots = 5;
                 velocityRnd = 0.3f;
-                spacing = 6f;
+                //spacing = 6f;
                 shootSound = UnitySounds.energyBolt;
 
+                shoot = new ShootSpread(){{
+                    shots = 5;
+                    spread = 6f;
+                }};
                 bullet = energy;
             }}, new Weapon(name + "-gun"){{
                 x = 12.5f;
@@ -844,13 +864,17 @@ public final class MonolithUnitTypes{
 
                 rotate = true;
                 rotateSpeed = 6f;
-                shots = 8;
-                shotDelay = 3f;
+                //shots = 8;
+                //shotDelay = 3f;
 
                 reload = 30f;
                 recoil = 8f;
                 shootSound = Sounds.shootBig;
 
+                shoot = new ShootPattern(){{
+                    shots = 8;
+                    shotDelay = 3f;
+                }};
                 bullet = new RicochetBulletType(12.5f, 640f, "shell"){
                     {
                         width = 20f;
@@ -885,7 +909,7 @@ public final class MonolithUnitTypes{
         }};
 
         adsect = new UnityUnitType("adsect"){{
-            defaultController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build);
+            aiController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build);
             health = 180f;
             speed = 4f;
             accel = 0.4f;
@@ -922,7 +946,7 @@ public final class MonolithUnitTypes{
         }};
 
         comitate = new UnityUnitType("comitate"){{
-            defaultController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build, Assistance.heal);
+            aiController = AssistantAI.create(Assistance.mendCore, Assistance.mine, Assistance.build, Assistance.heal);
             health = 420f;
             speed = 4.5f;
             accel = 0.5f;
@@ -964,11 +988,15 @@ public final class MonolithUnitTypes{
                 x = 3f;
                 y = 3f;
                 reload = 40f;
-                shots = 2;
-                shotDelay = 5f;
+                //shots = 2;
+                //shotDelay = 5f;
                 shootCone = 20f;
 
                 shootSound = Sounds.lasershoot;
+                shoot = new ShootPattern(){{
+                    shots = 2;
+                    shotDelay = 5f;
+                }};
                 bullet = new LaserBoltBulletType(4f, 30f){{
                     healPercent = 1.5f;
                     lifetime = 40f;
@@ -989,7 +1017,7 @@ public final class MonolithUnitTypes{
             flying = true;
             hitSize = 12f;
             lowAltitude = true;
-            rotateShooting = false;
+            faceTarget = false;
             outlineColor = UnityPal.darkOutline;
 
             interface EngineType{
@@ -1047,13 +1075,17 @@ public final class MonolithUnitTypes{
                 mirror = false;
                 rotate = true;
                 reload = 60f;
-                shots = 6;
-                shotDelay = 1f;
+                //shots = 6;
+                //shotDelay = 1f;
                 inaccuracy = 30f;
                 layerOffset = 10f;
                 eyeRadius = 1.8f;
 
                 shootSound = UnitySounds.energyBolt;
+                shoot = new ShootPattern(){{
+                    shots = 6;
+                    shotDelay = 1f;
+                }};
                 bullet = new BasicBulletType(1f, 6f, "shell"){
                     {
                         drag = -0.08f;
@@ -1095,7 +1127,7 @@ public final class MonolithUnitTypes{
 
         tendence = new UnityUnitType("tendence"){{
             health = 1200f;
-            rotateShooting = false;
+            faceTarget = false;
             lowAltitude = true;
             flying = true;
             maxSouls = 4;
@@ -1129,7 +1161,11 @@ public final class MonolithUnitTypes{
             );
             trailLength = 24;
 
-            decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.bullet - 0.02f, Color.white));
+            //decals.add(new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.bullet - 0.02f, Color.white));
+            parts.add(new RegionPart(name + "-top"){{
+                layer = Layer.bullet - 0.02f;
+            }});
+
             weapons.add(new EnergyRingWeapon(){{
                 rings.add(new Ring(){{
                     radius = 6.5f;
@@ -1154,7 +1190,7 @@ public final class MonolithUnitTypes{
                 mirror = false;
                 rotate = true;
                 reload = 72f;
-                firstShotDelay = 35f;
+                //firstShotDelay = 35f;
                 inaccuracy = 15f;
                 layerOffset = 10f;
                 eyeRadius = 1.8f;
@@ -1162,6 +1198,9 @@ public final class MonolithUnitTypes{
 
                 chargeSound = UnitySounds.energyCharge;
                 shootSound = UnitySounds.energyBlast;
+                shoot = new ShootPattern(){{
+                    firstShotDelay = 35f;
+                }};
                 bullet = new BasicBulletType(4.8f, 72f, "shell"){
                     {
                         lifetime = 48f;
@@ -1185,8 +1224,8 @@ public final class MonolithUnitTypes{
                         trailLength = 32;
 
                         hitEffect = despawnEffect = HitFx.tendenceHit;
-                        chargeShootEffect = ShootFx.tendenceShoot;
-                        shootEffect = ChargeFx.tendenceCharge;
+                        chargeEffect = ChargeFx.tendenceCharge;
+                        shootEffect = ShootFx.tendenceShoot;
                     }
 
                     @Override
@@ -1248,7 +1287,7 @@ public final class MonolithUnitTypes{
 
         liminality = new UnityUnitType("liminality"){{
             health = 2000f;
-            rotateShooting = false;
+            faceTarget = false;
             lowAltitude = true;
             flying = true;
             maxSouls = 5;
@@ -1289,9 +1328,17 @@ public final class MonolithUnitTypes{
             );
             trailLength = 48;
 
-            decals.add(
+            /*decals.add(
                 new UnitDecal(name + "-middle", 0f, 0f, 0f, Layer.bullet - 0.02f, Color.white),
                 new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.effect + 0.0199f, Color.white)
+            );*/
+
+            parts.add(
+                new RegionPart(name + "-middle"){{
+                    layer = Layer.bullet - 0.02f;
+                }}, new RegionPart(name + "-top"){{
+                    layer = Layer.effect + 0.0199f;
+                }}
             );
 
             weapons.add(new EnergyRingWeapon(){{
@@ -1340,7 +1387,7 @@ public final class MonolithUnitTypes{
 
         calenture = new UnityUnitType("calenture"){{
             health = 14400f;
-            rotateShooting = false;
+            faceTarget = false;
             lowAltitude = true;
             flying = true;
             maxSouls = 7;
@@ -1355,9 +1402,17 @@ public final class MonolithUnitTypes{
             outlineColor = UnityPal.darkOutline;
             ammoType = new PowerAmmoType(3000f);
 
-            decals.add(
+            /*decals.add(
                 new UnitDecal(name + "-middle", 0f, 0f, 0f, Layer.bullet - 0.02f, Color.white),
                 new UnitDecal(name + "-top", 0f, 0f, 0f, Layer.effect + 0.0199f, Color.white)
+            );*/
+
+            parts.add(
+                new RegionPart(name + "-middle"){{
+                    layer = Layer.bullet - 0.02f;
+                }}, new RegionPart(name + "-top"){{
+                    layer = Layer.effect + 0.0199f;
+                }}
             );
 
             weapons.add(new EnergyRingWeapon(){{

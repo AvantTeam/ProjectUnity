@@ -70,7 +70,7 @@ public class OrbTurret extends PowerTurret {
             super.placed();
 
             for (int i = 0; i < layers; i++){
-                rand.setSeed(pos() + i*69);
+                rand.setSeed(pos() + i * 69L);
                 offsets.add(rand.nextFloat() * 420f);
             }
         }
@@ -80,6 +80,7 @@ public class OrbTurret extends PowerTurret {
             return super.validateTarget() && trails.size > 0;
         }
 
+        /*
         @Override
         protected void bullet(BulletType type, float angle) {
             int l = (int)Math.ceil((float)trails.size / (float)layers);
@@ -95,6 +96,7 @@ public class OrbTurret extends PowerTurret {
             bullet.trail = trails.pop();
             bullet.data = new Color[]{bulletHeadColor, bulletTrailColor};
         }
+         */
 
         @Override
         public void update() {
@@ -102,7 +104,7 @@ public class OrbTurret extends PowerTurret {
 
             if(offsets.size == 0) {
                 for (int i = 0; i < layers; i++) {
-                    rand.setSeed(pos() + i * 69);
+                    rand.setSeed(pos() + i * 69L);
                     offsets.add(rand.nextFloat() * 420f);
                 }
             }
@@ -124,7 +126,7 @@ public class OrbTurret extends PowerTurret {
 
         @Override
         public void draw() {
-            Draw.rect(baseRegion, x, y);
+            //Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.effect);
 
@@ -137,11 +139,13 @@ public class OrbTurret extends PowerTurret {
             Draw.color();
         }
 
+        /*
         @Override
         protected void effects(){
             shootSound.at(x + tr.x, y + tr.y, Mathf.random(0.9f, 1.1f));
 
             recoil = recoilAmount;
         }
+         */
     }
 }

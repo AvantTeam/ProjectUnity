@@ -302,7 +302,7 @@ public class UnityUnitType extends UnitType{
         Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
         float z = (unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f)) - (unit.layer() * 0.00001f);
 
-        if(unit.isFlying() || visualElevation > 0){
+        if(unit.isFlying() || shadowElevation > 0){
             TextureRegion tmpShadow = shadowRegion;
             if(!unit.isHead() || unit.isTail()){
                 shadowRegion = unit.isTail() ? tailRegion : segmentRegion;
@@ -374,7 +374,7 @@ public class UnityUnitType extends UnitType{
             unit.trns(-legOffsetB.x, -legOffsetB.y);
         }
 
-        if(unit.abilities.size > 0){
+        if(unit.abilities.length > 0){
             for(Ability a : unit.abilities){
                 Draw.reset();
                 a.draw(unit);
@@ -398,7 +398,7 @@ public class UnityUnitType extends UnitType{
         }
     }
 
-    @Override
+    /*@Override
     public void drawEngine(Unit unit){
         if(!unit.isFlying()) return;
         if(engine != null){
@@ -406,7 +406,7 @@ public class UnityUnitType extends UnitType{
         }else{
             super.drawEngine(unit);
         }
-    }
+    }*/
 
     @Override
     public Color cellColor(Unit unit){
@@ -457,8 +457,8 @@ public class UnityUnitType extends UnitType{
                 jointOffsets[k][1] = Tmp.v1.y;
             }
 
-            if(leg.moving && visualElevation > 0f){
-                float scl = visualElevation;
+            if(leg.moving && shadowElevation > 0f){
+                float scl = shadowElevation;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
                 Draw.color(Pal.shadow);
                 Draw.rect(footRegion, leg.joints[2].x + shadowTX * elev, leg.joints[2].y + shadowTY * elev, position.angleTo(leg.joints[2]));
@@ -493,7 +493,7 @@ public class UnityUnitType extends UnitType{
     @Override
     public <T extends Unit & Legsc> void drawLegs(T unit){
         if(!customBackLegs){
-            if(legShadows && visualElevation > 0){
+            if(legShadows && shadowElevation > 0){
                 float z = Draw.z();
                 float rotation = unit.baseRotation();
                 Draw.z(Math.min(Layer.darkness, z - 0.98f));
@@ -504,7 +504,7 @@ public class UnityUnitType extends UnitType{
                 for(int j = legs.length - 1; j >= 0; j--){
                     int i = (j % 2 == 0 ? j / 2 : legs.length - 1 - j / 2);
                     Leg leg = legs[i];
-                    float angle = unit.legAngle(rotation, i);
+                    float angle = unit.legAngle(i);
                     boolean flip = i >= legs.length / 2f;
                     int flips = Mathf.sign(flip);
 
@@ -516,7 +516,7 @@ public class UnityUnitType extends UnitType{
                         elev = Mathf.slope(1f - leg.stage);
                     }
                     float mid = (elev / 2f) + 0.5f;
-                    float scl = visualElevation;
+                    float scl = shadowElevation;
 
                     Lines.stroke(legShadowRegion.height * Draw.scl * flips);
                     Lines.line(legShadowRegion, position.x + (shadowTX * scl), position.y + (shadowTY * scl), leg.joint.x + (shadowTX * mid * scl), leg.joint.y + (shadowTY * mid * scl), false);
@@ -546,7 +546,7 @@ public class UnityUnitType extends UnitType{
             for(int j = legs.length - 1; j >= 0; j--){
                 int i = (j % 2 == 0 ? j/2 : legs.length - 1 - j/2);
                 Leg leg = legs[i];
-                float angle = unit.legAngle(rotation, i);
+                float angle = unit.legAngle(i);
                 boolean flip = i >= legs.length/2f;
                 boolean back = j < legs.length - 2;
                 int flips = Mathf.sign(flip);
@@ -559,8 +559,8 @@ public class UnityUnitType extends UnitType{
 
                 Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
-                if(leg.moving && visualElevation > 0){
-                    float scl = visualElevation;
+                if(leg.moving && shadowElevation > 0){
+                    float scl = shadowElevation;
                     float elev = Mathf.slope(1f - leg.stage) * scl;
                     Draw.color(Pal.shadow);
                     Draw.rect(fr, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
