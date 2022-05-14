@@ -15,6 +15,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.turrets.*;
 import unity.content.effects.*;
 import unity.entities.bullet.anticheat.*;
 import unity.entities.bullet.anticheat.modules.*;
@@ -1436,6 +1437,8 @@ public class UnityBullets{
 
         //only enhanced
 
+        //TODO: please inline these and replace them with raw bullets, this is broken, slow and prone to future issues -Anuke
+
         standardDenseLarge = copy(Bullets.placeholder, (BasicBulletType t) -> {
             t.damage *= 1.4f;
             t.speed *= 1.1f;
@@ -1534,7 +1537,7 @@ public class UnityBullets{
             t.damage = 45f;
         });
 
-        artilleryExplosiveT2 = copy(Bullets.placeholder, (ArtilleryBulletType t) -> {
+        artilleryExplosiveT2 = copy(((ItemTurret)Blocks.ripple).ammoTypes.get(Items.blastCompound), (ArtilleryBulletType t) -> {
             t.speed = 4.5f;
             t.lifetime = 74f;
             t.ammoMultiplier = 2f;
