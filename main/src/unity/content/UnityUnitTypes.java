@@ -1989,7 +1989,7 @@ public class UnityUnitTypes{
             trailLength = 70;
             waveTrailX = 18f;
             waveTrailY = -32f;
-            tailScl = 3.5f;
+            trailScl = 3.5f;
 
             weapons.add(new Weapon(name + "-launcher"){{
                 x = 19f;
@@ -2060,7 +2060,7 @@ public class UnityUnitTypes{
             trailLength = 70;
             waveTrailX = 26f;
             waveTrailY = -42f;
-            tailScl = 4f;
+            trailScl = 4f;
 
             float spawnTime = 15f * 60f;
 
@@ -2320,7 +2320,7 @@ public class UnityUnitTypes{
                 waveTrailX = 3f;
                 waveTrailY = -5f;
                 trailLength = 13;
-                tailScl = 1.75f;
+                trailScl = 1.75f;
                 transformTime = 10f;
 
                 weapons.add(new Weapon("artillery"){{
@@ -2404,7 +2404,7 @@ public class UnityUnitTypes{
                 waveTrailX = 3f;
                 waveTrailY = -9f;
                 trailLength = 16;
-                tailScl = 1.85f;
+                trailScl = 1.85f;
                 transformTime = 30f;
 
                 weapons.add(new Weapon("unity-laser-weapon"){{

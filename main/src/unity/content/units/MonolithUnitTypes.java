@@ -133,7 +133,7 @@ public final class MonolithUnitTypes{
                     float z = Draw.z();
                     Draw.z(Layer.flyingUnitLow);
 
-                    float trailSize = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * tailScl;
+                    float trailSize = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * trailScl;
                     soul.trail.drawCap(engineColor, trailSize);
                     soul.trail.draw(engineColor, trailSize);
 

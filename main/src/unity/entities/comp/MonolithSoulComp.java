@@ -100,7 +100,7 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     @Override
     public void destroy(){
         if(!isAdded()) return;
-        TrailFx.trailFadeLow.at(x, y, (type.engineSize + Mathf.absin(Time.time, 2f, type.engineSize / 4f) * elevation) * type.tailScl, trail.copy());
+        TrailFx.trailFadeLow.at(x, y, (type.engineSize + Mathf.absin(Time.time, 2f, type.engineSize / 4f) * elevation) * type.trailScl, trail.copy());
     }
 
     void join(Teamc other){
