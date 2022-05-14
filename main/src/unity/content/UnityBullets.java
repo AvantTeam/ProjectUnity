@@ -1437,113 +1437,239 @@ public class UnityBullets{
 
         //only enhanced
 
-        //TODO: please inline these and replace them with raw bullets, this is broken, slow and prone to future issues -Anuke
+        standardDenseLarge = new BasicBulletType(7.5f, 50, "bullet"){{
+            hitSize = 4.8f;
+            width = 15f;
+            height = 21f;
+            shootEffect = Fx.shootBig;
+            ammoMultiplier = 4;
+            reloadMultiplier = 1.7f;
+            knockback = 0.3f;
 
-        standardDenseLarge = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.4f;
-            t.speed *= 1.1f;
-            t.width *= 1.12f;
-            t.height *= 1.12f;
-        });
+            damage *= 1.4f;
+            speed *= 1.1f;
+            width *= 1.12f;
+            height *= 1.12f;
+        }};
 
-        standardHomingLarge = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.23f;
-            t.reloadMultiplier = 1.3f;
-            t.homingPower = 0.09f;
-            t.speed *= 1.1f;
-            t.width *= 1.09f;
-            t.height *= 1.09f;
-        });
+        standardHomingLarge = new BasicBulletType(7.5f, 50, "bullet"){{
+            hitSize = 4.8f;
+            width = 15f;
+            height = 21f;
+            shootEffect = Fx.shootBig;
+            ammoMultiplier = 4;
+            knockback = 0.3f;
 
-        standardIncendiaryLarge = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.4f;
-            t.speed *= 1.1f;
-            t.width *= 1.12f;
-            t.height *= 1.12f;
-        });
+            damage *= 1.23f;
+            reloadMultiplier = 1.3f;
+            homingPower = 0.09f;
+            speed *= 1.1f;
+            width *= 1.09f;
+            height *= 1.09f;
+        }};
 
-        standardThoriumLarge = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.4f;
-            t.speed *= 1.1f;
-            t.width *= 1.12f;
-            t.height *= 1.12f;
-        });
+        standardIncendiaryLarge = new BasicBulletType(7f, 70, "bullet"){{
+            hitSize = 5;
+            width = 16f;
+            height = 21f;
+            frontColor = Pal.lightishOrange;
+            backColor = Pal.lightOrange;
+            status = StatusEffects.burning;
+            hitEffect = new MultiEffect(Fx.hitBulletSmall, Fx.fireHit);
+            shootEffect = Fx.shootBig;
+            makeFire = true;
+            pierceCap = 2;
+            pierceBuilding = true;
+            knockback = 0.6f;
+            ammoMultiplier = 3;
+            splashDamage = 15f;
+            splashDamageRadius = 24f;
 
-        standardDenseHeavy = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.7f;
-            t.speed *= 1.3f;
-            t.width *= 1.32f;
-            t.height *= 1.32f;
-        });
+            damage *= 1.4f;
+            speed *= 1.1f;
+            width *= 1.12f;
+            height *= 1.12f;
+        }};
 
-        standardHomingHeavy = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.4f;
-            t.reloadMultiplier = 1.3f;
-            t.homingPower = 0.09f;
-            t.speed *= 1.3f;
-            t.width *= 1.19f;
-            t.height *= 1.19f;
-        });
+        standardThoriumLarge = new BasicBulletType(8f, 80, "bullet"){{
+            hitSize = 5;
+            width = 16f;
+            height = 23f;
+            shootEffect = Fx.shootBig;
+            pierceCap = 2;
+            pierceBuilding = true;
+            knockback = 0.7f;
 
-        standardIncendiaryHeavy = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.7f;
-            t.speed *= 1.3f;
-            t.width *= 1.32f;
-            t.height *= 1.32f;
-        });
+            damage *= 1.4f;
+            speed *= 1.1f;
+            width *= 1.12f;
+            height *= 1.12f;
+        }};
 
-        standardThoriumHeavy = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.7f;
-            t.speed *= 1.3f;
-            t.width *= 1.32f;
-            t.height *= 1.32f;
-        });
+        standardDenseHeavy = new BasicBulletType(7.5f, 50, "bullet"){{
+            hitSize = 4.8f;
+            width = 15f;
+            height = 21f;
+            shootEffect = Fx.shootBig;
+            ammoMultiplier = 4;
+            reloadMultiplier = 1.7f;
+            knockback = 0.3f;
 
-        standardDenseMassive = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.8f;
-            t.speed *= 1.3f;
-            t.width *= 1.34f;
-            t.height *= 1.34f;
-            t.lifetime *= 1.1f;
-        });
+            damage *= 1.7f;
+            speed *= 1.3f;
+            width *= 1.32f;
+            height *= 1.32f;
+        }};
 
-        standardHomingMassive = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.6f;
-            t.reloadMultiplier = 1.3f;
-            t.homingPower = 0.09f;
-            t.speed *= 1.3f;
-            t.width *= 1.21f;
-            t.height *= 1.21f;
-            t.lifetime *= 1.1f;
-        });
+        standardHomingHeavy = new BasicBulletType(7.5f, 50, "bullet"){{
+            hitSize = 4.8f;
+            width = 15f;
+            height = 21f;
+            shootEffect = Fx.shootBig;
+            ammoMultiplier = 4;
+            knockback = 0.3f;
 
-        standardIncendiaryMassive = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.8f;
-            t.speed *= 1.3f;
-            t.width *= 1.34f;
-            t.height *= 1.34f;
-            t.lifetime *= 1.1f;
-        });
+            damage *= 1.4f;
+            reloadMultiplier = 1.3f;
+            homingPower = 0.09f;
+            speed *= 1.3f;
+            width *= 1.19f;
+            height *= 1.19f;
+        }};
 
-        standardThoriumMassive = copy(Bullets.placeholder, (BasicBulletType t) -> {
-            t.damage *= 1.8f;
-            t.speed *= 1.3f;
-            t.width *= 1.34f;
-            t.height *= 1.34f;
-            t.lifetime *= 1.1f;
-        });
+        standardIncendiaryHeavy = new BasicBulletType(7f, 70, "bullet"){{
+            hitSize = 5;
+            width = 16f;
+            height = 21f;
+            frontColor = Pal.lightishOrange;
+            backColor = Pal.lightOrange;
+            status = StatusEffects.burning;
+            hitEffect = new MultiEffect(Fx.hitBulletSmall, Fx.fireHit);
+            shootEffect = Fx.shootBig;
+            makeFire = true;
+            pierceCap = 2;
+            pierceBuilding = true;
+            knockback = 0.6f;
+            ammoMultiplier = 3;
+            splashDamage = 15f;
+            splashDamageRadius = 24f;
+
+            damage *= 1.7f;
+            speed *= 1.3f;
+            width *= 1.32f;
+            height *= 1.32f;
+        }};
+
+        standardThoriumHeavy = new BasicBulletType(8f, 80, "bullet"){{
+            hitSize = 5;
+            width = 16f;
+            height = 23f;
+            shootEffect = Fx.shootBig;
+            pierceCap = 2;
+            pierceBuilding = true;
+            knockback = 0.7f;
+
+            damage *= 1.7f;
+            speed *= 1.3f;
+            width *= 1.32f;
+            height *= 1.32f;
+        }};
+
+        standardDenseMassive = new BasicBulletType(7.5f, 50, "bullet"){{
+            hitSize = 4.8f;
+            width = 15f;
+            height = 21f;
+            shootEffect = Fx.shootBig;
+            ammoMultiplier = 4;
+            reloadMultiplier = 1.7f;
+            knockback = 0.3f;
+
+            damage *= 1.8f;
+            speed *= 1.3f;
+            width *= 1.34f;
+            height *= 1.34f;
+            lifetime *= 1.1f;
+        }};
+
+        standardHomingMassive = new BasicBulletType(7.5f, 50, "bullet"){{
+            hitSize = 4.8f;
+            width = 15f;
+            height = 21f;
+            shootEffect = Fx.shootBig;
+            ammoMultiplier = 4;
+            knockback = 0.3f;
+
+            damage *= 1.6f;
+            reloadMultiplier = 1.3f;
+            homingPower = 0.09f;
+            speed *= 1.3f;
+            width *= 1.21f;
+            height *= 1.21f;
+            lifetime *= 1.1f;
+        }};
+
+        standardIncendiaryMassive = new BasicBulletType(7f, 70, "bullet"){{
+            hitSize = 5;
+            width = 16f;
+            height = 21f;
+            frontColor = Pal.lightishOrange;
+            backColor = Pal.lightOrange;
+            status = StatusEffects.burning;
+            hitEffect = new MultiEffect(Fx.hitBulletSmall, Fx.fireHit);
+            shootEffect = Fx.shootBig;
+            makeFire = true;
+            pierceCap = 2;
+            pierceBuilding = true;
+            knockback = 0.6f;
+            ammoMultiplier = 3;
+            splashDamage = 15f;
+            splashDamageRadius = 24f;
+
+            damage *= 1.8f;
+            speed *= 1.3f;
+            width *= 1.34f;
+            height *= 1.34f;
+            lifetime *= 1.1f;
+        }};
+
+        standardThoriumMassive = new BasicBulletType(8f, 80, "bullet"){{
+            hitSize = 5;
+            width = 16f;
+            height = 23f;
+            shootEffect = Fx.shootBig;
+            pierceCap = 2;
+            pierceBuilding = true;
+            knockback = 0.7f;
+
+            damage *= 1.8f;
+            speed *= 1.3f;
+            width *= 1.34f;
+            height *= 1.34f;
+            lifetime *= 1.1f;
+        }};
 
         reignBulletWeakened = copy(UnitTypes.reign.weapons.get(0).bullet, (BasicBulletType t) -> {
             t.damage = 45f;
         });
 
-        artilleryExplosiveT2 = copy(((ItemTurret)Blocks.ripple).ammoTypes.get(Items.blastCompound), (ArtilleryBulletType t) -> {
-            t.speed = 4.5f;
-            t.lifetime = 74f;
-            t.ammoMultiplier = 2f;
-            t.splashDamageRadius *= 1.3f;
-            t.splashDamage *= 3f;
-        });
+        artilleryExplosiveT2 = new ArtilleryBulletType(2f, 20, "shell"){{
+            hitEffect = Fx.blastExplosion;
+            knockback = 0.8f;
+            width = height = 14f;
+            collidesTiles = false;
+            splashDamageRadius = 45f * 0.75f;
+            splashDamage = 55f;
+            backColor = Pal.missileYellowBack;
+            frontColor = Pal.missileYellow;
+
+            status = StatusEffects.blasted;
+
+            speed = 4.5f;
+            lifetime = 74f;
+            ammoMultiplier = 2f;
+            splashDamageRadius *= 1.3f;
+            splashDamage *= 3f;
+        }};
 
         //endregion
     }
