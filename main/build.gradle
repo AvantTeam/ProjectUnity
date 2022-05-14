@@ -116,7 +116,9 @@ class Fetcher{
             return error != null
         }
 
-        while(exec.get(run)){}
+        exec.get(run)
+        //TODO: why? -Anuke
+        //while(exec.get(run)){}
     }
 }
 
@@ -150,7 +152,7 @@ task fetchComps{
         final CopyOnWriteArrayList<Fetcher> fetches = new CopyOnWriteArrayList<>()
 
         UnsafeRunnable mainRun ={
-            Http.get("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryVersion")
+            Http.get("https://api.github.com/repos/Anuken/Mindustry/contents/core/src/mindustry/entities/comp?ref=$mindustryFetchVersion")
                 .error({ final t -> throw new RuntimeException(t) })
                 .block({ final res ->
                     final def list = Jval.read(res.getResultAsString()).asArray()
