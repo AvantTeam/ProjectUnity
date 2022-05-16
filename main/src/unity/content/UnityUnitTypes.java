@@ -1162,7 +1162,7 @@ public class UnityUnitTypes{
                 x = 36.5f;
                 y = 2.75f;
                 shootY = 19.25f;
-                //xRand = 4.5f;
+                xRand = 4.5f;
                 alternate = false;
                 rotate = true;
                 rotateSpeed = 1.2f;
@@ -1576,7 +1576,7 @@ public class UnityUnitTypes{
                 angleCone = 60f;
                 angleOffset = 45f;
                 inaccuracy = 25f;
-                //xRand = 2.25f;
+                xRand = 2.25f;
                 //shots = 2;
                 shootSound = Sounds.missile;
 
@@ -1840,7 +1840,7 @@ public class UnityUnitTypes{
                 rotate = true;
                 rotateSpeed = 2f;
                 reload = 2f;
-                //xRand = 3f;
+                xRand = 3f;
                 inaccuracy = 4f;
 
                 bullet = b;
@@ -1998,7 +1998,7 @@ public class UnityUnitTypes{
                 rotate = true;
                 inaccuracy = 15f;
                 reload = 7f;
-                //xRand = 2.25f;
+                xRand = 2.25f;
                 shootSound = Sounds.missile;
 
                 bullet = UnityBullets.basicMissile;
@@ -2009,7 +2009,7 @@ public class UnityUnitTypes{
                 rotate = true;
                 inaccuracy = 15f;
                 reload = 7f;
-                //xRand = 2.25f;
+                xRand = 2.25f;
                 shootSound = Sounds.missile;
 
                 bullet = UnityBullets.basicMissile;
@@ -2094,7 +2094,7 @@ public class UnityUnitTypes{
                     x = 29.75f;
                     y = -13f;
                     shootY = 7f;
-                    //xRand = 9f;
+                    xRand = 9f;
                     defaultAngle = angleOffset = 90f;
                     angleCone = 0f;
                     shootCone = 125f;
@@ -2169,7 +2169,7 @@ public class UnityUnitTypes{
                 mirror = false;
                 inaccuracy = 15f;
                 reload = 7f;
-                //xRand = 2.25f;
+                xRand = 2.25f;
                 shootSound = Sounds.missile;
                 angleCone = 135f;
 
@@ -2675,7 +2675,7 @@ public class UnityUnitTypes{
                 //shots = 12;
                 inaccuracy = 19f;
                 velocityRnd = 0.2f;
-                //xRand = 1.2f;
+                xRand = 1.2f;
                 shootSound = Sounds.missile;
 
                 shoot = new ShootPattern(){{
@@ -2773,7 +2773,7 @@ public class UnityUnitTypes{
                 x = 12.25f;
                 y = 13f;
                 shootY = 5f;
-                //xRand = 2.2f;
+                xRand = 2.2f;
                 shadow = 8f;
                 rotateSpeed = 5f;
                 rotate = true;
@@ -2800,7 +2800,7 @@ public class UnityUnitTypes{
                 //shots = 9;
                 inaccuracy = 19f;
                 velocityRnd = 0.2f;
-                //xRand = 1.2f;
+                xRand = 1.2f;
                 shootSound = Sounds.missile;
 
                 shoot = new ShootPattern(){{
@@ -2819,7 +2819,7 @@ public class UnityUnitTypes{
                 //shots = 9;
                 inaccuracy = 19f;
                 velocityRnd = 0.2f;
-                //xRand = 1.2f;
+                xRand = 1.2f;
                 shootSound = Sounds.missile;
 
                 shoot = new ShootPattern(){{
@@ -2874,7 +2874,7 @@ public class UnityUnitTypes{
                 //shots = 12;
                 inaccuracy = 19f;
                 velocityRnd = 0.2f;
-                //xRand = 1.2f;
+                xRand = 1.2f;
                 shootSound = Sounds.missile;
 
                 shoot = new ShootPattern(){{
@@ -2893,7 +2893,7 @@ public class UnityUnitTypes{
                 //shots = 12;
                 inaccuracy = 19f;
                 velocityRnd = 0.2f;
-                //xRand = 1.2f;
+                xRand = 1.2f;
                 shootSound = Sounds.missile;
 
                 shoot = new ShootPattern(){{
@@ -3369,7 +3369,7 @@ public class UnityUnitTypes{
                 //shots = 12;
                 shootCone = 90f;
                 inaccuracy = 35f;
-                //xRand = 2f;
+                xRand = 2f;
                 //shotDelay = 0.5f;
                 shoot = new ShootPattern(){{
                     shots = 12;
@@ -4136,7 +4136,7 @@ public class UnityUnitTypes{
                 inaccuracy = 1.4f;
                 //shots = 8;
                 //shotDelay = 3f;
-                //xRand = 12f;
+                xRand = 12f;
                 shootSound = UnitySounds.endMissile;
 
                 shoot = new ShootPattern(){{
@@ -4386,7 +4386,7 @@ public class UnityUnitTypes{
                         rotate = true;
                         rotateSpeed = 4f;
                         inaccuracy = 3f;
-                        //xRand = 10.25f;
+                        xRand = 10.25f;
 
                         //shots = 13;
                         //shotDelay = 5f;
@@ -4437,7 +4437,7 @@ public class UnityUnitTypes{
                     rotate = true;
                     rotateSpeed = 3f;
                     inaccuracy = 15f;
-                    //xRand = 6f;
+                    xRand = 6f;
 
                     //shots = 5;
 
@@ -4744,7 +4744,7 @@ public class UnityUnitTypes{
                 y = 53.75f;
                 x = 34.5f;
                 rotate = true;
-                //xRand = 2f;
+                xRand = 2f;
                 reload = 7f;
                 shootSound = UnitySounds.endMissile;
 
@@ -4756,7 +4756,7 @@ public class UnityUnitTypes{
                 y = 24.25f;
                 x = 50.75f;
                 rotate = true;
-                //xRand = 2f;
+                xRand = 2f;
                 reload = 7f;
                 shootSound = UnitySounds.endMissile;
 
@@ -5244,7 +5244,7 @@ public class UnityUnitTypes{
                 mirror = false;
                 //shotDelay = 3f;
                 //shots = 5;
-                //xRand = 5.75f;
+                xRand = 5.75f;
                 rotate = true;
                 rotateSpeed = 4f;
                 inaccuracy = 7f;

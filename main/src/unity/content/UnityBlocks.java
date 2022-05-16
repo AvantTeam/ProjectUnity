@@ -1895,7 +1895,7 @@ public class UnityBlocks{
             //burstSpacing = 20f;
             inaccuracy = 1f;
             //spread = 0f;
-            //xRand = 6f;
+            xRand = 6f;
 
             shootY = size * tilesize / 2.7f;
             shoot = new ShootPattern(){{
