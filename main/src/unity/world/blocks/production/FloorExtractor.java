@@ -89,8 +89,8 @@ public class FloorExtractor extends GenericCrafter{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
-        return super.canPlaceOn(tile, team) && count(tile) > 0f;
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        return super.canPlaceOn(tile, team, rotation) && count(tile) > 0f;
     }
 
     public float count(Tile tile){

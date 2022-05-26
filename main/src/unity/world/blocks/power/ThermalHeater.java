@@ -26,7 +26,7 @@ public class ThermalHeater extends HeatGenerator{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attri)) > 0.01f;
     }
 
