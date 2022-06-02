@@ -9,11 +9,58 @@ dependencies{
 }
 
 import arc.files.*
+import arc.struct.*
 import arc.util.*
 
 import java.util.regex.*
 
-task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
+task list(dependsOn: [jar, configurations.runtimeClasspath]){
+    doFirst{
+        def anon = Pattern.compile('\\$\\d+')
+
+        Seq<String> classes = new Seq<>(), packages = new Seq<>()
+        def procFile = { def self, String pack, Fi dir ->
+            for(Fi child : dir.list()){
+                if(child.isDirectory()){
+                    def name = child.name()
+                    if(!pack.startsWith('unity') && name != 'unity') continue
+
+                    def packName = pack.empty ? name : "$pack.$name"
+
+                    packages.add(packName)
+                    self(self, packName, child)
+                }else{
+                    def name = child.nameWithoutExtension()
+                    if(child.extEquals('class') && !anon.matcher(name).find()){
+                        classes.add("$pack.$name")
+                    }
+                }
+            }
+        }
+
+        (configurations.runtimeClasspath.files + jar.archiveFile.get().asFile).forEach{
+            procFile(procFile, '', new ZipFi(new Fi(it)))
+        }
+
+        classes.distinct()
+        packages.distinct()
+
+        def output = file("$assetsDir/meta/classes.out")
+        output.parentFile.mkdirs()
+
+        output.text = 'Packages:\n'
+        for(def p : packages) output.text += "$p\n"
+
+        output.text += "Classes:\n"
+        for(def c : classes) output.text += "$c\n"
+
+        println "Successfully listed $packages.size packages and $classes.size classes."
+    }
+}
+
+task deploy(type: Jar, dependsOn: [list, configurations.runtimeClasspath]){
+    mustRunAfter list
+
     outputs.upToDateWhen{ false }
     if(!spritesDir.exists() || taskNames.contains('tools:proc') || taskNames.contains('proc')){
         dependsOn ':tools:proc'

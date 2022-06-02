@@ -14,9 +14,10 @@ import static unity.tools.Tools.*;
  */
 public class GenAtlas extends TextureAtlas{
     public GenRegion clear;
-    private final ObjectMap<String, GenRegion> regions = new ObjectMap<>();
+    private final OrderedMap<String, GenRegion> regions = new OrderedMap<>();
 
     public GenAtlas(){
+        regions.orderedKeys().ordered = false;
         clear = addRegion("clear", new GenRegion("clear", Pixmaps.blankPixmap()));
     }
 
@@ -96,7 +97,7 @@ public class GenAtlas extends TextureAtlas{
     @Override
     public void dispose(){
         synchronized(regions){
-            for(var pix : regions.values()){
+            for(GenRegion pix : regions.values()){
                 if(pix.pixmap != null) pix.pixmap.dispose();
             }
 

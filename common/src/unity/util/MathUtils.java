@@ -1,4 +1,4 @@
-package unity.utils;
+package unity.util;
 
 import arc.math.*;
 import arc.math.Interp.*;

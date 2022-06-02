@@ -8,7 +8,7 @@ import unity.graphics.*;
 import unity.graphics.BaseTrail.*;
 import unity.graphics.MultiTrail.*;
 import unity.mod.*;
-import unity.utils.*;
+import unity.util.*;
 
 /**
  * Provides various types of trails used by {@linkplain Faction#monolith monolith} entities.

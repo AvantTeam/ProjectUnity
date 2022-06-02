@@ -1,12 +1,16 @@
 package unity;
 
 import arc.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import unity.content.*;
 import unity.gen.assets.*;
 import unity.gen.entities.*;
 import unity.mod.*;
+import unity.util.*;
+
+import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -23,14 +27,47 @@ public class ProjectUnity extends ProjectUnityCommon{
             if(dev == null) dev = new DevBuild(){};
         }
 
-        Events.on(FileTreeInitEvent.class, e -> Core.app.post(PUSounds::load));
-        Events.on(ContentInitEvent.class, e -> Core.app.post(Faction::load));
+        Events.on(FileTreeInitEvent.class, e -> Core.app.post(() -> {
+            PUSounds.load();
 
-        Core.app.post(dev::setup);
+            try(Reader file = tree.get("meta/classes.out").reader();
+                BufferedReader reader = new BufferedReader(file)
+            ){
+                Seq<String> current = packages;
+
+                String line;
+                while((line = reader.readLine()) != null){
+                    switch(line){
+                        case "Packages:" -> current = packages;
+                        case "Classes:" -> current = classes;
+                        default -> current.add(line);
+                    }
+                }
+
+                classes.removeAll(str -> {
+                    try{
+                        Class.forName(str, true, mods.mainLoader());
+                        return false;
+                    }catch(ClassNotFoundException | NoClassDefFoundError ex){
+                        Log.warn("Class not found: '@'.", str);
+                        return true;
+                    }
+                });
+            }catch(IOException ex){
+                throw new RuntimeException(ex);
+            }
+        }));
+
+        Events.on(ContentInitEvent.class, e -> Core.app.post(Faction::load));
+        Core.app.post(() -> {
+            dev.setup();
+            JSBridge.init();
+        });
     }
 
     @Override
     public void init(){
+        JSBridge.importDefaults(JSBridge.defaultScope);
         dev.init();
     }
 
