@@ -1,0 +1,80 @@
+sourceSets.main.java.srcDirs = ['src/']
+
+dependencies{
+    compileOnly mindustry(':core')
+    compileOnly arc(':arc-core')
+
+    api project(':factions:vanilla')
+    api project(':factions:monolith')
+}
+
+import arc.files.*
+import arc.util.*
+
+import java.util.regex.*
+
+task deploy(type: Jar, dependsOn: configurations.runtimeClasspath){
+    outputs.upToDateWhen{ false }
+    if(!spritesDir.exists() || taskNames.contains('tools:proc') || taskNames.contains('proc')){
+        dependsOn ':tools:proc'
+        mustRunAfter ':tools:proc'
+
+        if(taskNames.contains('mod:deploy') || taskNames.contains('deploy')) println 'Sprites folder not found; automatically generating sprites.'
+    }
+
+    archiveFileName = "${modName}Desktop.jar"
+
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
+    from files(assetsDir){ exclude 'sprites/vanilla/**' }
+
+    from(rootDir){
+        include 'mod.json'
+        include 'icon.png'
+    }
+
+    doFirst{
+        println "Deploying ${devBuild ? 'developer' : 'user'} build."
+
+        def file = Fi.get("$rootDir/mod.json")
+        def str = file.readString('UTF-8')
+        def matcher = Pattern.compile('"version": "(.*)"').matcher(str)
+        if(matcher.find()){
+            def start = matcher.start(1), end = matcher.end(1)
+            def prev = str.substring(start, end)
+            if(prev != modVersion) println "Bumped `mod.json` versioning from $prev to $modVersion."
+
+            file.writeString("${str.substring(0, start)}$modVersion${str.substring(end)}")
+        }
+    }
+}
+
+task dex(type: Jar){
+    archiveFileName = "${modName}.jar"
+
+    final def desktopJar = deploy.archiveFile.get().asFile
+    final def dexJar = file("$dex.temporaryDir/Dexed.jar")
+
+    if(!desktopJar.exists() || (taskNames.contains('mod:deploy') || taskNames.contains('deploy'))) dependsOn deploy
+    doFirst{
+        println 'Dexifying...'
+        def command = "d8 --min-api $sdkAPI --output $dexJar $desktopJar"
+
+        (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList()).forEach{
+            if(it.exists()) command += " --classpath $it.path"
+        }
+
+        command += " --lib ${file("$sdkRoot/platforms/android-$sdkVersion/android.jar")}"
+
+        if(OS.isWindows) command = 'cmd /c ' + command
+        command.execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+    }
+
+    from zipTree(desktopJar)
+    from zipTree(dexJar)
+}
+
+tasks.withType(Jar){
+    if(!devBuild) exclude 'unity/mod/DevBuildImpl*'
+}

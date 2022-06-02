@@ -1,0 +1,134 @@
+buildscript{
+    dependencies{
+        classpath "com.github.Anuken.MindustryJitpack:core:$mindustryVersion"
+        classpath "com.github.Anuken.Arc:arc-core:$arcVersion"
+    }
+
+    repositories{
+        google()
+        mavenCentral()
+        maven{ url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven{ url 'https://oss.sonatype.org/content/repositories/releases/' }
+        maven{ url 'https://jitpack.io' }
+    }
+}
+
+plugins{
+    id 'java-library'
+    id 'maven-publish'
+
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'org.jetbrains.kotlin.kapt' version '1.6.21'
+}
+
+configure(allprojects){
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+
+    group = 'com.github.GlennFolker'
+    version = modVersion
+
+    ext{
+        sdkRoot = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
+        taskNames = gradle.startParameter.taskNames
+        compilerVersion = JavaVersion.current().ordinal() - JavaVersion.VERSION_16.ordinal() + 16
+
+        assetsDir = file("${project(':mod').projectDir}/assets")
+        assetsRawDir = file("${project(':mod').projectDir}/assets-raw")
+        spritesDir = file("$assetsDir/sprites")
+        spritesRawDir = file("$assetsRawDir/sprites")
+
+        // `-Pmod.dev` will initiate a developer build. Default is `false`.
+        devBuild = project.hasProperty('mod.dev') && Boolean.parseBoolean(project.property('mod.dev'))
+
+        mindustry = { String submodule ->
+            return "com.github.Anuken.MindustryJitpack$submodule:$mindustryVersion"
+        }
+
+        arc = { String submodule ->
+            return "com.github.Anuken.Arc$submodule:$arcVersion"
+        }
+    }
+
+    repositories{
+        mavenCentral()
+        maven{ url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven{ url 'https://oss.sonatype.org/content/repositories/releases/' }
+        maven{ url 'https://jitpack.io' }
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes){
+        archiveClassifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts{
+        archives sourcesJar
+    }
+
+    java{
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing{
+        publications{
+            maven(MavenPublication){
+                from components.java
+            }
+        }
+    }
+
+    tasks.withType(JavaCompile){
+        options.incremental = true
+        options.encoding = 'UTF-8'
+        options.compilerArgs += ['-Xlint:deprecation']
+    }
+}
+
+configure(project(':annotations')){
+    sourceCompatibility = 8
+    targetCompatibility = 8
+
+    tasks.withType(JavaCompile){
+        sourceCompatibility = 8
+        targetCompatibility = 8
+    }
+}
+
+configure(project(':common')){
+    apply plugin: 'kotlin'
+    apply plugin: 'kotlin-kapt'
+
+    sourceCompatibility = compilerVersion
+    kapt{
+        javacOptions{
+            option('-source', compilerVersion)
+            option('-target', '1.8')
+
+            option("-AassetsDirectory=$assetsDir")
+            option("-ArevisionDirectory=${project(':annotations').projectDir}/assets/revisions")
+        }
+    }
+
+    tasks.withType(JavaCompile){
+        sourceCompatibility = compilerVersion
+
+        options.release = 8
+        javaCompiler = javaToolchains.compilerFor{
+            languageVersion = JavaLanguageVersion.of(compilerVersion)
+        }
+    }
+}
+
+configure([project(':core'), project(':mod'), project(':tools')] + project(':factions').subprojects){
+    sourceCompatibility = compilerVersion
+    tasks.withType(JavaCompile){
+        sourceCompatibility = compilerVersion
+
+        options.release = 8
+        javaCompiler = javaToolchains.compilerFor{
+            languageVersion = JavaLanguageVersion.of(compilerVersion)
+        }
+    }
+}

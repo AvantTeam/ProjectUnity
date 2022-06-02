@@ -1,0 +1,17 @@
+if(JavaVersion.current().ordinal() < JavaVersion.VERSION_16.ordinal()){
+    throw new GradleException("JDK 16 is a required minimum version. Yours: ${System.getProperty('java.version')}")
+}
+
+include ':annotations'
+
+include ':common'
+include ':core'
+
+include ':factions'
+include ':factions:vanilla'
+include ':factions:monolith'
+
+include ':mod'
+include ':tools'
+
+rootProject.name = modName
