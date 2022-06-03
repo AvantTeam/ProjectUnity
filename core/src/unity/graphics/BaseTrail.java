@@ -178,7 +178,7 @@ public class BaseTrail extends Trail{
     public float update(float x, float y, float width, float angle){
         boolean interval = (counter += Time.delta) >= 1f;
 
-        float delta = counter, speed = Mathf.dst(lastX, lastY, x, y) / delta;
+        float delta = counter, speed = Mathf.dst(lastX, lastY, x, y) / Time.delta;
         if(interval){
             int stride = this.stride;
             if(speed >= minDst){

@@ -11,7 +11,6 @@ import unity.graphics.BaseTrail.*;
  * Velocity trail attribute. Adds an arbitrary vector multiplied by trail speed to the trail position.
  * @author GlennFolker
  */
-//TODO completely hecking brrrrokeennn ngnggghghgngnghghhhhhhh
 @SuppressWarnings("unchecked")
 public class VelAttrib extends TrailAttrib{
     private static final Vec2 vec = new Vec2();
@@ -24,7 +23,7 @@ public class VelAttrib extends TrailAttrib{
     }
 
     public <T extends BaseTrail, V extends VelAttrib> VelAttrib(float velX, float velY, VelRotationHandler<T, V> rotation){
-        this(velX, velY, rotation, 0.8f);
+        this(velX, velY, rotation, 0.25f);
     }
 
     public <T extends BaseTrail, V extends VelAttrib> VelAttrib(float velX, float velY, VelRotationHandler<T, V> rotation, float drag){
@@ -54,7 +53,7 @@ public class VelAttrib extends TrailAttrib{
 
     @Override
     protected void point(BaseTrail trail, FloatSeq points, int index, float x, float y, float width, float angle, float speed, float delta){
-        float v = speed * Time.delta;
+        float v = speed;
         vec.trns(rotation.get(trail, this) - 90f, velX * v, velY * v);
         points.add(vec.x, vec.y);
     }
