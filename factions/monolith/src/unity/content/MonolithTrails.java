@@ -7,6 +7,7 @@ import arc.util.*;
 import unity.graphics.*;
 import unity.graphics.BaseTrail.*;
 import unity.graphics.MultiTrail.*;
+import unity.graphics.trail.*;
 import unity.mod.*;
 import unity.util.*;
 
@@ -78,8 +79,7 @@ public final class MonolithTrails{
         float offset = Mathf.random(Mathf.PI2 * scale);
         return new MultiTrail(rot, trails){
             @Override
-            public float update(float x, float y, float width, float angle){
-                float speed = Mathf.dst(x, y, lastX, lastY) / Time.delta;
+            public void defUpdate(float x, float y, float width, float angle, float speed, float delta){
                 float scl = Interp.pow2Out.apply(speedThreshold == -1f ? 1f : Mathf.clamp(speed / speedThreshold));
 
                 angle = unconvRot(angle) - 90f;
@@ -96,10 +96,6 @@ public final class MonolithTrails{
 
                     trail.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * trail.width);
                 }
-
-                lastX = x;
-                lastY = y;
-                return speed;
             }
         };
     }
@@ -124,7 +120,7 @@ public final class MonolithTrails{
     }
 
     public static MultiTrail soul(RotationHandler rot, int length){
-        return soul(rot, length, 6f, 2.2f, -1f);
+        return soul(rot, length, 6f, 2.2f, -1f, null);
     }
 
     public static MultiTrail soul(int length, float speedThreshold){
@@ -132,14 +128,22 @@ public final class MonolithTrails{
     }
 
     public static MultiTrail soul(RotationHandler rot, int length, float speedThreshold){
-        return soul(rot, length, 6f, 2.2f, speedThreshold);
+        return soul(rot, length, 6f, 2.2f, speedThreshold, null);
+    }
+
+    public static MultiTrail soul(RotationHandler rot, int length, float speedThreshold, VelAttrib vel){
+        return soul(rot, length, 6f, 2.2f, speedThreshold, vel);
     }
 
     public static MultiTrail soul(int length, float scale, float magnitude, float speedThreshold){
-        return soul(BaseTrail::rot, length, scale, magnitude, speedThreshold);
+        return soul(BaseTrail::rot, length, scale, magnitude, speedThreshold, null);
     }
 
     public static MultiTrail soul(RotationHandler rot, int length, float scale, float magnitude, float speedThreshold){
+        return soul(rot, length, scale, magnitude, speedThreshold, null);
+    }
+
+    public static MultiTrail soul(RotationHandler rot, int length, float scale, float magnitude, float speedThreshold, VelAttrib vel){
         int strandsAmount = 3;
 
         TrailHold[] trails = new TrailHold[strandsAmount + 1];
@@ -153,12 +157,12 @@ public final class MonolithTrails{
         trails[strandsAmount] = new TrailHold(singlePhantasmal(length), Palettes.monolith);
 
         float dir = Mathf.sign(Mathf.chance(0.5f));
-        return new MultiTrail(rot, trails){
+        return new MultiTrail(rot, vel, trails){
             float time = Time.time + Mathf.random(Mathf.PI2 * scale);
 
             @Override
-            public void update(float x, float y, float width){
-                float angle = unconvRot(rot.get(this, x, y)) - 90f;
+            public void defUpdate(float x, float y, float width, float angle, float speed, float delta){
+                angle = unconvRot(angle) - 90f;
 
                 time += (speedThreshold == -1f ? 1f : Mathf.clamp(Mathf.dst(x, y, lastX, lastY) / Time.delta / speedThreshold)) * Time.delta;
                 for(int i = 0; i < strandsAmount; i++){
@@ -174,8 +178,6 @@ public final class MonolithTrails{
                 Tmp.v1.trns(angle, main.x, main.y);
 
                 main.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * main.width);
-                lastX = x;
-                lastY = y;
             }
         };
     }

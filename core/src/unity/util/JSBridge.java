@@ -45,7 +45,6 @@ public final class JSBridge{
 
             supported = true;
         }catch(Throwable t){
-            Log.err("Exception occurred when trying to initialize JS bridge", t);
             supported = false;
         }
     }

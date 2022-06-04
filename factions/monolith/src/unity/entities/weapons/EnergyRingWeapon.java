@@ -57,8 +57,11 @@ public class EnergyRingWeapon extends Weapon{
 
             Lines.stroke(ring.thickness, ring.color);
             for(int i = 0; i < ring.divisions; i++){
-                float angleStep = 360f / ring.divisions;
-                Lines.arc(Tmp.v1.x, Tmp.v1.y, ring.radius, ring.divisions == 1 ? 1f : (angleStep - ring.divisionSeparation) / 360f, rotation + angleStep * i);
+                float angleStep = 360f / ring.divisions, sect = angleStep - ring.divisionSeparation;
+                Lines.arc(Tmp.v1.x, Tmp.v1.y,
+                    ring.radius, ring.divisions == 1 ? 1f : (sect / 360f),
+                    rotation - sect / 2f + angleStep * i
+                );
             }
 
             for(int i = 0; i < ring.spikes; i++){

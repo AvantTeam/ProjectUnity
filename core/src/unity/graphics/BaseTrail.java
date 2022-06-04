@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.graphics.MultiTrail.*;
 
 /**
  * A dynamically composed trail.
@@ -27,7 +28,7 @@ public class BaseTrail extends Trail{
     public float minDst = -1f;
 
     protected final FloatSeq points;
-    protected float lastX, lastY, lastWidth, lastAngle, counter;
+    protected float lastX = Float.NaN, lastY = Float.NaN, lastWidth = Float.NaN, lastAngle = Float.NaN, counter;
 
     private final float[] tmpVertex;
 
@@ -41,6 +42,8 @@ public class BaseTrail extends Trail{
 
     public BaseTrail(int length, RotationHandler rot, TrailAttrib... attributes){
         super(0); // Don't allocate anything for base class' point array.
+        super.length = length;
+
         this.attributes = attributes;
         this.rot = rot;
 
@@ -97,7 +100,7 @@ public class BaseTrail extends Trail{
 
     @Override
     public void draw(Color color, float width){
-        if(forceCap) drawCap(color, width);
+        if(forceCap) forceDrawCap(color, width);
 
         float[] items = points.items;
         int psize = points.size, stride = this.stride;
@@ -140,7 +143,10 @@ public class BaseTrail extends Trail{
     @Override
     public void drawCap(Color color, float width){
         if(forceCap) return;
+        forceDrawCap(color, width);
+    }
 
+    protected void forceDrawCap(Color color, float width){
         int psize = points.size, stride = this.stride;
         if(psize > 0){
             Draw.color(color);
@@ -159,10 +165,15 @@ public class BaseTrail extends Trail{
     /** @inheritDocs. Should not be called at the same tick with {@link #update(float, float, float, float)}. */
     @Override
     public void shorten(){
+        length = super.length;
+
+        float delta = counter;
         if((counter += Time.delta) >= 1f){
             if(points.size >= stride) points.removeRange(0, stride - 1);
             counter %= 1f;
         }
+
+        mutate(0f, delta);
     }
 
     @Override
@@ -176,10 +187,17 @@ public class BaseTrail extends Trail{
     }
 
     public float update(float x, float y, float width, float angle){
-        boolean interval = (counter += Time.delta) >= 1f;
+        length = super.length;
+        if(Float.isNaN(lastX) || Float.isNaN(lastY) || Float.isNaN(lastWidth) || Float.isNaN(lastAngle)){
+            lastX = x;
+            lastY = y;
+            lastWidth = width;
+            lastAngle = angle;
+            return 0f;
+        }
 
         float delta = counter, speed = Mathf.dst(lastX, lastY, x, y) / Time.delta;
-        if(interval){
+        if((counter += Time.delta) >= 1f){
             int stride = this.stride;
             if(speed >= minDst){
                 if(points.size > length * stride - stride) points.removeRange(0, stride - 1);
@@ -194,6 +212,10 @@ public class BaseTrail extends Trail{
         saveLast(x, y, width, angle, speed, delta);
         mutate(speed, delta);
         return speed;
+    }
+
+    public void length(int length){
+        this.length = super.length = length;
     }
 
     /** Forces angle recalculation using the default angle calculator.  */
@@ -235,18 +257,26 @@ public class BaseTrail extends Trail{
     }
 
     protected void mutate(float speed, float delta){
-        float[] items = points.items;
-
         int psize = points.size, stride = this.stride;
         for(TrailAttrib attrib : attributes){
             for(int i = 0, ind = 0; i < psize; i += stride, ind++){
-                System.arraycopy(items, i, tmpVertex, 0, stride);
-                attrib.mutate(this, tmpVertex, ind, speed, delta);
-                System.arraycopy(tmpVertex, 0, items, i, stride);
+                float[] vert = vert(ind);
+
+                attrib.mutate(this, vert, ind, speed, delta);
+                vert(vert, ind);
             }
         }
 
         for(TrailAttrib attrib : attributes) attrib.endMutate(this);
+    }
+
+    public float[] vert(int index){
+        System.arraycopy(points.items, index * stride, tmpVertex, 0, stride);
+        return tmpVertex;
+    }
+
+    public void vert(float[] vert, int index){
+        System.arraycopy(vert, 0, points.items, index * stride, stride);
     }
 
     public float x(float[] vertex){
@@ -329,6 +359,21 @@ public class BaseTrail extends Trail{
         return out;
     }
 
+    public static int length(Trail trail){
+        return length(0, trail);
+    }
+
+    public static int length(int def, Trail trail){
+        int len = def;
+        if(trail instanceof MultiTrail t){
+            for(TrailHold hold : t.trails) len = Math.max(len, length(len, hold.trail));
+        }else{
+            len = Math.max(len, trail.length);
+        }
+
+        return len;
+    }
+
     public interface RotationHandler{
         float get(BaseTrail trail, float x, float y);
     }
@@ -346,13 +391,13 @@ public class BaseTrail extends Trail{
         public void init(){}
 
         /** Adds arbitrary attributes, up to the {@link #size}. */
-        protected abstract void point(BaseTrail trail, FloatSeq points, int index, float x, float y, float width, float angle, float speed, float delta);
+        public abstract void point(BaseTrail trail, FloatSeq points, int index, float x, float y, float width, float angle, float speed, float delta);
 
-        protected void saveLast(BaseTrail trail, float x, float y, float width, float angle, float speed, float delta){}
+        public void saveLast(BaseTrail trail, float x, float y, float width, float angle, float speed, float delta){}
 
-        protected void mutate(BaseTrail trail, float[] vertex, int index, float speed, float delta){}
+        public void mutate(BaseTrail trail, float[] vertex, int index, float speed, float delta){}
 
-        protected void endMutate(BaseTrail trail){}
+        public void endMutate(BaseTrail trail){}
 
         public abstract TrailAttrib copy();
     }

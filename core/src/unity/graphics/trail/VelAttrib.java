@@ -52,17 +52,16 @@ public class VelAttrib extends TrailAttrib{
     }
 
     @Override
-    protected void point(BaseTrail trail, FloatSeq points, int index, float x, float y, float width, float angle, float speed, float delta){
-        float v = speed;
-        vec.trns(rotation.get(trail, this) - 90f, velX * v, velY * v);
+    public void point(BaseTrail trail, FloatSeq points, int index, float x, float y, float width, float angle, float speed, float delta){
+        vec.trns(rotation.get(trail, this) - 90f, velX * speed, velY * speed);
         points.add(vec.x, vec.y);
     }
 
     @Override
-    protected void mutate(BaseTrail trail, float[] vertex, int index, float speed, float delta){
+    public void mutate(BaseTrail trail, float[] vertex, int index, float speed, float delta){
         if(index == trail.length - 1) return;
 
-        float vx = velX(vertex) * Time.delta, vy = velY(vertex) * Time.delta, d = Mathf.clamp(1f - drag * Time.delta);
+        float vx = velX(vertex) * Time.delta, vy = velY(vertex) * Time.delta, d = Math.max(1f - drag * Time.delta, 0f);
         trail.x(vertex, trail.x(vertex) + vx);
         trail.y(vertex, trail.y(vertex) + vy);
 
@@ -71,13 +70,19 @@ public class VelAttrib extends TrailAttrib{
     }
 
     @Override
-    protected void endMutate(BaseTrail trail){
+    public void endMutate(BaseTrail trail){
         trail.recalculateAngle();
     }
 
     @Override
     public VelAttrib copy(){
         return new VelAttrib(velX, velY, rotation, drag);
+    }
+
+    public VelAttrib flip(){
+        VelAttrib out = copy();
+        out.velX *= -1f;
+        return out;
     }
 
     public interface VelRotationHandler<T extends BaseTrail, V extends VelAttrib>{

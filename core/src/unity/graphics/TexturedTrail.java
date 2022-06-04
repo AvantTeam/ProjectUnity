@@ -81,6 +81,7 @@ public class TexturedTrail extends BaseTrail{
         out.lastY = lastY;
         out.lastAngle = lastAngle;
         out.lastWidth = lastWidth;
+        out.rot = rot;
         out.counter = counter;
         out.shrink = shrink;
         out.fadeAlpha = fadeAlpha;
@@ -109,7 +110,7 @@ public class TexturedTrail extends BaseTrail{
 
     @Override
     public void draw(Color color, float widthMultiplier){
-        if(forceCap) drawCap(color, widthMultiplier);
+        if(forceCap) forceDrawCap(color, widthMultiplier);
         float width = baseWidth * widthMultiplier;
 
         if(region == null) region = Core.atlas.find("white");
@@ -221,8 +222,8 @@ public class TexturedTrail extends BaseTrail{
     }
 
     @Override
-    public void drawCap(Color color, float widthMultiplier){
-        if(forceCap || capRegion == Core.atlas.find("clear")) return;
+    public void forceDrawCap(Color color, float widthMultiplier){
+        if(capRegion == Core.atlas.find("clear")) return;
 
         float width = baseWidth * widthMultiplier;
         if(capRegion == null) capRegion = Core.atlas.find("unity-hcircle");
@@ -235,7 +236,7 @@ public class TexturedTrail extends BaseTrail{
                 w = Mathf.map(rv, 1f - shrink, 1f) * width * lastWidth * 2f,
                 h = ((float)capRegion.height / capRegion.width) * w,
 
-                angle = -Mathf.radDeg * lastAngle - 90f,
+                angle = unconvRot(lastAngle) - 90f,
                 u = capRegion.u, v = capRegion.v2, u2 = capRegion.u2, v2 = capRegion.v, uh = Mathf.lerp(u, u2, 0.5f),
                 cx = Mathf.cosDeg(angle) * w / 2f, cy = Mathf.sinDeg(angle) * w / 2f,
                 x1 = lastX, y1 = lastY,
@@ -328,6 +329,7 @@ public class TexturedTrail extends BaseTrail{
             );
         }
 
+        calcProgress();
         return speed;
     }
 
@@ -335,12 +337,6 @@ public class TexturedTrail extends BaseTrail{
     protected void basePoint(float x, float y, float width, float angle, float speed, float delta){
         super.basePoint(x, y, width, angle, speed, delta);
         points.add(1f);
-    }
-
-    @Override
-    protected void mutate(float speed, float delta){
-        super.mutate(speed, delta);
-        calcProgress();
     }
 
     public void calcProgress(){

@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import unity.graphics.*;
 
 /**
  * Base implementation of {@link PUUnitTypeCommon}.
@@ -20,6 +21,10 @@ public class PUUnitType extends PUUnitTypeCommon{
     public PUUnitType(String name){
         super(name);
         properties.orderedKeys().ordered = false;
+    }
+
+    public <T extends Unit> void trail(Func<T, Trail> trailType){
+        trail(-2, trailType);
     }
 
     public <T extends Unit> void trail(int trailLength, Func<T, Trail> trailType){
@@ -61,6 +66,8 @@ public class PUUnitType extends PUUnitTypeCommon{
         for(Props prop : properties.values()) prop.preInit();
         super.init();
         for(Props prop : properties.values()) prop.init();
+
+        if(trailLength == -2) trailLength = BaseTrail.length(trailType.get(sample));
     }
 
     @Override
