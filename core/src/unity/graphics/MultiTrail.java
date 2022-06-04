@@ -55,11 +55,6 @@ public class MultiTrail extends BaseTrail{
     }
 
     @Override
-    public int size(){
-        return length * baseSize();
-    }
-
-    @Override
     public void drawCap(Color color, float width){
         if(forceCap) return;
         forceDrawCap(color, width);
@@ -109,32 +104,34 @@ public class MultiTrail extends BaseTrail{
             counter %= 1f;
         }
 
-        lastX = x;
-        lastY = y;
         if(vel != null){
             float[] items = points.items;
             for(int i = 0, ind = 0; i < psize - stride; i += stride, ind++){
                 float x1 = items[i], y1 = items[i + 1];
 
-                float[] v = vert(ind);
-                vel.mutate(this, v, ind, speed, delta);
-                vert(v, ind);
+                float[] baseVert = vert(ind);
+                vel.mutate(this, baseVert, ind, speed, delta);
+                vert(baseVert, ind);
 
                 float dx = items[i] - x1, dy = items[i + 1] - y1;
                 for(TrailHold trail : trails){
                     BaseTrail t = trail.trail;
-                    if(ind >= t.size() - 1) continue;
 
-                    float[] vert = t.vert(ind);
-                    t.x(vert, t.x(vert) + dx);
-                    t.y(vert, t.y(vert) + dy);
-                    t.vert(vert, ind);
+                    int childInd = ind + (t.size() - size());
+                    if(childInd >= 0 && childInd < t.size() - 1){
+                        float[] vert = t.vert(childInd);
+                        t.x(vert, t.x(vert) + dx);
+                        t.y(vert, t.y(vert) + dy);
+                        t.vert(vert, childInd);
+                    }
                 }
             }
 
             for(TrailHold trail : trails) trail.trail.recalculateAngle();
         }
 
+        lastX = x;
+        lastY = y;
         return speed;
     }
 

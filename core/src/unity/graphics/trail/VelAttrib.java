@@ -59,7 +59,7 @@ public class VelAttrib extends TrailAttrib{
 
     @Override
     public void mutate(BaseTrail trail, float[] vertex, int index, float speed, float delta){
-        if(index == trail.length - 1) return;
+        if(index == trail.size() - 1) return;
 
         float vx = velX(vertex) * Time.delta, vy = velY(vertex) * Time.delta, d = Math.max(1f - drag * Time.delta, 0f);
         trail.x(vertex, trail.x(vertex) + vx);

@@ -42,7 +42,7 @@ public class BaseTrail extends Trail{
 
     public BaseTrail(int length, RotationHandler rot, TrailAttrib... attributes){
         super(0); // Don't allocate anything for base class' point array.
-        super.length = length;
+        super.length = length; // Just in case people still use Trail#length.
 
         this.attributes = attributes;
         this.rot = rot;

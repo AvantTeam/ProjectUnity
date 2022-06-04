@@ -33,7 +33,7 @@ public final class MonolithTrails{
             mixAlpha = 1f;
             trailChance = 0.4f;
             trailWidth = 1.6f;
-            trailColor = Palettes.monolithLight;
+            trailColor = Palettes.monolith;
         }};
     }
 
@@ -112,6 +112,7 @@ public final class MonolithTrails{
             mixAlpha = 0.8f;
             fadeAlpha = 0.5f;
             trailChance = 0f;
+            trailColor = Palettes.monolithDark;
         }};
     }
 
@@ -174,7 +175,7 @@ public final class MonolithTrails{
                     trail.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * trail.width * scl);
                 }
 
-                TrailHold main = trails[trails.length - 1];
+                TrailHold main = trails[strandsAmount];
                 Tmp.v1.trns(angle, main.x, main.y);
 
                 main.trail.update(x + Tmp.v1.x, y + Tmp.v1.y, width * main.width);

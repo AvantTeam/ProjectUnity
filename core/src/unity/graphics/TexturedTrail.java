@@ -187,33 +187,33 @@ public class TexturedTrail extends BaseTrail{
 
             Draw.vert(region.texture, vertices, 0, 24);
 
-            vertices[6] = x1 + cx;
-            vertices[7] = y1 + cy;
-            vertices[8] = col1h;
-            vertices[9] = u2;
-            vertices[10] = mv1;
-            vertices[11] = mix1;
-
-            vertices[0] = x1;
-            vertices[1] = y1;
-            vertices[2] = col1;
-            vertices[3] = uh;
+            vertices[0] = x1 + cx;
+            vertices[1] = y1 + cy;
+            vertices[2] = col1h;
+            vertices[3] = u2;
             vertices[4] = mv1;
             vertices[5] = mix1;
 
-            vertices[18] = x2;
-            vertices[19] = y2;
-            vertices[20] = col2;
-            vertices[21] = uh;
-            vertices[22] = mv2;
-            vertices[23] = mix2;
+            vertices[6] = x1;
+            vertices[7] = y1;
+            vertices[8] = col1;
+            vertices[9] = uh;
+            vertices[10] = mv1;
+            vertices[11] = mix1;
 
-            vertices[12] = x2 + nx;
-            vertices[13] = y2 + ny;
-            vertices[14] = col2h;
-            vertices[15] = u2;
+            vertices[12] = x2;
+            vertices[13] = y2;
+            vertices[14] = col2;
+            vertices[15] = uh;
             vertices[16] = mv2;
             vertices[17] = mix2;
+
+            vertices[18] = x2 + nx;
+            vertices[19] = y2 + ny;
+            vertices[20] = col2h;
+            vertices[21] = u2;
+            vertices[22] = mv2;
+            vertices[23] = mix2;
 
             Draw.vert(region.texture, vertices, 0, 24);
         }
@@ -280,33 +280,33 @@ public class TexturedTrail extends BaseTrail{
 
             Draw.vert(region.texture, vertices, 0, 24);
 
-            vertices[6] = x1 + cx;
-            vertices[7] = y1 + cy;
-            vertices[8] = col1h;
-            vertices[9] = u2;
-            vertices[10] = v;
-            vertices[11] = mix1;
-
-            vertices[0] = x1;
-            vertices[1] = y1;
-            vertices[2] = col1;
-            vertices[3] = uh;
+            vertices[0] = x1 + cx;
+            vertices[1] = y1 + cy;
+            vertices[2] = col1h;
+            vertices[3] = u2;
             vertices[4] = v;
             vertices[5] = mix1;
 
-            vertices[18] = x2;
-            vertices[19] = y2;
-            vertices[20] = col2;
-            vertices[21] = uh;
-            vertices[22] = v2;
-            vertices[23] = mix2;
+            vertices[6] = x1;
+            vertices[7] = y1;
+            vertices[8] = col1;
+            vertices[9] = uh;
+            vertices[10] = v;
+            vertices[11] = mix1;
 
-            vertices[12] = x2 + cx;
-            vertices[13] = y2 + cy;
-            vertices[14] = col2h;
-            vertices[15] = u2;
+            vertices[12] = x2;
+            vertices[13] = y2;
+            vertices[14] = col2;
+            vertices[15] = uh;
             vertices[16] = v2;
             vertices[17] = mix2;
+
+            vertices[18] = x2 + cx;
+            vertices[19] = y2 + cy;
+            vertices[20] = col2h;
+            vertices[21] = u2;
+            vertices[22] = v2;
+            vertices[23] = mix2;
 
             Draw.vert(region.texture, vertices, 0, 24);
             Draw.blend();

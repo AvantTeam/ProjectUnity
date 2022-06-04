@@ -175,7 +175,7 @@ public final class MonolithUnitTypes{
             setEnginesMirror(new UnitEngine(5f, -11.5f, 2.5f, -90f));
 
             trail(unit -> {
-                VelAttrib vel = new VelAttrib(-0.2f, 0f, (t, v) -> unit.rotation);
+                VelAttrib vel = new VelAttrib(-0.18f, 0f, (t, v) -> unit.rotation);
                 return new MultiTrail(BaseTrail.rot(unit),
                     new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 24, speed, vel), 5f, -3.5f, 1f, monolithLight),
                     new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 24, speed, vel.flip()), -5f, -3.5f, 1f, monolithLight)
