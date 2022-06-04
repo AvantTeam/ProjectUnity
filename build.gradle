@@ -21,7 +21,7 @@ plugins{
     id 'org.jetbrains.kotlin.kapt' version '1.6.21'
 }
 
-allprojects{
+configure(allprojects){
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
@@ -86,7 +86,7 @@ allprojects{
     }
 }
 
-project(':annotations'){
+configure(project(':annotations')){
     sourceCompatibility = 8
     targetCompatibility = 8
 
@@ -96,7 +96,7 @@ project(':annotations'){
     }
 }
 
-project(':common'){
+configure(project(':common')){
     apply plugin: 'kotlin'
     apply plugin: 'kotlin-kapt'
 
@@ -124,7 +124,7 @@ project(':common'){
     }
 }
 
-([project(':core'), project(':mod'), project(':tools')] + project(':factions').subprojects).forEach{
+configure([project(':core'), project(':mod'), project(':tools')] + project(':factions').subprojects){
     sourceCompatibility = compilerVersion
     tasks.withType(JavaCompile){
         sourceCompatibility = compilerVersion
