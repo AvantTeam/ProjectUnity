@@ -79,7 +79,7 @@ public class MultiTrail extends BaseTrail{
 
     @Override
     public float update(float x, float y, float width, float angle){
-        if(Float.isNaN(lastX) || Float.isNaN(lastY) || Float.isNaN(lastWidth) || Float.isNaN(lastAngle)){
+        if(Float.isNaN(lastX) || Float.isNaN(lastY)){
             lastX = x;
             lastY = y;
             lastWidth = width;

@@ -14,6 +14,7 @@ import unity.assets.list.*;
 import unity.entities.prop.*;
 import unity.entities.type.*;
 import unity.entities.type.bullet.energy.*;
+import unity.entities.type.bullet.laser.*;
 import unity.entities.weapons.*;
 import unity.gen.entities.*;
 import unity.graphics.*;
@@ -40,20 +41,23 @@ public final class MonolithUnitTypes{
     public static void load(){
         stray = register(Faction.monolith, content("stray", MonolithUnit.class, n -> new PUUnitType(n){{
             health = 300f;
-            speed = 5f;
-            accel = 0.08f;
-            drag = 0.045f;
-            rotateSpeed = 8f;
-            flying = true;
-            hitSize = 12f;
-            lowAltitude = true;
             faceTarget = false;
+            lowAltitude = true;
+            flying = true;
+
+            hitSize = 12f;
+            speed = 5f;
+            rotateSpeed = 8f;
+            drag = 0.045f;
+            accel = 0.08f;
+
             outlineColor = darkOutline;
+            ammoType = new PowerAmmoType(500f);
 
             engineColor = monolithLight;
             engineSize = 2.5f;
             engineOffset = 12.5f;
-            setEnginesMirror(new UnitEngine(4.5f, -10f, 1.8f, -90f));
+            setEnginesMirror(new PUUnitEngine(4.5f, -10f, 1.8f, -90f));
 
             trail(unit -> {
                 TexturedTrail right = MonolithTrails.singlePhantasmal(20, new VelAttrib(0.14f, 0f, (t, v) -> unit.rotation, 0.15f));
@@ -136,7 +140,14 @@ public final class MonolithUnitTypes{
 
                     @Override
                     public void updateTrail(Bullet b){
-                        if(!headless && b.trail == null) b.trail = MonolithTrails.singlePhantasmal(trailLength);
+                        if(!headless && b.trail == null){
+                            TexturedTrail trail = MonolithTrails.singlePhantasmal(trailLength);
+                            trail.forceCap = true;
+                            trail.kickstart(b.x, b.y);
+
+                            b.trail = trail;
+                        }
+
                         super.updateTrail(b);
                     }
 
@@ -172,7 +183,7 @@ public final class MonolithUnitTypes{
             engineOffset = 8f;
             engineSize = 2.5f;
             engineColor = monolith;
-            setEnginesMirror(new UnitEngine(5f, -11.5f, 2.5f, -90f));
+            setEnginesMirror(new PUUnitEngine(5f, -11.5f, 2.5f, -90f));
 
             trail(unit -> {
                 VelAttrib vel = new VelAttrib(-0.18f, 0f, (t, v) -> unit.rotation);
@@ -183,6 +194,7 @@ public final class MonolithUnitTypes{
             });
 
             parts.add(new RegionPart("-top"){{
+                outline = false;
                 layer = Layer.bullet - 0.02f;
             }});
 
@@ -255,12 +267,12 @@ public final class MonolithUnitTypes{
 
                     @Override
                     public void updateTrail(Bullet b){
-                        if(!headless && trailLength > 0 && b.trail == null){
-                            MultiTrail trail = MonolithTrails.soul(trailLength, 6, trailWidth - 0.3f, speed);
+                        if(!headless && b.trail == null){
+                            MultiTrail trail = MonolithTrails.soul(trailLength, 6f, trailWidth - 0.3f, speed);
                             trail.forceCap = true;
+                            trail.kickstart(b.x, b.y);
 
                             b.trail = trail;
-                            for(int i = 0; i < b.trail.length; i++) b.trail.update(b.x, b.y, 0f); // Give a head start.
                         }
 
                         super.updateTrail(b);
@@ -276,11 +288,174 @@ public final class MonolithUnitTypes{
         }}));
 
         liminality = register(Faction.monolith, content("liminality", MonolithUnit.class, n -> new PUUnitType(n){{
+            health = 2000f;
+            faceTarget = false;
+            lowAltitude = true;
+            flying = true;
 
+            strafePenalty = 0.1f;
+            hitSize = 36f;
+            speed = 3.5f;
+            rotateSpeed = 3.6f;
+            drag = 0.06f;
+            accel = 0.08f;
+
+            outlineColor = darkOutline;
+            ammoType = new PowerAmmoType(2000f);
+
+            prop(new MonolithProps(){{
+                maxSouls = 5;
+                soulLackStatus = content.getByName(ContentType.status, "unity-disabled");
+            }});
+
+            engineOffset = 22.25f;
+            engineSize = 4f;
+            engineColor = monolithLight;
+            setEnginesMirror(
+                new PUUnitEngine(17.875f, -16.25f, 3f, -90f),
+                new PUUnitEngine(9f, -11f, 3.5f, -45f, monolith)
+            );
+
+            trail(unit -> {
+                VelAttrib velInner = new VelAttrib(0.2f, 0f, (t, v) -> unit.rotation, 0.25f);
+                VelAttrib velOuter = new VelAttrib(0.24f, 0.1f, (t, v) -> unit.rotation, 0.2f);
+                return new MultiTrail(BaseTrail.rot(unit),
+                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 32, 5.6f, 8f, speed, 0f), monolithLight),
+                    new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, 6f, 3.2f, speed, velInner), 9f, 11.25f, 0.75f, monolithLight),
+                    new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, 6f, 3.2f, speed, velInner.flip()), -9f, 11.25f, 0.75f, monolithLight),
+                    new TrailHold(MonolithTrails.singlePhantasmal(10, velOuter), 17.875f, 6f, 0.6f, monolithLight),
+                    new TrailHold(MonolithTrails.singlePhantasmal(10, velOuter.flip()), -17.875f, 6f, 0.6f, monolithLight)
+                );
+            });
+
+            parts.add(
+                new RegionPart("-middle"){{
+                    outline = false;
+                    layer = Layer.bullet - 0.02f;
+                }}, new RegionPart("-top"){{
+                    outline = false;
+                    layer = Layer.effect + 0.0199f;
+                }}
+            );
+
+            weapons.add(new EnergyRingWeapon(){{
+                rings.add(new Ring(){{
+                    radius = 9f;
+                    thickness = 1f;
+                    spikes = 6;
+                    spikeOffset = 1.5f;
+                    spikeWidth = 2f;
+                    spikeLength = 4f;
+                    color = monolithDark.cpy().lerp(monolith, 0.5f);
+                }}, new Ring(){{
+                    shootY = radius = 5.6f;
+                    rotate = false;
+                    thickness = 1f;
+                    divisions = 2;
+                    divisionSeparation = 30f;
+                    angleOffset = 90f;
+                    color = monolith;
+                }}, new Ring(){{
+                    radius = 2f;
+                    thickness = 1f;
+                    spikes = 4;
+                    spikeOffset = 0.4f;
+                    spikeWidth = 1f;
+                    spikeLength = 1.5f;
+                    flip = true;
+                    color = monolithDark;
+                }});
+
+                x = 0f;
+                y = 5f;
+                mirror = false;
+                rotate = true;
+                reload = 56f;
+                layerOffset = 10f;
+                eyeRadius = 2f;
+
+                shootSound = Sounds.laser;
+                bullet = new HelixLaserBulletType(240f){{
+                    sideWidth = 1.4f;
+                    sideAngle = 30f;
+                }};
+            }});
         }}));
 
         calenture = register(Faction.monolith, content("calenture", MonolithUnit.class, n -> new PUUnitType(n){{
+            health = 14400f;
+            faceTarget = false;
+            lowAltitude = true;
+            flying = true;
 
+            strafePenalty = 0.3f;
+            hitSize = 48f;
+            speed = 3.5f;
+            rotateSpeed = 3.6f;
+            drag = 0.06f;
+            accel = 0.08f;
+
+            outlineColor = darkOutline;
+            ammoType = new PowerAmmoType(3000f);
+
+            prop(new MonolithProps(){{
+                maxSouls = 7;
+                soulLackStatus = content.getByName(ContentType.status, "unity-disabled");
+            }});
+
+            parts.add(
+                new RegionPart(name + "-middle"){{
+                    outline = false;
+                    layer = Layer.bullet - 0.02f;
+                }}, new RegionPart(name + "-top"){{
+                    outline = false;
+                    layer = Layer.effect + 0.0199f;
+                }}
+            );
+
+            weapons.add(new EnergyRingWeapon(){{
+                rings.add(new Ring(){{
+                    color = monolithLight;
+                    radius = 14f;
+                    rotateSpeed = 4f;
+                    spikes = 8;
+                    spikeOffset = 2f;
+                    spikeWidth = 3f;
+                    spikeLength = 4.5f;
+                }}, new Ring(){{
+                    color = monolithDark.cpy().lerp(monolith, 0.5f);
+                    thickness = 1f;
+                    radius = 12f;
+                    rotateSpeed = 3.2f;
+                    flip = true;
+                    divisions = 2;
+                    divisionSeparation = 30f;
+                }}, new Ring(){{
+                    color = monolith;
+                    shootY = radius = 8.5f;
+                    rotate = false;
+                    angleOffset  = 90f;
+                    divisions = 2;
+                    divisionSeparation = 30f;
+                }}, new Ring(){{
+                    color = monolithDark;
+                    thickness = 1f;
+                    radius = 4f;
+                    rotateSpeed = 2.4f;
+                    spikes = 6;
+                    spikeOffset = 0.4f;
+                    spikeWidth = 2f;
+                    spikeLength = 2f;
+                }});
+
+                x = 0f;
+                y = 10f;
+                mirror = false;
+                rotate = true;
+                reload = 120f;
+                layerOffset = 10f;
+                eyeRadius = 2f;
+            }});
         }}));
 
         hallucination = register(Faction.monolith, content("hallucination", MonolithUnit.class, n -> new PUUnitType(n){{

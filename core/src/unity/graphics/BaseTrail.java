@@ -188,7 +188,7 @@ public class BaseTrail extends Trail{
 
     public float update(float x, float y, float width, float angle){
         length = super.length;
-        if(Float.isNaN(lastX) || Float.isNaN(lastY) || Float.isNaN(lastWidth) || Float.isNaN(lastAngle)){
+        if(Float.isNaN(lastX) || Float.isNaN(lastY)){
             lastX = x;
             lastY = y;
             lastWidth = width;
@@ -212,6 +212,11 @@ public class BaseTrail extends Trail{
         saveLast(x, y, width, angle, speed, delta);
         mutate(speed, delta);
         return speed;
+    }
+
+    public void kickstart(float x, float y){
+        clear();
+        for(int i = 0; i < length; i++) point(x, y, 0f, 0f, 0f, 0f);
     }
 
     public void length(int length){
