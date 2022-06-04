@@ -104,6 +104,7 @@ project(':common'){
     kapt{
         useBuildCache = false
         correctErrorTypes = true
+        keepJavacAnnotationProcessors = true
 
         javacOptions{
             option('-source', compilerVersion)
