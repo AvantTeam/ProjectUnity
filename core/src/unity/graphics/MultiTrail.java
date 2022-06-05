@@ -135,6 +135,21 @@ public class MultiTrail extends BaseTrail{
         return speed;
     }
 
+    @Override
+    public void kickstart(float x, float y){
+        clear();
+        for(int i = 0; i < length; i++){
+            points.add(x, y);
+            if(vel != null){
+                vel.point(this, points, i, x, y, 0f, 0f, 0f, 0f);
+            }else{
+                points.add(Float.NaN, Float.NaN);
+            }
+        }
+
+        for(TrailHold trail : trails) trail.trail.kickstart(x, y);
+    }
+
     public void defUpdate(float x, float y, float width, float angle, float speed, float delta){
         for(TrailHold trail : trails){
             Tmp.v1.trns(unconvRot(angle) - 90f, trail.x, trail.y);
