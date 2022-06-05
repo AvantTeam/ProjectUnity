@@ -21,7 +21,7 @@ import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.*;
-import static unity.graphics.Palettes.*;
+import static unity.graphics.MonolithPalettes.*;
 
 /**
  * Defines all {@linkplain Faction#monolith monolith} effect types.

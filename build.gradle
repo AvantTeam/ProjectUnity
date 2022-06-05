@@ -101,6 +101,12 @@ configure(project(':common')){
     apply plugin: 'kotlin-kapt'
 
     sourceCompatibility = compilerVersion
+    kotlin{
+        jvmToolchain{
+            languageVersion = JavaLanguageVersion.of(compilerVersion)
+        }
+    }
+
     kapt{
         useBuildCache = false
         correctErrorTypes = true

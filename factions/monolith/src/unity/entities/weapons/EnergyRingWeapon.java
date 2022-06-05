@@ -9,7 +9,8 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import unity.graphics.*;
+
+import static unity.graphics.MonolithPalettes.*;
 
 /**
  * Sprite-less weapon composed of revolving energy rings.
@@ -22,7 +23,7 @@ public class EnergyRingWeapon extends Weapon{
     public float aggressionSpeed = 0.2f;
     public float cooldownSpeed = 0.08f;
 
-    public Color eyeColor = Palettes.monolithLight;
+    public Color eyeColor = monolithLight;
     public float eyeRadius = 2.5f;
 
     public EnergyRingWeapon(){
@@ -85,7 +86,7 @@ public class EnergyRingWeapon extends Weapon{
     public void drawOutline(Unit unit, WeaponMount mount){}
 
     public static class Ring{
-        public Color color = Palettes.monolithLight;
+        public Color color = monolithLight;
 
         public float thickness = 1.5f;
         public float radius = 4.5f;

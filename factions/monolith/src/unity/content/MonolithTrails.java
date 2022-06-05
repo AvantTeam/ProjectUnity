@@ -11,6 +11,8 @@ import unity.graphics.trail.*;
 import unity.mod.*;
 import unity.util.*;
 
+import static unity.graphics.MonolithPalettes.*;
+
 /**
  * Provides various types of trails used by {@linkplain Faction#monolith monolith} entities.
  * @author GlennFolker
@@ -33,7 +35,7 @@ public final class MonolithTrails{
             mixAlpha = 1f;
             trailChance = 0.4f;
             trailWidth = 1.6f;
-            trailColor = Palettes.monolith;
+            trailColor = monolith;
         }};
     }
 
@@ -112,7 +114,7 @@ public final class MonolithTrails{
             mixAlpha = 0.8f;
             fadeAlpha = 0.5f;
             trailChance = 0f;
-            trailColor = Palettes.monolithDark;
+            trailColor = monolithDark;
         }};
     }
 
@@ -155,7 +157,7 @@ public final class MonolithTrails{
             trails[i] = new TrailHold(t, 0f, 0f, 0.56f);
         }
 
-        trails[strandsAmount] = new TrailHold(singlePhantasmal(length), Palettes.monolith);
+        trails[strandsAmount] = new TrailHold(singlePhantasmal(length), monolith);
 
         float dir = Mathf.sign(Mathf.chance(0.5f));
         return new MultiTrail(rot, vel, trails){

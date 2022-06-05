@@ -24,7 +24,7 @@ import unity.mod.*;
 
 import static mindustry.Vars.*;
 import static unity.gen.entities.EntityRegistry.*;
-import static unity.graphics.Palettes.*;
+import static unity.graphics.MonolithPalettes.*;
 import static unity.mod.FactionRegistry.*;
 
 /**
@@ -32,13 +32,29 @@ import static unity.mod.FactionRegistry.*;
  * @author GlennFolker
  */
 public final class MonolithUnitTypes{
-    public static PUUnitType stray, tendence, liminality, calenture, hallucination, escapism, fantasy;
+    public static PUUnitType
+    stele, pedestal, pilaster, pylon, monument, colossus, bastion,
+    stray, tendence, liminality, calenture, hallucination, escapism, fantasy;
 
     private MonolithUnitTypes(){
         throw new AssertionError();
     }
 
     public static void load(){
+        stele = register(Faction.monolith, content("stele", MonolithMechUnit.class, n -> new PUUnitType(n){{}}));
+
+        pedestal = register(Faction.monolith, content("pedestal", MonolithMechUnit.class, n -> new PUUnitType(n){{}}));
+
+        pilaster = register(Faction.monolith, content("pilaster", MonolithMechUnit.class, n -> new PUUnitType(n){{}}));
+
+        pylon = register(Faction.monolith, content("pylon", MonolithLegsUnit.class, n -> new PUUnitType(n){{}}));
+
+        monument = register(Faction.monolith, content("monument", MonolithLegsUnit.class, n -> new PUUnitType(n){{}}));
+
+        colossus = register(Faction.monolith, content("colossus", MonolithLegsUnit.class, n -> new PUUnitType(n){{}}));
+
+        bastion = register(Faction.monolith, content("bastion", MonolithLegsUnit.class, n -> new PUUnitType(n){{}}));
+
         stray = register(Faction.monolith, content("stray", MonolithUnit.class, n -> new PUUnitType(n){{
             health = 300f;
             faceTarget = false;
@@ -51,7 +67,7 @@ public final class MonolithUnitTypes{
             drag = 0.045f;
             accel = 0.08f;
 
-            outlineColor = darkOutline;
+            outlineColor = monolithOutline;
             ammoType = new PowerAmmoType(500f);
 
             engineColor = monolithLight;
@@ -172,7 +188,7 @@ public final class MonolithUnitTypes{
             drag = 0.045f;
             accel = 0.08f;
 
-            outlineColor = darkOutline;
+            outlineColor = monolithOutline;
             ammoType = new PowerAmmoType(1000f);
 
             prop(new MonolithProps(){{
@@ -300,7 +316,7 @@ public final class MonolithUnitTypes{
             drag = 0.06f;
             accel = 0.08f;
 
-            outlineColor = darkOutline;
+            outlineColor = monolithOutline;
             ammoType = new PowerAmmoType(2000f);
 
             prop(new MonolithProps(){{
@@ -395,7 +411,7 @@ public final class MonolithUnitTypes{
             drag = 0.06f;
             accel = 0.08f;
 
-            outlineColor = darkOutline;
+            outlineColor = monolithOutline;
             ammoType = new PowerAmmoType(3000f);
 
             prop(new MonolithProps(){{

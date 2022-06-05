@@ -380,7 +380,7 @@ public abstract class BaseProcessor implements Processor{
 
     @Override
     public SourceVersion getSupportedSourceVersion(){
-        return SourceVersion.RELEASE_8;
+        return SourceVersion.RELEASE_16;
     }
 
     @Override

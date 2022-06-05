@@ -4,13 +4,20 @@ import arc.graphics.*;
 
 import static mindustry.graphics.Pal.*;
 
-public class Palettes{
+/**
+ * Shared access for commonly used palettes. Specific palettes should be defined in the corresponding submodules, optionally
+ * copying/referencing colors from this class to avoid recompilation as much as possible.
+ * @author GlennFolker
+ */
+public final class Palettes{
     public static final Color
         monolith = new Color(0x87ceebff),
-        monolithLight = new Color(0xc0ecffff),
-        monolithDark = new Color(0x6586b0ff),
 
         outline = darkerMetal,
         darkOutline = new Color(0x38383dff),
         darkerOutline = new Color(0x2e3142ff);
+
+    private Palettes(){
+        throw new AssertionError();
+    }
 }
