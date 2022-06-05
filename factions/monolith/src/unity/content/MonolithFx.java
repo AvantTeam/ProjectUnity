@@ -20,6 +20,7 @@ import static arc.Core.*;
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
+import static arc.math.Interp.*;
 import static mindustry.Vars.*;
 import static unity.graphics.MonolithPalettes.*;
 
@@ -31,12 +32,79 @@ public final class MonolithFx{
     private static final Color col = new Color();
 
     public static final Effect
+    trailFadeLow = CoreFx.trailFadeLow,
+
     spark = new Effect(60f, e -> randLenVectors(e.id, 2, e.rotation, (x, y) -> {
         color(monolith, monolithDark, e.fin());
 
         float w = 1f + e.fout() * 4f;
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
+
+    soul = new Effect(48f, e -> {
+        if(!(e.data instanceof Vec2 data)) return;
+
+        blend(Blending.additive);
+        color(monolith, monolithDark, Color.black, e.finpow());
+
+        float time = Time.time - e.rotation, vx = data.x * time, vy = data.y * time;
+        randLenVectors(e.id, 1, 5f + e.finpowdown() * 8f, (x, y) -> {
+            float fin = 1f - e.fin(pow2In);
+
+            alpha(1f);
+            Fill.circle(e.x + x + vx, e.y + y + vy, fin * 2f);
+
+            alpha(0.67f);
+            Draw.rect("circle-shadow", e.x + x + vx, e.y + y + vy, fin * 8f, fin * 8f);
+        });
+
+        blend();
+    }).layer(Layer.flyingUnit - 0.01f),
+
+    soulAbsorb = new Effect(32f, e -> {
+        if(!(e.data instanceof Position data)) return;
+
+        Tmp.v1
+            .trns(Angles.angle(e.x, e.y, data.getX(), data.getY()) - 90f, Mathf.randomSeedRange(e.id, 3f))
+            .scl(pow3Out.apply(e.fslope()));
+        Tmp.v2.trns(Mathf.randomSeed(e.id + 1, 360f), e.fin(pow4Out));
+        Tmp.v3.set(data).sub(e.x, e.y).scl(e.fin(pow4In))
+            .add(Tmp.v2).add(Tmp.v1).add(e.x, e.y);
+
+        float fin = 0.3f + e.fin() * 1.4f;
+
+        blend(Blending.additive);
+        color(Color.black, monolithDark, e.fin());
+
+        alpha(1f);
+        Fill.circle(Tmp.v3.x, Tmp.v3.y, fin);
+
+        alpha(0.67f);
+        Draw.rect("circle-shadow", Tmp.v3.x, Tmp.v3.y, fin + 6f, fin + 6f);
+
+        blend();
+    }).layer(Layer.flyingUnitLow),
+
+    soulDeath = new Effect(64f, e -> {
+        color(monolith, monolithDark, e.fin());
+        randLenVectors(e.id, 27, e.finpow() * 56f, (x, y) ->
+            Fill.circle(e.x + x, e.y + y, 0.5f + e.fout() * 2.5f)
+        );
+
+        e.scaled(48f, i -> {
+            stroke(i.fout() * 2.5f, monolithLight);
+            Lines.circle(e.x, e.y, i.fin(pow10Out) * 32f);
+
+            float thick = i.foutpowdown() * 4f;
+
+            Fill.circle(e.x, e.y, thick / 2f);
+            for(int t = 0; t < 4; t++){
+                Drawf.tri(e.x, e.y, thick, thick * 14f,
+                    Mathf.randomSeed(e.id + 1, 360f) + 90f * t + i.finpow() * 60f * Mathf.sign(e.id % 2 == 0)
+                );
+            }
+        });
+    }),
 
     strayShoot = new Effect(12f, e -> {
         color(monolithLight, monolith, monolithDark, e.finpowdown());
@@ -57,7 +125,7 @@ public final class MonolithFx{
 
         DrawUtils.panningCircle(reg,
             e.x, e.y, w, h,
-            rad, 360f, e.fin(Interp.pow2Out) * 90f * Mathf.sign(e.id % 2 == 0) + e.id * 30f,
+            rad, 360f, e.fin(pow2Out) * 90f * Mathf.sign(e.id % 2 == 0) + e.id * 30f,
             MathUtils.q1, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
@@ -104,7 +172,7 @@ public final class MonolithFx{
         color();
         for(TrailHold hold : data){
             Tmp.v1.set(hold.x, hold.y);
-            Tmp.v2.trns(Tmp.v1.angle() - 90f, Mathf.sin(hold.width * 2.6f, hold.width * 8f * Interp.pow2Out.apply(e.fslope())));
+            Tmp.v2.trns(Tmp.v1.angle() - 90f, Mathf.sin(hold.width * 2.6f, hold.width * 8f * pow2Out.apply(e.fslope())));
             Tmp.v1.scl(e.foutpowdown()).add(Tmp.v2).add(e.x, e.y);
 
             float w = hold.width * e.fin();
@@ -122,7 +190,7 @@ public final class MonolithFx{
     tendenceHit = new Effect(52f, e -> {
         color(monolithLight, monolith, monolithDark, e.fin());
         for(int sign : Mathf.signs){
-            randLenVectors(e.id + sign, 3, e.fin(Interp.pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
+            randLenVectors(e.id + sign, 3, e.fin(pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
                 Fill.square(e.x + x, e.y + y, e.foutpowdown() * 2.5f, e.id * 30f + e.finpow() * 90f * sign)
             );
         }
