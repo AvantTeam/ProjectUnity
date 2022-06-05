@@ -1,10 +1,13 @@
 package unity.entities.type;
 
 import arc.func.*;
+import arc.math.*;
 import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
+
+import static mindustry.Vars.*;
 
 /**
  * Base implementation of {@link PUUnitTypeCommon}.
@@ -17,6 +20,8 @@ public class PUUnitType extends PUUnitTypeCommon{
 
     /** The trail constructor, as a support for custom trails. */
     public Func<Unit, Trail> trailType = unit -> new Trail(trailLength);
+    /** Whether to kickstart trails when instantiating. Only valid if the trail is an instanceof {@link BaseTrail}. */
+    public boolean kickstartTrail = false;
 
     public PUUnitType(String name){
         super(name);
@@ -34,8 +39,30 @@ public class PUUnitType extends PUUnitTypeCommon{
 
     @Override
     public void drawTrail(Unit unit){
-        if(unit.trail == null) unit.trail = trailType.get(unit);
+        if(!headless && unit.trail == null){
+            Trail trail = trailType.get(unit);
+            if(kickstartTrail && trail instanceof BaseTrail t) kickstartTrail(unit, t);
+
+            unit.trail = trail;
+        }
+
         super.drawTrail(unit);
+    }
+
+    public <T extends Trail> T createTrail(Unit unit){
+        return (T)trailType.get(unit);
+    }
+
+    public <T extends BaseTrail> T kickstartTrail(Unit unit, T trail){
+        float scale = useEngineElevation ? unit.elevation : 1f;
+        float offset = engineOffset / 2f + engineOffset / 2f * scale;
+
+        float
+            cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset),
+            cy = unit.y + Angles.trnsy(unit.rotation + 180f, offset);
+
+        trail.kickstart(cx, cy);
+        return trail;
     }
 
     @Override

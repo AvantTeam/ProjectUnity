@@ -121,6 +121,10 @@ configure(project(':common')){
     }
 
     tasks.withType(JavaCompile){
+        // If I don't recompile the :common module every time, other modules might potentially fail while compiling
+        // due to them using Java 9+ syntax. I don't know why this happens.
+        outputs.upToDateWhen{ false }
+
         sourceCompatibility = compilerVersion
 
         options.release = 8

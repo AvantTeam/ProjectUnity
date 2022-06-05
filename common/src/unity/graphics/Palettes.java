@@ -11,7 +11,7 @@ import static mindustry.graphics.Pal.*;
  */
 public final class Palettes{
     public static final Color
-        monolith = new Color(0x87ceebff),
+        monolith = new Color(0x6bb4f0ff),
 
         outline = darkerMetal,
         darkOutline = new Color(0x38383dff),
