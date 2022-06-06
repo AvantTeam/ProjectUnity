@@ -3,38 +3,7 @@ name: Java CI
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  buildJar16:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up JDK 16
-      uses: actions/setup-java@v1
-      with:
-        java-version: 16
-
-    - name: Set up PATH
-      run: echo "${ANDROID_HOME}/build-tools/30.0.1" >> $GITHUB_PATH
-
-    - name: General information
-      run: |
-        java --version
-        d8 --version
-
-    - name: Build and dexify mod jar file
-      run: |
-        chmod +x gradlew
-        ./gradlew tools:proc mod:deploy mod:dex --no-daemon --stacktrace
-
-    - name: Upload built mod jar file
-      uses: actions/upload-artifact@v2.2.1
-      with:
-        name: Project Unity (zipped)
-        path: mod/build/libs/ProjectUnity.jar
-        retention-days: 3
-
-  buildJar17:
+  buildJar:
     runs-on: ubuntu-latest
 
     steps:
@@ -56,4 +25,11 @@ jobs:
     - name: Build and dexify mod jar file
       run: |
         chmod +x gradlew
-        ./gradlew tools:proc mod:deploy mod:dex --no-daemon --stacktrace
+        ./gradlew tools:proc mod:deploy mod:dex --no-daemon --info --stacktrace
+
+    - name: Upload built mod jar file
+      uses: actions/upload-artifact@v2.2.1
+      with:
+        name: Project Unity (zipped)
+        path: mod/build/libs/ProjectUnity.jar
+        retention-days: 3

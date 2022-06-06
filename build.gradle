@@ -31,7 +31,7 @@ configure(allprojects){
     ext{
         sdkRoot = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
         taskNames = gradle.startParameter.taskNames
-        compilerVersion = JavaVersion.current().ordinal() - JavaVersion.VERSION_16.ordinal() + 16
+        compilerVersion = JavaVersion.current().ordinal() - JavaVersion.VERSION_17.ordinal() + 17
 
         assetsDir = file("${project(':mod').projectDir}/assets")
         assetsRawDir = file("${project(':mod').projectDir}/assets-raw")
