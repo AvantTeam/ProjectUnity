@@ -10,22 +10,23 @@ import arc.struct.*;
 public final class DrawUtils{
     public static final float perspectiveDistance = 150f;
 
-    private static final Vec2 vec1 = new Vec2(), vec2 = new Vec2();
+    private static final Vec2 vec1 = new Vec2();
     private static final Vec2
-        A = new Vec2(), AB = new Vec2(),
-        B = new Vec2(), BC = new Vec2(),
-        C = new Vec2(),
-        D = new Vec2(), D0 = new Vec2(),
-        E = new Vec2(), E0 = new Vec2();
+        a = new Vec2(),
+        b = new Vec2(),
+        c = new Vec2(),
+        left = new Vec2(), leftInit = new Vec2(),
+        right = new Vec2(), rightInit = new Vec2();
 
     private static final Vec3
-        q1 = new Vec3(),
-        q2 = new Vec3(),
-        q3 = new Vec3(),
-        q4 = new Vec3();
+        vert1 = new Vec3(),
+        vert2 = new Vec3(),
+        vert3 = new Vec3(),
+        vert4 = new Vec3();
 
     private static boolean building;
-    private static final FloatSeq floatBuilder = new FloatSeq(40);
+    private static final FloatSeq floatBuilder = new FloatSeq(50);
+    private static final int linestr = 5;
 
     private static final Vec3 v31 = new Vec3();
     private static final Mat3D m41 = new Mat3D();
@@ -90,10 +91,15 @@ public final class DrawUtils{
     }
 
     public static void linePoint(float x, float y, float col, float z){
+        linePoint(x, y, col, Lines.getStroke(), z);
+    }
+
+    public static void linePoint(float x, float y, float col, float w, float z){
         if(!building){
             throw new IllegalStateException("Not building.");
         }else{
-            floatBuilder.add(x, y, col, z);
+            floatBuilder.add(x, y, col, w);
+            floatBuilder.add(z);
         }
     }
 
@@ -112,112 +118,79 @@ public final class DrawUtils{
 
     public static void endLine(boolean wrap){
         if(!building){
-            throw new IllegalStateException("Not building");
+            throw new IllegalStateException("Not building.");
         }else{
             polyLine(floatBuilder.items, 0, floatBuilder.size, wrap);
             building = false;
         }
     }
 
-    public static void polyLine(float[] points, int offset, int length, boolean wrap){
-        if(length < 8) return;
+    public static void polyLine(float[] items, int offset, int length, boolean wrap){
+        if(length < linestr * 2) return;
+        for(int i = offset + linestr; i < length - linestr; i += linestr){
+            float
+                widthA = items[i - linestr + 3] / 2f, colA = items[i - linestr + 2],
+                widthB = items[i + 3] / 2f, colB = items[i + 2],
+                z = items[i + 4];
 
-        float halfWidth = 0.5f * Lines.getStroke();
-        boolean open = !wrap;
+            a.set(items[i - linestr], items[i - linestr + 1]);
+            b.set(items[i], items[i + 1]);
+            c.set(items[i + linestr], items[i + linestr + 1]);
 
-        int start = offset + 4, end = start + length;
-        for(int i = start; i < end - 4; i += 4){
-            A.set(points[i - 4], points[i - 3]);
-            B.set(points[i], points[i + 1]);
-            C.set(points[i + 4], points[i + 5]);
+            MathUtils.pathJoin(a, b, c, left, right, widthB);
+            vert3.set(left, colB);
+            vert4.set(right, colB);
 
-            preparePointyJoin(A, B, C, D, E, halfWidth);
-            float x3 = D.x;
-            float y3 = D.y;
-            float x4 = E.x;
-            float y4 = E.y;
+            if(i == offset + linestr){
+                if(wrap){
+                    vec1.set(items[offset + length - linestr], items[offset + length - linestr + 1]);
 
-            q3.set(D, points[i + 2]);
-            q4.set(E, points[i + 2]);
-            if(i == start){
-                if(open){
-                    prepareFlatEndpoint(points[start], points[start + 1], points[offset], points[offset + 1], halfWidth);
-                    q1.set(E, points[offset + 2]);
-                    q2.set(D, points[offset + 2]);
+                    MathUtils.pathJoin(vec1, a, b, leftInit, rightInit, widthA);
+                    vert1.set(rightInit, colA);
+                    vert2.set(leftInit, colA);
                 }else{
-                    vec1.set(points[end - 4], points[end - 3]);
-
-                    preparePointyJoin(vec1, A, B, D0, E0, halfWidth);
-                    q1.set(E0, points[offset + 2]);
-                    q2.set(D0, points[offset + 2]);
+                    MathUtils.pathEnd(b.x, b.y, a.x, a.y, left, right, widthA);
+                    vert1.set(right, colA);
+                    vert2.set(left, colA);
                 }
             }
 
-            pushQuad(points[i + 3]);
-            q1.set(x4, y4, points[i + 2]);
-            q2.set(x3, y3, points[i + 2]);
+            pushQuad(z);
+            vert1.set(vert4.x, vert4.y, colB);
+            vert2.set(vert3.x, vert3.y, colB);
         }
 
-        if(open){
-            prepareFlatEndpoint(halfWidth);
-            q3.set(E, points[end - 2]);
-            q4.set(D, points[end - 2]);
+        float
+            widthEnd = items[offset + length - linestr + 3] / 2f,
+            colEnd = items[offset + length - linestr + 2],
+            zEnd = items[offset + length - linestr + 4];
+
+        if(wrap){
+            float
+                colStart = items[offset + 2],
+                zStart = items[offset + 4];
+
+            a.set(items[offset], items[offset + 1]);
+            MathUtils.pathJoin(b, c, a, left, right, widthEnd);
+            vert3.set(left, colEnd);
+            vert4.set(right, colEnd);
+            pushQuad(zEnd);
+
+            vert1.set(left, colEnd);
+            vert2.set(right, colEnd);
+            vert3.set(rightInit, colStart);
+            vert4.set(leftInit, colStart);
+            pushQuad(zStart);
         }else{
-            A.set(points[offset], points[offset + 1]);
-            preparePointyJoin(B, C, A, D, E, halfWidth);
-
-            q3.set(D, points[end - 2]);
-            q4.set(E, points[end - 2]);
-            pushQuad(points[end - 1]);
-
-            q1.set(D, points[end - 2]);
-            q2.set(E, points[end - 2]);
-            q3.set(E0, points[offset + 2]);
-            q4.set(D0, points[offset + 2]);
+            MathUtils.pathEnd(b.x, b.y, c.x, c.y, left, right, widthEnd);
+            vert3.set(right, colEnd);
+            vert4.set(left, colEnd);
+            pushQuad(zEnd);
         }
-
-        pushQuad(points[offset + 3]);
     }
 
     private static void pushQuad(float z){
         Draw.z(z);
-        Fill.quad(q1.x, q1.y, q1.z, q2.x, q2.y, q2.z, q3.x, q3.y, q3.z, q4.x, q4.y, q4.z);
-    }
-
-    private static void prepareFlatEndpoint(float halfWidth){
-        prepareFlatEndpoint(B.x, B.y, C.x, C.y, halfWidth);
-    }
-
-    @SuppressWarnings("SuspiciousNameCombination")
-    private static void prepareFlatEndpoint(float sx, float sy, float ex, float ey, float halfWidth){
-        vec2.set(ex, ey).sub(sx, sy).setLength(halfWidth);
-        D.set(vec2.y, -vec2.x).add(ex, ey);
-        E.set(-vec2.y, vec2.x).add(ex, ey);
-    }
-
-    private static void preparePointyJoin(Vec2 A, Vec2 B, Vec2 C, Vec2 D, Vec2 E, float halfLineWidth){
-        AB.set(B).sub(A);
-        BC.set(C).sub(B);
-
-        float angle = Mathf.atan2(AB.x * BC.x + AB.y * BC.y, BC.x * AB.y - BC.y * AB.x);
-        if(!Mathf.equal(angle, 0f) && !Mathf.equal(angle, Mathf.PI2)){
-            float len = halfLineWidth / Mathf.sin(angle);
-            boolean bendsLeft = angle < 0f;
-
-            AB.setLength(len);
-            BC.setLength(len);
-
-            (bendsLeft ? D : E).set(B).sub(AB).add(BC);
-            (bendsLeft ? E : D).set(B).add(AB).sub(BC);
-        }else{
-            prepareStraightJoin(B, D, E, halfLineWidth);
-        }
-    }
-
-    @SuppressWarnings("SuspiciousNameCombination")
-    private static void prepareStraightJoin(Vec2 B, Vec2 D, Vec2 E, float halfLineWidth){
-        AB.setLength(halfLineWidth);
-        D.set(-AB.y, AB.x).add(B);
-        E.set(AB.y, -AB.x).add(B);
+        Fill.quad(vert1.x, vert1.y, vert1.z, vert2.x, vert2.y, vert2.z, vert3.x, vert3.y, vert3.z, vert4.x, vert4.y, vert4.z);
     }
 }

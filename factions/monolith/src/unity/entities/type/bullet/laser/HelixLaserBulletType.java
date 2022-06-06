@@ -15,8 +15,8 @@ import static unity.graphics.MonolithPalettes.*;
 public class HelixLaserBulletType extends LaserBulletType{
     public int swirlAmount = 3;
     public Color
-        swirlColor = monolith, swirlColorDark = monolithDark,
-        dashColor = monolithLight, dashColorDark = monolith;
+        swirlColor = monolithLight, swirlColorDark = monolithDark,
+        dashColor = monolith, dashColorDark = monolithDark;
 
     public float
         swirlScale = 12f, swirlMagnitude = 6f, swirlThickness = 1f,
@@ -55,66 +55,70 @@ public class HelixLaserBulletType extends LaserBulletType{
 
             dfin = Mathf.curve(fin, dashFrom * scl, dashTo);
 
-        for(Color color : colors){
-            Tmp.v1.trns(rot, laserShrink);
+        if(lfin <= laserTo){
+            for(Color color : colors){
+                Tmp.v1.trns(rot, laserShrink);
 
-            Draw.color(color);
-            Lines.stroke((cwidth *= lengthFalloff) * laserThickInterp.apply(lfout));
-            Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, rot, laserLen - laserShrink, false);
+                Draw.color(color);
+                Lines.stroke((cwidth *= lengthFalloff) * laserThickInterp.apply(lfout));
+                Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, rot, laserLen - laserShrink, false);
 
-            Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke(), Lines.getStroke() / 2f, rot + 180f);
-            Tmp.v1.trns(rot, laserLen);
-            Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke(), cwidth * 2f + width / 2f, rot);
+                Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke(), Lines.getStroke() / 2f, rot + 180f);
+                Tmp.v1.trns(rot, laserLen);
+                Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke(), cwidth * 2f + width / 2f, rot);
 
-            Fill.circle(b.x, b.y, 1f * cwidth * lfout);
-            for(int i : Mathf.signs){
-                Drawf.tri(b.x, b.y, sideWidth * lfout * cwidth, sideLength * compound, rot + sideAngle * i);
+                Fill.circle(b.x, b.y, 1f * cwidth * lfout);
+                for(int i : Mathf.signs){
+                    Drawf.tri(b.x, b.y, sideWidth * lfout * cwidth, sideLength * compound, rot + sideAngle * i);
+                }
+
+                compound *= lengthFalloff;
             }
-
-            compound *= lengthFalloff;
         }
 
-        Lines.stroke(dashThickness, Tmp.c1.set(dashColor).lerp(dashColorDark, dashColorInterp.apply(dfin)));
-        for(int sign : Mathf.signs){
-            float x = dashWidth * sign * 0.5f, cy = Lines.getStroke() * 2.5f;
-            Tmp.v1.trns(rot - 90f, x, dashInterp1.apply(dfin) * realLength + cy).add(b);
-            Tmp.v2.trns(rot - 90f, x, dashInterp2.apply(dfin) * realLength + cy).add(b);
+        if(dfin >= dashFrom && dfin <= dashTo){
+            Lines.stroke(dashThickness, Tmp.c1.set(dashColor).lerp(dashColorDark, dashColorInterp.apply(dfin)));
+            for(int sign : Mathf.signs){
+                float x = dashWidth * sign * 0.5f, cy = Lines.getStroke() * 2.5f;
+                Tmp.v1.trns(rot - 90f, x, dashInterp1.apply(dfin) * realLength + cy).add(b);
+                Tmp.v2.trns(rot - 90f, x, dashInterp2.apply(dfin) * realLength + cy).add(b);
 
-            Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, false);
-            Drawf.tri(Tmp.v1.x, Tmp.v1.y, Lines.getStroke(), cy, rot + 180f);
-            Drawf.tri(Tmp.v2.x, Tmp.v2.y, Lines.getStroke(), cy, rot);
+                Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, false);
+                Drawf.tri(Tmp.v1.x, Tmp.v1.y, Lines.getStroke(), cy, rot + 180f);
+                Drawf.tri(Tmp.v2.x, Tmp.v2.y, Lines.getStroke(), cy, rot);
+            }
         }
 
-        Lines.stroke(swirlThickness);
+        if(sfin >= swirlFrom && sfin <= swirlTo){
+            Lines.stroke(swirlThickness);
 
-        int iterations = Math.max(Mathf.round(realLength), 2);
-        float
-            seg = realLength / iterations,
-            rand =
-                Mathf.randomSeed(b.id, Mathf.PI2 * swirlScale) +
-                    (Mathf.randomSeed(b.id + 1, 0, 1) * 2f - 1f);
-        for(int i = 0; i < swirlAmount; i++){
-            DrawUtils.beginLine();
+            int iterations = Math.max(Mathf.round(realLength), 2);
+            float
+                seg = realLength / iterations,
+                rand = Mathf.randomSeed(b.id, Mathf.PI2 * swirlScale) + (Mathf.randomSeed(b.id + 1, 0, 1) * 2f - 1f);
+            for(int i = 0; i < swirlAmount; i++){
+                DrawUtils.beginLine();
 
-            float angleOffset = rand + (Mathf.PI2 * swirlScale) * ((float)i / swirlAmount);
-            for(int it = 0; it < iterations; it++){
-                float
-                    in = it / (iterations - 1f),
-                    off = soffset * in,
-                    prog = (
-                        swirlInInterp.apply(Mathf.curve(sfin, off, swirlIn + off)) -
-                            swirlOutInterp.apply(Mathf.curve(sfin, swirlStay + off, swirlOut + off))
-                    ) * swirlFadeInterp.apply(1f - in),
+                float angleOffset = rand + (Mathf.PI2 * swirlScale) * ((float)i / swirlAmount);
+                for(int it = 0; it < iterations; it++){
+                    float
+                        in = it / (iterations - 1f),
+                        off = soffset * in,
+                        prog = (
+                            swirlInInterp.apply(Mathf.curve(sfin, off, swirlIn + off)) -
+                                swirlOutInterp.apply(Mathf.curve(sfin, swirlStay + off, swirlOut + off))
+                        ) * swirlFadeInterp.apply(1f - in),
 
-                    rad = it * seg + angleOffset,
-                    x = Mathf.cos(rad, swirlScale, swirlMagnitude),
-                    tz = Mathf.sin(rad, swirlScale, 1f) >= 0f ? z : (z - 0.01f);
+                        rad = it * seg + angleOffset,
+                        x = Mathf.cos(rad, swirlScale, swirlMagnitude),
+                        tz = Mathf.sin(rad, swirlScale, 1f) >= 0f ? z : (z - 0.01f);
 
-                Tmp.v1.trns(rot - 90f, x, it * seg).add(b);
-                DrawUtils.linePoint(Tmp.v1.x, Tmp.v1.y, Tmp.c1.set(swirlColor).lerp(swirlColorDark, 1f - prog).a(prog).toFloatBits(), tz);
+                    Tmp.v1.trns(rot - 90f, x, it * seg).add(b);
+                    DrawUtils.linePoint(Tmp.v1.x, Tmp.v1.y, Tmp.c1.set(swirlColor).lerp(swirlColorDark, 1f - prog).a(prog).toFloatBits(), tz);
+                }
+
+                DrawUtils.endLine();
             }
-
-            DrawUtils.endLine();
         }
 
         Draw.z(z);

@@ -105,6 +105,8 @@ public class MultiTrail extends BaseTrail{
         }
 
         if(vel != null){
+            vel.saveLast(this, x, y, width, angle, speed, delta);
+
             float[] items = points.items;
             for(int i = 0, ind = 0; i < psize - stride; i += stride, ind++){
                 float x1 = items[i], y1 = items[i + 1];
