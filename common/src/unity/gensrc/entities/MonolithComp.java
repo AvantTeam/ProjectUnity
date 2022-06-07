@@ -13,7 +13,6 @@ import static mindustry.Vars.*;
 
 @EntityComponent
 abstract class MonolithComp implements Unitc, Factionc, SoulHolder{
-    @Import UnitType type;
     @Import boolean spawnedByCore;
 
     private int souls;
@@ -21,7 +20,7 @@ abstract class MonolithComp implements Unitc, Factionc, SoulHolder{
 
     @Override
     public Faction faction(){
-        return FactionRegistry.faction(type);
+        return Faction.monolith;
     }
 
     @Override
@@ -53,16 +52,6 @@ abstract class MonolithComp implements Unitc, Factionc, SoulHolder{
     public void killed(){
         if(net.server() || !net.active()) spreadSouls();
     }
-
-    /*@Override
-    public boolean apply(MonolithSoul soul, int index, boolean transferred){
-        if(isPlayer() && !transferred && (Mathf.chance(1f / souls) || index == souls - 1)){
-            soul.controller(getPlayer());
-            transferred = true;
-        }
-
-        return transferred;
-    }*/
 
     boolean disabled(){
         return !spawnedByCore && souls <= 0;

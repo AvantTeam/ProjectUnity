@@ -1,12 +1,17 @@
 package unity.util;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.game.EventType.*;
+import mindustry.graphics.*;
 
-/** Intermediately-shared utility access for rendering operations. */
+import static mindustry.Vars.*;
+
+/** Shared utility access for rendering operations. */
 public final class DrawUtils{
     public static final float perspectiveDistance = 150f;
 
@@ -25,8 +30,8 @@ public final class DrawUtils{
         vert4 = new Vec3();
 
     private static boolean building;
-    private static final FloatSeq floatBuilder = new FloatSeq(50);
     private static final int linestr = 5;
+    private static final FloatSeq floatBuilder = new FloatSeq(linestr * 20);
 
     private static final Vec3 v31 = new Vec3();
     private static final Mat3D m41 = new Mat3D();

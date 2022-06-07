@@ -29,10 +29,10 @@ public final class Annotations{
         throw new AssertionError();
     }
 
-    /** Reserved for annotation processors that don't really need any annotations to process. */
+    /** Defines a class providing static entries of IO handlers. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface ModBase{}
+    public @interface TypeIOHandler{}
 
     /** Indicates that this class is an entities component. */
     @Target(ElementType.TYPE)

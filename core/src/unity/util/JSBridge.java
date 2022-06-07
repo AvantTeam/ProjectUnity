@@ -2,7 +2,6 @@ package unity.util;
 
 import arc.*;
 import arc.func.*;
-import arc.util.*;
 import rhino.*;
 
 import static mindustry.Vars.*;
@@ -26,8 +25,8 @@ public final class JSBridge{
         throw new AssertionError();
     }
 
-    // Main thread only!
-    public static void init(){
+    /** Sets up the JS bridge. Main thread only! */
+    public static void setup(){
         try{
             context = mods.getScripts().context;
             defaultScope = (ImporterTopLevel)mods.getScripts().scope;

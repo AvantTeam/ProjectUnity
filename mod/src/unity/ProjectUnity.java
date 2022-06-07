@@ -61,7 +61,7 @@ public class ProjectUnity extends ProjectUnityCommon{
         Events.on(ContentInitEvent.class, e -> Core.app.post(Faction::load));
         Core.app.post(() -> {
             dev.setup();
-            JSBridge.init();
+            JSBridge.setup();
         });
     }
 

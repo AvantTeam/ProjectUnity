@@ -83,6 +83,22 @@ public final class ReflectUtils{
         }
     }
 
+    public static void set(Object inst, String name, Object value){
+        set(inst, findf(inst.getClass(), name), value);
+    }
+
+    public static void set(Class<?> type, Object inst, String name, Object value){
+        set(inst, findf(type, name), value);
+    }
+
+    public static void set(Object inst, Field field, Object value){
+        try{
+            field.set(inst, value);
+        }catch(Throwable t){
+            throw new RuntimeException(t);
+        }
+    }
+
     public static <T> T invoke(Object inst, String name, Object[] args, @Nullable Class<?>... params){
         return invoke(inst.getClass(), inst, name, args, params);
     }
