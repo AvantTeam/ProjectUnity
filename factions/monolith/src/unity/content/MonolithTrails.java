@@ -52,21 +52,23 @@ public final class MonolithTrails{
         return t;
     }
 
-    public static MultiTrail phantasmal(int length){
-        return phantasmal(length, 3.6f, 3.5f, -1f, 0f);
+    public static MultiTrail phantasmal(int length, int strandsAmount){
+        return phantasmal(length, strandsAmount, 3.6f, 3.5f, -1f, 0f);
     }
 
-    public static MultiTrail phantasmal(RotationHandler rot, int length){
-        return phantasmal(rot, length, 3.6f, 3.5f, -1f, 0f);
+    public static MultiTrail phantasmal(int length, int strandsAmount, VelAttrib vel){
+        return phantasmal(BaseTrail::rot, length, strandsAmount, 3.6f, 3.5f, -1f, 0f, vel);
     }
 
-    public static MultiTrail phantasmal(int length, float scale, float magnitude, float speedThreshold, float offsetY){
-        return phantasmal(BaseTrail::rot, length, scale, magnitude, speedThreshold, offsetY);
+    public static MultiTrail phantasmal(RotationHandler rot, int length, int strandsAmount){
+        return phantasmal(rot, length, strandsAmount, 3.6f, 3.5f, -1f, 0f, null);
     }
 
-    public static MultiTrail phantasmal(RotationHandler rot, int length, float scale, float magnitude, float speedThreshold, float offsetY){
-        int strandsAmount = 2;
+    public static MultiTrail phantasmal(int length, int strandsAmount, float scale, float magnitude, float speedThreshold, float offsetY){
+        return phantasmal(BaseTrail::rot, length, strandsAmount, scale, magnitude, speedThreshold, offsetY, null);
+    }
 
+    public static MultiTrail phantasmal(RotationHandler rot, int length, int strandsAmount, float scale, float magnitude, float speedThreshold, float offsetY, VelAttrib vel){
         TrailHold[] trails = new TrailHold[strandsAmount + 2];
         for(int i = 0; i < strandsAmount; i++){
             TexturedTrail t = singlePhantasmal(Mathf.round(length * 1.5f));
@@ -79,7 +81,7 @@ public final class MonolithTrails{
         trails[strandsAmount + 1] = new TrailHold(phantasmalExhaust(Mathf.round(length * 0.5f)), 0f, 1.6f);
 
         float offset = Mathf.random(Mathf.PI2 * scale);
-        return new MultiTrail(rot, trails){
+        return new MultiTrail(rot, vel, trails){
             @Override
             public void defUpdate(float x, float y, float width, float angle, float speed, float delta){
                 float scl = Interp.pow2Out.apply(speedThreshold == -1f ? 1f : Mathf.clamp(speed / speedThreshold));

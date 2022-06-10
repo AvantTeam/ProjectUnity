@@ -1,6 +1,5 @@
 package unity.entities.type;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -14,10 +13,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import unity.content.*;
+import unity.entities.prop.*;
 import unity.gen.entities.*;
 import unity.graphics.*;
-import unity.graphics.MultiTrail.*;
-import unity.util.*;
 
 import static mindustry.Vars.*;
 import static unity.graphics.MonolithPalettes.*;
@@ -26,50 +24,73 @@ import static unity.graphics.MonolithPalettes.*;
  * Convenience class for {@link MonolithSoul} types.
  * @author GlennFolker
  */
+@SuppressWarnings("unchecked")
 public class MonolithSoulType extends PUUnitType{
-    public Func<MonolithSoul, MultiTrail> corporealTrail = soul -> new MultiTrail(new TrailHold(new BaseTrail(trailLength)));
+    public Func<MonolithSoul, Trail> corporealTrail = soul -> trailType.get(soul);
 
-    public float trailChance = -1f, formChance = -1f, formAbsorbChance = -1f;
-    public Effect trailEffect = Fx.none, formEffect = Fx.none, formAbsorbEffect = Fx.none;
+    public float trailChance = -1f, formChance = -1f, formTileChance = -1f, formAbsorbChance = -1f, joinChance = -1f;
+    public Effect trailEffect = Fx.none, formEffect = Fx.none, formTileEffect = Fx.none, formAbsorbEffect = Fx.none, joinEffect = Fx.none;
 
-    public MonolithSoulType(String name){
+    public MonolithSoulType(String name, MonolithSoulProps props){
         super(name);
+
+        fallSpeed = 1f;
 
         lowAltitude = true;
         flying = true;
         omniMovement = false;
         playerControllable = false;
+
+        prop(props);
+    }
+
+    @Override
+    public StateTrail createTrail(Unit unit){
+        return super.createTrail(unit);
+    }
+
+    @Override
+    public void init(){
+        if(!(trailType.get(sample) instanceof StateTrail)){
+            Func<Unit, Trail> type = trailType;
+            trailType = unit -> new StateTrail(type.get(unit));
+        }
+
+        super.init();
     }
 
     @Override
     public void update(Unit unit){
         if(unit instanceof MonolithSoul soul){
-            if(soul.trail instanceof MultiTrail trail){
+            if(soul.trail instanceof StateTrail trail){
                 float width = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation);
-                if(trail.trails.length == 3 && soul.corporeal()){
-                    MultiTrail copy = trail.copy();
-                    copy.rot = BaseTrail::rot;
+                if(soul.corporeal && !trail.corporeal){
+                    Trail copy = trail.trail.copy();
+                    if(copy instanceof BaseTrail t) t.rot = BaseTrail::rot;
 
                     MonolithFx.trailFadeLow.at(soul.x, soul.y, width, monolithLight, copy);
-                    soul.trail = corporealTrail.get(soul);
-                }else if(trail.trails.length == 1 && !soul.corporeal()){
-                    MultiTrail copy = trail.copy();
-                    copy.rot = BaseTrail::rot;
+                    trail.trail = corporealTrail.get(soul);
+                    trail.corporeal = true;
+                }else if(!soul.corporeal && trail.corporeal){
+                    Trail copy = trail.trail.copy();
+                    if(copy instanceof BaseTrail t) t.rot = BaseTrail::rot;
 
                     MonolithFx.trailFadeLow.at(soul.x, soul.y, width, monolithLight, copy);
-                    soul.trail = kickstartTrail(soul, createTrail(soul));
+                    trail.trail = kickstartTrail(soul, createTrail(soul));
+                    trail.corporeal = false;
                 }
             }
 
             if(!soul.corporeal()){
                 if(trailChance > 0f && Mathf.chanceDelta(trailChance)) trailEffect.at(soul.x, soul.y, Time.time, new Vec2(soul.vel).scl(-0.3f / Time.delta));
                 if(soul.forming()){
-                    if(formChance > 0f && formAbsorbChance > 0f) for(Tile form : soul.forms){
-                        if(formChance > 0f && Mathf.chanceDelta(formChance)) formEffect.at(form.drawx(), form.drawy(), 4f);
+                    if(formChance > 0f || formTileChance > 0f || formAbsorbChance > 0f) for(Tile form : soul.forms){
+                        if(formChance > 0f && Mathf.chanceDelta(formChance)) formEffect.at(soul);
+                        if(formTileChance > 0f && Mathf.chanceDelta(formTileChance)) formTileEffect.at(form.drawx(), form.drawy(), 4f);
                         if(formAbsorbChance > 0f && Mathf.chanceDelta(formAbsorbChance)) formAbsorbEffect.at(form.drawx(), form.drawy(), 0f, soul);
                     }
-                }else if(soul.joining() && Mathf.chanceDelta(0.33f)){
-                    MonolithFx.soulAbsorb.at(soul.x + Mathf.range(6f), soul.y + Mathf.range(6f), 0f, soul.joinTarget);
+                }else if(soul.joining() && joinChance > 0f && Mathf.chanceDelta(joinChance)){
+                    joinEffect.at(soul.x + Mathf.range(6f), soul.y + Mathf.range(6f), 0f, soul.joinTarget);
                 }
             }
         }
@@ -99,35 +120,20 @@ public class MonolithSoulType extends PUUnitType{
             Draw.z(Layer.flyingUnit);
             drawJoin(soul);
 
+            Draw.reset();
             Draw.z(z);
+        }else{
+            super.draw(unit);
         }
     }
 
-    public void drawBase(MonolithSoul soul){
-        /*Draw.blend(Blending.additive);
-        Draw.color(monolith);
-        Fill.circle(soul.x, soul.y, 6f);
-
-        Draw.color(monolithDark);
-        Draw.rect(softShadowRegion, soul.x, soul.y, 16f, 16f);
-
-        Draw.blend();
-        Lines.stroke(1f, monolithDark);
-
-        float rotation = Time.time * 3f * Mathf.sign(soul.id % 2 == 0);
-        for(int i = 0; i < 5; i++){
-            float r = rotation + 72f * i, sect = 60f;
-            Lines.arc(soul.x, soul.y, 10f, sect / 360f, r - sect / 2f);
-
-            Tmp.v1.trns(r, 10f).add(soul);
-            Drawf.tri(Tmp.v1.x, Tmp.v1.y, 2.5f, 6f, r);
-        }
-
-        Draw.reset();*/
-    }
+    public void drawBase(MonolithSoul soul){}
 
     public void drawForm(MonolithSoul soul){
-        /*for(int i = 0; i < wreckRegions.length; i++){
+        for(int i = 0; i < wreckRegions.length; i++){
+            TextureRegion reg = wreckRegions[i];
+            if(reg == null || !reg.found()) continue;
+
             float off = (360f / wreckRegions.length) * i;
             float fin = soul.formProgress, fout = 1f - fin;
 
@@ -136,41 +142,94 @@ public class MonolithSoulType extends PUUnitType{
                 .add(soul);
 
             Draw.alpha(fin);
-            Draw.rect(wreckRegions[i], Tmp.v1.x, Tmp.v1.y, soul.rotation - 90f);
-        }*/
+            Draw.rect(reg, Tmp.v1.x, Tmp.v1.y, soul.rotation - 90f);
+        }
     }
 
-    public void drawJoin(MonolithSoul soul){
-        /*Lines.stroke(1.5f, monolith);
-
-        TextureRegion reg = Core.atlas.find("unity-monolith-chain");
-        Quat rot = MathUtils.q1.set(Vec3.Z, soul.ringRotation() + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
-        float
-            t = Interp.pow3Out.apply(soul.joinTime()), w = reg.width * Draw.scl * 0.5f * t, h = reg.height * Draw.scl * 0.5f * t,
-            rad = t * 25f, a = Mathf.curve(t, 0.33f);
-
-        Draw.alpha(a);
-        DrawUtils.panningCircle(reg,
-            soul.x, soul.y, w, h,
-            rad, 360f, Time.time * 6f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
-            rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
-        );
-
-        Draw.color(Color.black, monolithDark, 0.67f);
-        Draw.alpha(a);
-
-        Draw.blend(Blending.additive);
-        DrawUtils.panningCircle(Core.atlas.find("unity-line-shade"),
-            soul.x, soul.y, w + 6f, h + 6f,
-            rad, 360f, 0f,
-            rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
-        );
-
-        Draw.blend();*/
-    }
+    public void drawJoin(MonolithSoul soul){}
 
     @Override
     public MonolithSoul create(Team team){
         return (MonolithSoul)super.create(team);
+    }
+
+    public static class StateTrail extends BaseTrail{
+        public Trail trail;
+        public boolean corporeal = false;
+
+        public StateTrail(Trail trail){
+            super(0);
+            this.trail = trail;
+        }
+
+        @Override
+        public int baseSize(){
+            return 0;
+        }
+
+        @Override
+        public void shorten(){
+            trail.shorten();
+        }
+
+        @Override
+        public float update(float x, float y, float width, float angle){
+            if(Float.isNaN(lastX) || Float.isNaN(lastY)){
+                lastX = x;
+                lastY = y;
+            }
+
+            trail.update(x, y, width);
+
+            float speed = Mathf.dst(lastX, lastY, x, y) / Time.delta;
+            lastX = x;
+            lastY = y;
+            return speed;
+        }
+
+        @Override
+        public void draw(Color color, float width){
+            trail.draw(color, width);
+        }
+
+        @Override
+        public void drawCap(Color color, float width){
+            trail.drawCap(color, width);
+        }
+
+        @Override
+        public void forceDrawCap(Color color, float width){
+            if(trail instanceof BaseTrail t) t.forceDrawCap(color, width);
+        }
+
+        @Override
+        public void kickstart(float x, float y){
+            if(trail instanceof BaseTrail t) t.kickstart(x, y);
+        }
+
+        @Override
+        public void length(int length){
+            if(trail instanceof BaseTrail t) t.length(length);
+        }
+
+        @Override
+        public void recalculateAngle(){
+            if(trail instanceof BaseTrail t) t.recalculateAngle();
+        }
+
+        @Override
+        public int size(){
+            return trail.size();
+        }
+
+        @Override
+        public float width(){
+            return trail.width();
+        }
+
+        @Override
+        public void clear(){
+            trail.clear();
+        }
     }
 }

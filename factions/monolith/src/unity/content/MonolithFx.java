@@ -11,6 +11,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.entities.type.*;
+import unity.gen.entities.*;
 import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
 import unity.mod.*;
@@ -42,15 +43,16 @@ public final class MonolithFx{
     })),
 
     soul = new Effect(48f, e -> {
-        if(!(e.data instanceof Vec2 data)) return;
+        if(!(e.data instanceof Position data)) return;
 
         blend(Blending.additive);
         color(monolith, monolithDark, Color.black, e.finpow());
 
-        float time = Time.time - e.rotation, vx = data.x * time, vy = data.y * time;
-        randLenVectors(e.id, 1, 5f + e.finpowdown() * 8f, (x, y) -> {
-            float fin = 1f - e.fin(pow2In);
+        float
+            time = Time.time - e.rotation, vx = data.getX() * time, vy = data.getY() * time,
+            fin = 1f - e.fin(pow2In);
 
+        randLenVectors(e.id, 1, 5f + e.finpowdown() * 8f, (x, y) -> {
             alpha(1f);
             Fill.circle(e.x + x + vx, e.y + y + vy, fin * 2f);
 
@@ -85,6 +87,27 @@ public final class MonolithFx{
         blend();
     }).layer(Layer.flyingUnitLow),
 
+    soulTransfer = new Effect(64f, e -> {
+        if(!(e.data instanceof Position data)) return;
+
+        Tmp.v1.set(data).sub(e.x, e.y).scl(e.fin(pow2In)).add(e.x, e.y);
+
+        color(monolithDark, monolith, e.fslope());
+        randLenVectors(e.id, 5, pow3Out.apply(e.fslope()) * 8f, 360f, 0f, 8f, (x, y) ->
+            Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 0.5f + e.fslope() * 2.7f)
+        );
+
+        float size = e.fin(pow10Out) * e.foutpowdown();
+
+        color(monolith);
+        Fill.circle(Tmp.v1.x, Tmp.v1.y, size * 4.8f);
+
+        color(monolithLight);
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(Tmp.v1.x, Tmp.v1.y, size * 6.4f, size * 27f, e.rotation + 90f * i + e.finpow() * 45f * Mathf.sign(e.id % 2 == 0));
+        }
+    }),
+
     soulDeath = new Effect(64f, e -> {
         color(monolith, monolithDark, e.fin());
         randLenVectors(e.id, 27, e.finpow() * 56f, (x, y) ->
@@ -106,6 +129,37 @@ public final class MonolithFx{
         });
     }),
 
+    soulJoin = new Effect(72f, e -> {
+        if(!(e.data instanceof MonolithSoul soul)) return;
+
+        stroke(1.5f, monolith);
+
+        TextureRegion reg = atlas.find("unity-monolith-chain");
+        Quat rot = MathUtils.q1.set(Vec3.Z, e.rotation + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
+        float
+            t = e.foutpowdown(), rad = t * 25f, a = Mathf.curve(t, 0.25f),
+            w = (Mathf.PI2 * rad) / (reg.width * scl * 0.5f), h = w * ((float)reg.height / reg.width);
+
+        alpha(a);
+        DrawUtils.panningCircle(reg,
+            e.x, e.y, w, h,
+            rad, 360f, Time.time * 6f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
+            rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+        );
+
+        color(Color.black, monolithDark, 0.67f);
+        alpha(a);
+
+        blend(Blending.additive);
+        DrawUtils.panningCircle(atlas.find("unity-line-shade"),
+            e.x, e.y, w + 6f, h + 6f,
+            rad, 360f, 0f,
+            rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+        );
+
+        blend();
+    }).layer(Layer.flyingUnit),
+
     strayShoot = new Effect(12f, e -> {
         color(monolithLight, monolith, monolithDark, e.finpowdown());
         stroke(e.fout() * 1.2f + 0.5f);
@@ -118,9 +172,11 @@ public final class MonolithFx{
     tendenceShoot = new Effect(32f, e -> {
         TextureRegion reg = atlas.find("unity-monolith-chain");
         MathUtils.q1.set(Vec3.Z, e.rotation + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
-        float t = e.finpow(), w = reg.width * scl * 0.4f * t, h = reg.height * scl * 0.4f * t, rad = 9f + t * 8f;
+        float
+            t = e.finpow(), rad = 9f + t * 8f,
+            w = (Mathf.PI2 * rad) / (reg.width * scl * 0.4f), h = w * ((float)reg.height / reg.width);
 
-        color(monolithLight);
+        color(monolith);
         alpha(e.foutpowdown());
 
         DrawUtils.panningCircle(reg,

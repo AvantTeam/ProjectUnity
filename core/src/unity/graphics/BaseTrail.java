@@ -146,7 +146,7 @@ public class BaseTrail extends Trail{
         forceDrawCap(color, width);
     }
 
-    protected void forceDrawCap(Color color, float width){
+    public void forceDrawCap(Color color, float width){
         int psize = points.size, stride = this.stride;
         if(psize > 0){
             Draw.color(color);
@@ -169,7 +169,7 @@ public class BaseTrail extends Trail{
 
         float delta = counter;
         if((counter += Time.delta) >= 1f){
-            if(points.size >= stride) points.removeRange(0, stride - 1);
+            if(length > 0 && points.size >= stride) points.removeRange(0, stride - 1);
             counter %= 1f;
         }
 
@@ -193,17 +193,19 @@ public class BaseTrail extends Trail{
             lastY = y;
             lastWidth = width;
             lastAngle = angle;
-            return 0f;
+            //return 0f;
         }
 
         float delta = counter, speed = Mathf.dst(lastX, lastY, x, y) / Time.delta;
         if((counter += Time.delta) >= 1f){
-            int stride = this.stride;
-            if(speed >= minDst){
-                if(points.size > length * stride - stride) points.removeRange(0, stride - 1);
-                point(x, y, width, angle, speed, delta);
-            }else if(points.size >= stride){
-                points.removeRange(0, stride - 1);
+            if(length > 0){
+                int stride = this.stride;
+                if(speed >= minDst){
+                    if(points.size > length * stride - stride) points.removeRange(0, stride - 1);
+                    point(x, y, width, angle, speed, delta);
+                }else if(points.size >= stride){
+                    points.removeRange(0, stride - 1);
+                }
             }
 
             counter %= 1f;

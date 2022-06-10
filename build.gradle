@@ -21,6 +21,12 @@ plugins{
     id 'org.jetbrains.kotlin.kapt' version '1.6.21'
 }
 
+import arc.util.io.*
+import arc.struct.*
+
+final StringMap props = new StringMap()
+file("$rootDir/local.properties").withReader{ PropertiesUtils.load(props, it) }
+
 configure(allprojects){
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
@@ -29,6 +35,22 @@ configure(allprojects){
     version = modVersion
 
     ext{
+        mindustry = { String submodule ->
+            return "com.github.Anuken.MindustryJitpack$submodule:$mindustryVersion"
+        }
+
+        arc = { String submodule ->
+            return "com.github.Anuken.Arc$submodule:$arcVersion"
+        }
+
+        hasProp = { String key ->
+            return project.hasProperty(key) || props.containsKey(key)
+        }
+
+        prop = { String key ->
+            return project.hasProperty(key) ? project.property(key) : props.get(key)
+        }
+
         sdkRoot = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
         taskNames = gradle.startParameter.taskNames
         compilerVersion = JavaVersion.current().ordinal() - JavaVersion.VERSION_17.ordinal() + 17
@@ -39,15 +61,9 @@ configure(allprojects){
         spritesRawDir = file("$assetsRawDir/sprites")
 
         // `-Pmod.dev` will initiate a developer build. Default is `false`.
-        devBuild = project.hasProperty('mod.dev') && Boolean.parseBoolean(project.property('mod.dev'))
-
-        mindustry = { String submodule ->
-            return "com.github.Anuken.MindustryJitpack$submodule:$mindustryVersion"
-        }
-
-        arc = { String submodule ->
-            return "com.github.Anuken.Arc$submodule:$arcVersion"
-        }
+        devBuild = hasProp('mod.dev') && Boolean.parseBoolean(prop('mod.dev'))
+        // `-Pmod.forcecommon` will force `:common` to be recompiled. Default is `true`.
+        commonRecompile = !hasProp('mod.forcecommon') || Boolean.parseBoolean(prop('mod.forcecommon'))
     }
 
     repositories{
@@ -69,6 +85,10 @@ configure(allprojects){
     java{
         withJavadocJar()
         withSourcesJar()
+
+        toolchain{
+            languageVersion = JavaLanguageVersion.of(compilerVersion)
+        }
     }
 
     publishing{
@@ -88,8 +108,6 @@ configure(allprojects){
 
 configure(project(':annotations')){
     sourceCompatibility = 8
-    targetCompatibility = 8
-
     tasks.withType(JavaCompile){
         sourceCompatibility = 8
         targetCompatibility = 8
@@ -120,17 +138,17 @@ configure(project(':common')){
         }
     }
 
+    compileKotlin{
+        outputs.upToDateWhen{ true }
+    }
+
     tasks.withType(JavaCompile){
-        // If I don't recompile the :common module every time, other modules might potentially fail while compiling
+        // If I don't recompile the :common module, other modules might potentially fail while compiling
         // due to them using Java 9+ syntax. I don't know why this happens.
-        outputs.upToDateWhen{ false }
+        if(commonRecompile) outputs.upToDateWhen{ false }
 
         sourceCompatibility = compilerVersion
-
         options.release = 8
-        javaCompiler = javaToolchains.compilerFor{
-            languageVersion = JavaLanguageVersion.of(compilerVersion)
-        }
     }
 }
 
@@ -138,10 +156,6 @@ configure([project(':core'), project(':mod'), project(':tools')] + project(':fac
     sourceCompatibility = compilerVersion
     tasks.withType(JavaCompile){
         sourceCompatibility = compilerVersion
-
         options.release = 8
-        javaCompiler = javaToolchains.compilerFor{
-            languageVersion = JavaLanguageVersion.of(compilerVersion)
-        }
     }
 }

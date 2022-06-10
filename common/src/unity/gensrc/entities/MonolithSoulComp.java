@@ -52,6 +52,7 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     @Override
     public void add(){
         health = Math.min(maxHealth / 2f, health);
+        ringRotation = rotation;
     }
 
     @Override
@@ -62,7 +63,12 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     @Override
     public void afterSync(){
         if(!isLocal()){
-            if(wasCorporeal && !corporeal) crack();
+            if(wasCorporeal && !corporeal){
+                crack();
+            }else if(!wasCorporeal && corporeal){
+                form();
+            }
+
             wasCorporeal = corporeal;
         }
     }
@@ -70,7 +76,7 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     @Override
     @MethodPriority(-1)
     public void update(){
-        ringRotation = Mathf.slerp(ringRotation, joining() ? rotation : angleTo(joinTarget), props.ringRotateSpeed);
+        ringRotation = Mathf.slerp(ringRotation, joining() ? angleTo(joinTarget) : rotation, props.ringRotateSpeed);
         if(isLocal()){
             if(!mobile){
                 float mx = Core.input.mouseWorldX(), my = Core.input.mouseWorldY();
@@ -91,8 +97,8 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
                 if(joinInvalid(joinTarget)) joinTarget = null;
                 forms.removeAll(this::formInvalid);
 
-                health = Mathf.clamp(health + (joining() ? props.healthJoinDelta : lifeDelta()), 0f, maxHealth);
-                joinTime = joining() ? Mathf.lerpDelta(joinTime, 0f, props.joinCooldown) : Mathf.approachDelta(joinTime, 1f, props.joinWarmup);
+                health = Mathf.clamp(health + (joining() ? props.healthJoinDelta : lifeDelta()) * Time.delta, 0f, maxHealth);
+                joinTime = joining() ? Mathf.approachDelta(joinTime, 1f, props.joinWarmup) : Mathf.lerpDelta(joinTime, 0f, props.joinCooldown);
                 formProgress = Mathf.lerpDelta(formProgress, forming() ? (health / maxHealth) : 0f, props.formWarmup);
             }else if(health <= maxHealth * 0.5f){
                 crack();
@@ -110,11 +116,9 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
                         }
                     }
 
-                    //DeathFx.monolithSoulJoin.at(x, y, ringRotation, this);
                     props.joinEffect.at(x, y, ringRotation, this);
-
-                    //LineFx.monolithSoulTransfer.at(x, y, rotation, joinTarget);
                     props.transferEffect.at(x, y, rotation, joinTarget);
+
                     Time.run(props.transferDelay, () -> {
                         if(joinTarget.isValid()){
                             SoulHolder.toSoul(joinTarget).transferSoul(props.transferAmount);
@@ -122,8 +126,7 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
                         }
                     });
                 }else if(!corporeal && Mathf.equal(health, maxHealth)){
-                    corporeal = true;
-                    joinTime = 0f;
+                    form();
                 }
             }
         }
@@ -137,6 +140,16 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
         joinTarget = null;
         forms.clear();
         formProgress = 0f;
+        joinTime = 0f;
+    }
+
+    void form(){
+        props.joinEffect.at(x, y, rotation);
+        props.joinSound.at(x, y, Mathf.random(props.joinPitchMin, props.joinPitchMax));
+
+        corporeal = true;
+        joinTarget = null;
+        forms.clear();
         joinTime = 0f;
     }
 

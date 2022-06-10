@@ -22,8 +22,9 @@ public class MonolithSoulProps extends Props{
         ringRotateSpeed = 0.08f,
 
         crackPitchMin = 0.9f, crackPitchMax = 1.1f,
-        joinPitchMin = 0.8f, joinPitchMax = 1.2f;
+        joinPitchMin = 0.8f, joinPitchMax = 1.2f,
+        formPitchMin = 0.9f, formPitchMax = 1.1f;
 
-    public Sound crackSound = Sounds.none, joinSound = Sounds.none;
-    public Effect crackEffect = Fx.none, joinEffect = Fx.none, transferEffect = Fx.none;
+    public Sound crackSound = Sounds.none, joinSound = Sounds.none, formSound = Sounds.none;
+    public Effect crackEffect = Fx.none, joinEffect = Fx.none, formEffect = Fx.none, transferEffect = Fx.none;
 }

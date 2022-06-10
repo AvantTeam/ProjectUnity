@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;

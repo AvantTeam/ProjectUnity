@@ -61,7 +61,7 @@ public class MultiTrail extends BaseTrail{
     }
 
     @Override
-    protected void forceDrawCap(Color color, float width){
+    public void forceDrawCap(Color color, float width){
         for(TrailHold trail : trails) trail.trail.drawCap(trail.color == null ? color : trail.color, width);
     }
 
@@ -84,7 +84,7 @@ public class MultiTrail extends BaseTrail{
             lastY = y;
             lastWidth = width;
             lastAngle = angle;
-            return 0f;
+            //return 0f;
         }
 
         float delta = counter, speed = Mathf.dst(lastX, lastY, x, y) / Time.delta;
@@ -187,11 +187,12 @@ public class MultiTrail extends BaseTrail{
             this(trail, x, y, 1f, null);
         }
 
+        public TrailHold(BaseTrail trail, float x, float y, Color color){
+            this(trail, x, y, 1f, color);
+        }
+
         public TrailHold(BaseTrail trail, float x, float y, float width){
-            this.trail = trail;
-            this.x = x;
-            this.y = y;
-            this.width = width;
+            this(trail, x, y, width, null);
         }
 
         public TrailHold(BaseTrail trail, float x, float y, float width, Color color){

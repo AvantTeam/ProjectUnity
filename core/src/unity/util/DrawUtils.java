@@ -1,17 +1,12 @@
 package unity.util;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import mindustry.game.EventType.*;
-import mindustry.graphics.*;
 
-import static mindustry.Vars.*;
-
-/** Shared utility access for rendering operations. */
+/** Intermediately-shared utility access for rendering operations. */
 public final class DrawUtils{
     public static final float perspectiveDistance = 150f;
 

@@ -68,4 +68,20 @@ public final class MathUtils{
         d.set(v3.y, -v3.x).add(ex, ey);
         e.set(-v3.y, v3.x).add(ex, ey);
     }
+
+    /**
+     * @return [0-1] value depending on how close the normal is to {@code 225f}.
+     * @author GlennFolker
+     */
+    public static float shade(float normalAngle){
+        return shade(normalAngle, 225f);
+    }
+
+    /**
+     * @return [0-1] value depending on how close the normal is to the light angle.
+     * @author GlennFolker
+     */
+    public static float shade(float normalAngle, float lightAngle){
+        return Angles.angleDist(normalAngle, lightAngle - 180f) / 180f;
+    }
 }

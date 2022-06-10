@@ -40,7 +40,7 @@ public class PUUnitType extends PUUnitTypeCommon{
     @Override
     public void drawTrail(Unit unit){
         if(!headless && unit.trail == null){
-            Trail trail = trailType.get(unit);
+            Trail trail = createTrail(unit);
             if(kickstartTrail && trail instanceof BaseTrail t) kickstartTrail(unit, t);
 
             unit.trail = trail;
@@ -94,7 +94,7 @@ public class PUUnitType extends PUUnitTypeCommon{
         super.init();
         for(Props prop : properties.values()) prop.init();
 
-        if(trailLength == -2) trailLength = BaseTrail.length(trailType.get(sample));
+        if(trailLength == -2) trailLength = BaseTrail.length(createTrail(sample));
     }
 
     @Override

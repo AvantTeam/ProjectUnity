@@ -28,7 +28,7 @@ public final class PUTypeIO{
             write.i(s.id());
         }else{
             write.b(3);
-            Log.debug("Unhandled Healthc overload: @", ReflectUtils.known(e.getClass()));
+            if(e != null) Log.debug("Unhandled Healthc overload: @", ReflectUtils.known(e.getClass()));
         }
     }
 

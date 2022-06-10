@@ -1,7 +1,11 @@
 package unity.content;
 
+import arc.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
@@ -21,6 +25,7 @@ import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
 import unity.graphics.trail.*;
 import unity.mod.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 import static unity.gen.entities.EntityRegistry.*;
@@ -43,15 +48,89 @@ public final class MonolithUnitTypes{
     }
 
     public static void load(){
-        souls[0] = register(Faction.monolith, content("monolith-soul-0", MonolithSoul.class, n -> new MonolithSoulType(n){{
+        souls[0] = register(Faction.monolith, content("monolith-soul-0", MonolithSoul.class, n -> new MonolithSoulType(n, new MonolithSoulProps(){{
+            transferAmount = 1;
+            formAmount = 1;
+            formDelta = 0.2f;
+        }}){
+            {
+                health = 80f;
+                range = maxRange = 48f;
+
+                hitSize = 7.2f;
+                speed = 3.6f;
+                rotateSpeed = 7.5f;
+                drag = 0.04f;
+                accel = 0.18f;
+
+                formTileChance = 0.17f;
+                formAbsorbChance = 0f;
+
+                engineColor = monolithLight;
+                engineSize = 2f;
+                engineOffset = 3.5f;
+
+                trail(18, unit -> new MultiTrail(BaseTrail.rot(unit),
+                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 24, 0), 0f, engineOffset, monolithLight)
+                ));
+
+                corporealTrail = soul -> new MultiTrail(
+                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(soul), 18, 0), monolithLight),
+                    new TrailHold(MonolithTrails.singleSoul(6), monolith)
+                );
+            }
+
+            @Override
+            public void drawBase(MonolithSoul soul){
+                Vec2
+                    right = Tmp.v1.trns(soul.rotation - 90f, 4f, 0.5f),
+                    left = Tmp.v2.trns(soul.rotation - 90f, -4f, 0.5f),
+                    front = Tmp.v3.trns(soul.rotation, 4.5f).add(soul),
+                    center = Tmp.v4.trns(soul.rotation, 1.8f).add(soul),
+                    back = Tmp.v5.trns(soul.rotation, -4.5f).add(soul);
+
+                Draw.color(monolithDark, monolith, 1f - MathUtils.shade(soul.rotation - 45f));
+                Fill.tri(center.x, center.y, front.x, front.y, soul.x + right.x, soul.y + right.y);
+
+                Draw.color(monolithDark, monolith, 1f - MathUtils.shade(soul.rotation - 135f));
+                Fill.tri(center.x, center.y, soul.x + right.x, soul.y + right.y, back.x, back.y);
+
+                Draw.color(monolithDark, monolith, 1f - MathUtils.shade(soul.rotation + 45f));
+                Fill.tri(center.x, center.y, front.x, front.y, soul.x + left.x, soul.y + left.y);
+
+                Draw.color(monolithDark, monolith, 1f - MathUtils.shade(soul.rotation + 135f));
+                Fill.tri(center.x, center.y, soul.x + left.x, soul.y + left.y, back.x, back.y);
+
+                Draw.reset();
+            }
+
+            @Override
+            public void drawForm(MonolithSoul soul){
+
+            }
+
+            @Override
+            public void drawJoin(MonolithSoul soul){
+                
+            }
+        }));
+
+        souls[1] = register(Faction.monolith, content("monolith-soul-1", MonolithSoul.class, n -> new MonolithSoulType(n, new MonolithSoulProps(){{
+            transferAmount = 2;
+            formAmount = 3;
+            formDelta = 0.4f;
+        }}){{
 
         }}));
 
-        souls[1] = register(Faction.monolith, content("monolith-soul-1", MonolithSoul.class, n -> new MonolithSoulType(n){{
+        souls[2] = register(Faction.monolith, content("monolith-soul-2", MonolithSoul.class, n -> new MonolithSoulType(n, new MonolithSoulProps(){{
+            transferAmount = 4;
+            formAmount = 5;
+            formDelta = 0.6f;
 
-        }}));
-
-        souls[2] = register(Faction.monolith, content("monolith-soul-2", MonolithSoul.class, n -> new MonolithSoulType(n){
+            joinEffect = MonolithFx.soulJoin;
+            transferEffect = MonolithFx.soulTransfer;
+        }}){
             {
                 health = 300f;
                 range = maxRange = 96f;
@@ -61,32 +140,90 @@ public final class MonolithUnitTypes{
                 rotateSpeed = 10f;
                 drag = 0.08f;
                 accel = 0.2f;
-                fallSpeed = 1f;
 
                 trailChance = 1f;
-                formChance = 0.17f;
+                formTileChance = 0.17f;
                 formAbsorbChance = 0.67f;
+                joinChance = 0.33f;
                 trailEffect = MonolithFx.soul;
-                formEffect = MonolithFx.spark;
+                formTileEffect = MonolithFx.spark;
                 formAbsorbEffect = MonolithFx.soulAbsorb;
+                joinEffect = MonolithFx.soulAbsorb;
 
                 deathExplosionEffect = MonolithFx.soulDeath;
                 //deathSound = PUSounds.soulDeath;
 
-                prop(new MonolithSoulProps());
-
                 engineColor = monolithLight;
                 trail(24, unit -> new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 30, 5.6f, 8.4f, speed, 4f), monolithLight),
+                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 30, 2, 5.6f, 8.4f, speed, 4f, null), monolithLight),
                     new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, speed), 4.8f, 6f, 0.56f, monolithLight),
                     new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, speed), -4.8f, 6f, 0.56f, monolithLight)
                 ));
 
                 corporealTrail = soul -> new MultiTrail(new TrailHold(MonolithTrails.soul(BaseTrail.rot(soul), trailLength, speed), monolithLight));
             }
+
+            @Override
+            public void drawBase(MonolithSoul soul){
+                Draw.blend(Blending.additive);
+                Draw.color(monolith);
+                Fill.circle(soul.x, soul.y, 6f);
+
+                Draw.color(monolithDark);
+                Draw.rect(softShadowRegion, soul.x, soul.y, 16f, 16f);
+                Draw.blend();
+
+                Lines.stroke(1f, monolithDark);
+
+                float rotation = Time.time * 3f * Mathf.sign(soul.id % 2 == 0);
+                for(int i = 0; i < 5; i++){
+                    float r = rotation + 72f * i, sect = 60f;
+                    Lines.arc(soul.x, soul.y, 10f, sect / 360f, r - sect / 2f);
+
+                    Tmp.v1.trns(r, 10f).add(soul);
+                    Drawf.tri(Tmp.v1.x, Tmp.v1.y, 2.5f, 6f, r);
+                }
+
+                Draw.reset();
+            }
+
+            @Override
+            public void drawJoin(MonolithSoul soul){
+                Lines.stroke(1.5f, monolith);
+
+                TextureRegion reg = Core.atlas.find("unity-monolith-chain");
+                Quat rot = MathUtils.q1.set(Vec3.Z, soul.ringRotation() + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
+                float
+                    t = Interp.pow3Out.apply(soul.joinTime()),
+                    rad = t * 25f, a = Mathf.curve(t, 0.33f),
+                    w = (Mathf.PI2 * rad) / (reg.width * Draw.scl * 0.5f), h = w * ((float)reg.height / reg.width);
+
+                Draw.alpha(a);
+                DrawUtils.panningCircle(reg,
+                    soul.x, soul.y, w, h,
+                    rad, 360f, Time.time * 4f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
+                    rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                );
+
+                Draw.color(Color.black, monolithDark, 0.67f);
+                Draw.alpha(a);
+
+                Draw.blend(Blending.additive);
+                DrawUtils.panningCircle(Core.atlas.find("unity-line-shade"),
+                    soul.x, soul.y, w + 6f, h + 6f,
+                    rad, 360f, 0f,
+                    rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                );
+
+                Draw.blend();
+            }
         }));
 
-        souls[3] = register(Faction.monolith, content("monolith-soul-3", MonolithSoul.class, n -> new MonolithSoulType(n){{
+        souls[3] = register(Faction.monolith, content("monolith-soul-3", MonolithSoul.class, n -> new MonolithSoulType(n, new MonolithSoulProps(){{
+            transferAmount = 8;
+            formAmount = 7;
+            formDelta = 0.8f;
+        }}){{
 
         }}));
 
@@ -112,17 +249,29 @@ public final class MonolithUnitTypes{
             
         }}));
 
-        pedestal = register(Faction.monolith, content("pedestal", MonolithMechUnit.class, n -> new PUUnitType(n){{}}));
+        pedestal = register(Faction.monolith, content("pedestal", MonolithMechUnit.class, n -> new PUUnitType(n){{
 
-        pilaster = register(Faction.monolith, content("pilaster", MonolithMechUnit.class, n -> new PUUnitType(n){{}}));
+        }}));
 
-        pylon = register(Faction.monolith, content("pylon", MonolithLegsUnit.class, n -> new PUUnitType(n){{}}));
+        pilaster = register(Faction.monolith, content("pilaster", MonolithMechUnit.class, n -> new PUUnitType(n){{
 
-        monument = register(Faction.monolith, content("monument", MonolithLegsUnit.class, n -> new PUUnitType(n){{}}));
+        }}));
 
-        colossus = register(Faction.monolith, content("colossus", MonolithLegsUnit.class, n -> new PUUnitType(n){{}}));
+        pylon = register(Faction.monolith, content("pylon", MonolithLegsUnit.class, n -> new PUUnitType(n){{
 
-        bastion = register(Faction.monolith, content("bastion", MonolithLegsUnit.class, n -> new PUUnitType(n){{}}));
+        }}));
+
+        monument = register(Faction.monolith, content("monument", MonolithLegsUnit.class, n -> new PUUnitType(n){{
+
+        }}));
+
+        colossus = register(Faction.monolith, content("colossus", MonolithLegsUnit.class, n -> new PUUnitType(n){{
+
+        }}));
+
+        bastion = register(Faction.monolith, content("bastion", MonolithLegsUnit.class, n -> new PUUnitType(n){{
+
+        }}));
 
         stray = register(Faction.monolith, content("stray", MonolithUnit.class, n -> new PUUnitType(n){{
             health = 300f;
@@ -155,7 +304,7 @@ public final class MonolithUnitTypes{
                 left.attrib(VelAttrib.class).velX *= -1f;
 
                 return new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 16, 3.6f, 6f, speed, 2f), monolithLight),
+                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 16, 2, 3.6f, 6f, speed, 2f, null), monolithLight),
                     new TrailHold(right, 4.5f, 2.5f, 0.3f, monolithLight),
                     new TrailHold(left, -4.5f, 2.5f, 0.3f, monolithLight)
                 );
@@ -405,7 +554,7 @@ public final class MonolithUnitTypes{
                 VelAttrib velInner = new VelAttrib(0.2f, 0f, (t, v) -> unit.rotation, 0.25f);
                 VelAttrib velOuter = new VelAttrib(0.24f, 0.1f, (t, v) -> unit.rotation, 0.2f);
                 return new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 32, 5.6f, 8f, speed, 0f), monolithLight),
+                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 32, 2, 5.6f, 8f, speed, 0f, null), monolithLight),
                     new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, 6f, 3.2f, speed, velInner), 9f, 11.25f, 0.75f, monolithLight),
                     new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, 6f, 3.2f, speed, velInner.flip()), -9f, 11.25f, 0.75f, monolithLight),
                     new TrailHold(MonolithTrails.singlePhantasmal(10, velOuter), 17.875f, 6f, 0.6f, monolithLight),

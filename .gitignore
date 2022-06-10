@@ -7,6 +7,7 @@ build/
 .classpath
 
 # Project-specific
+local.properties
 mod/assets/meta
 mod/assets/sprites/
 
