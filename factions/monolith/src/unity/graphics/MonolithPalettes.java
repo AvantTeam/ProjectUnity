@@ -10,7 +10,7 @@ import unity.mod.*;
 public final class MonolithPalettes{
     public static final Color
         monolith = Palettes.monolith,
-        monolithLight = new Color(0xc0ecffff),
+        monolithLight = new Color(0x9cd4f8ff),
         monolithDark = new Color(0x4679cfff),
 
         monolithOutline = Palettes.darkOutline;
