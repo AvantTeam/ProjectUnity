@@ -594,7 +594,7 @@ public final class MonolithUnitTypes{
                     thickness = 1f;
                     spikes = 4;
                     spikeOffset = 0.4f;
-                    spikeWidth = 1f;
+                    spikeWidth = 1.5f;
                     spikeLength = 1.5f;
                     flip = true;
                     color = monolithDark;
