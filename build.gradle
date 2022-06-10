@@ -25,7 +25,12 @@ import arc.util.io.*
 import arc.struct.*
 
 final StringMap props = new StringMap()
-file("$rootDir/local.properties").withReader{ PropertiesUtils.load(props, it) }
+props.with{
+    def local = file("$rootDir/local.properties")
+
+    def map = it
+    if(local.exists()) local.withReader{ PropertiesUtils.load(map, it) }
+}
 
 configure(allprojects){
     apply plugin: 'java-library'
