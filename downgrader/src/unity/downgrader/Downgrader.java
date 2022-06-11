@@ -17,6 +17,7 @@ import java.util.*;
  * @author GlennFolker
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
+@SupportedAnnotationTypes("*")
 public class Downgrader extends AbstractProcessor{
     static{
         try{

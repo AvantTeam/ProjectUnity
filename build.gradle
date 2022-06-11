@@ -106,8 +106,6 @@ configure(allprojects){
         options.deprecation = true
         options.incremental = true
         options.encoding = 'UTF-8'
-
-        options.listFiles = true
     }
 }
 
