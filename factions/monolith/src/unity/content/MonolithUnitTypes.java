@@ -14,6 +14,7 @@ import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.ammo.*;
+import mindustry.world.*;
 import unity.assets.list.*;
 import unity.entities.prop.*;
 import unity.entities.type.*;
@@ -66,7 +67,7 @@ public final class MonolithUnitTypes{
                 formTileChance = 0.17f;
                 formAbsorbChance = 0f;
 
-                engineColor = monolithLight;
+                engineColor = trailColor = monolithLight;
                 engineSize = 2f;
                 engineOffset = 3.5f;
 
@@ -82,36 +83,61 @@ public final class MonolithUnitTypes{
 
             @Override
             public void drawBase(MonolithSoul soul){
-                Vec2
-                    right = Tmp.v1.trns(soul.rotation - 90f, 4f, 0.5f),
-                    left = Tmp.v2.trns(soul.rotation - 90f, -4f, 0.5f),
-                    front = Tmp.v3.trns(soul.rotation, 4.5f).add(soul),
-                    center = Tmp.v4.trns(soul.rotation, 1.8f).add(soul),
-                    back = Tmp.v5.trns(soul.rotation, -4.5f).add(soul);
+                draw(soul.x, soul.y, soul.rotation, 4f, 0.5f, 4.5f, 1.8f, -4.5f);
+            }
 
-                Draw.color(monolithDark, monolith, 1f - MathUtils.shade(soul.rotation - 45f));
-                Fill.tri(center.x, center.y, front.x, front.y, soul.x + right.x, soul.y + right.y);
+            @Override
+            public void drawForm(MonolithSoul soul){
+                Tmp.v1.trns(soul.rotation, 1.8f).add(soul);
 
-                Draw.color(monolithDark, monolith, 1f - MathUtils.shade(soul.rotation - 135f));
-                Fill.tri(center.x, center.y, soul.x + right.x, soul.y + right.y, back.x, back.y);
+                Lines.stroke(2f + Mathf.absin(12f, 0.1f));
+                for(Tile tile : soul.forms){
+                    long seed = soul.id + tile.pos();
+                    Tmp.v2.trns(Mathf.randomSeed(seed, 360f) + Time.time * MathUtils.randomSeedSign(seed), 3f).add(tile);
 
-                Draw.color(monolithDark, monolith, 1f - MathUtils.shade(soul.rotation + 45f));
-                Fill.tri(center.x, center.y, front.x, front.y, soul.x + left.x, soul.y + left.y);
-
-                Draw.color(monolithDark, monolith, 1f - MathUtils.shade(soul.rotation + 135f));
-                Fill.tri(center.x, center.y, soul.x + left.x, soul.y + left.y, back.x, back.y);
+                    DrawUtils.lineFalloff(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, Tmp.c1.set(monolithDark).a(0.4f), monolithLight, 4, 0.67f);
+                }
 
                 Draw.reset();
             }
 
             @Override
-            public void drawForm(MonolithSoul soul){
-
-            }
-
-            @Override
             public void drawJoin(MonolithSoul soul){
-                
+                if(soul.joinTarget != null){
+                    Tmp.v1.trns(soul.rotation, 1.8f).add(soul);
+
+                    Lines.stroke(2f + Mathf.absin(12f, 0.1f));
+                    DrawUtils.lineFalloff(Tmp.v1.x, Tmp.v1.y, soul.joinTarget.getX(), soul.joinTarget.getY(), Tmp.c1.set(monolithDark).a(0.4f), monolithLight, 4, 0.67f);
+                    Draw.reset();
+                }
+
+                Lines.stroke(1.5f, monolith);
+
+                TextureRegion reg = Core.atlas.white();
+                Quat rot = MathUtils.q1.set(Vec3.Z, soul.ringRotation() + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
+                float
+                    t = Interp.pow5Out.apply(soul.joinTime()),
+                    rad = t * 7.2f, a = Mathf.curve(t, 0.25f),
+                    s = Lines.getStroke();
+
+                Draw.alpha(a);
+                DrawUtils.panningCircle(reg,
+                    soul.x, soul.y, s, s,
+                    rad, 360f, Time.time * 4f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
+                    rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                );
+
+                Draw.color(Color.black, monolithDark, 0.67f);
+                Draw.alpha(a);
+
+                Draw.blend(Blending.additive);
+                DrawUtils.panningCircle(Core.atlas.find("unity-line-shade"),
+                    soul.x, soul.y, s + 6f, s + 6f,
+                    rad, 360f, 0f,
+                    rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                );
+
+                Draw.blend();
             }
         }));
 
@@ -119,9 +145,43 @@ public final class MonolithUnitTypes{
             transferAmount = 2;
             formAmount = 3;
             formDelta = 0.4f;
-        }}){{
+        }}){
+            {
+                health = 180f;
+                range = maxRange = 72f;
 
-        }}));
+                hitSize = 9.6f;
+                speed = 3f;
+                rotateSpeed = 7.2f;
+                drag = 0.04f;
+                accel = 0.18f;
+
+                //formTileChance = 0.17f;
+                //formAbsorbChance = 0f;
+
+                engineColor = trailColor = monolithLight;
+                engineSize = 2f;
+                engineOffset = 3.5f;
+            }
+
+            @Override
+            public void drawBase(MonolithSoul soul){
+                draw(soul.x, soul.y, soul.rotation, 5.2f, 1f, 6f, 1f, -7f);
+            }
+
+            @Override
+            public void drawEyes(MonolithSoul soul){
+                Tmp.v1.trns(soul.rotation, 6f);
+                Tmp.v2.trns(soul.rotation, 3f).add(Tmp.v1);
+
+                Lines.stroke(1.4f * 4f, Tmp.c1.set(0f, 0f, 0f, 0.4f));
+                Lines.line(softShadowRegion, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, true);
+
+                Lines.stroke(1.4f);
+                DrawUtils.lineFalloff(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, Tmp.c1.set(monolithDark).a(0.4f), monolithLight, 3, 0.75f);
+                Draw.reset();
+            }
+        }));
 
         souls[2] = register(Faction.monolith, content("monolith-soul-2", MonolithSoul.class, n -> new MonolithSoulType(n, new MonolithSoulProps(){{
             transferAmount = 4;
@@ -153,26 +213,19 @@ public final class MonolithUnitTypes{
                 deathExplosionEffect = MonolithFx.soulDeath;
                 //deathSound = PUSounds.soulDeath;
 
-                engineColor = monolithLight;
+                engineColor = trailColor = monolithLight;
                 trail(24, unit -> new MultiTrail(BaseTrail.rot(unit),
                     new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 30, 2, 5.6f, 8.4f, speed, 4f, null), monolithLight),
                     new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, speed), 4.8f, 6f, 0.56f, monolithLight),
                     new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, speed), -4.8f, 6f, 0.56f, monolithLight)
                 ));
 
-                corporealTrail = soul -> new MultiTrail(new TrailHold(MonolithTrails.soul(BaseTrail.rot(soul), trailLength, speed), monolithLight));
+                corporealTrail = soul -> MonolithTrails.soul(BaseTrail.rot(soul), trailLength, speed);
             }
 
             @Override
             public void drawBase(MonolithSoul soul){
-                Draw.blend(Blending.additive);
-                Draw.color(monolith);
-                Fill.circle(soul.x, soul.y, 6f);
-
-                Draw.color(monolithDark);
-                Draw.rect(softShadowRegion, soul.x, soul.y, 16f, 16f);
-                Draw.blend();
-
+                draw(soul.x, soul.y, soul.rotation, 7f, 1f, 6f, 1f, -7f);
                 Lines.stroke(1f, monolithDark);
 
                 float rotation = Time.time * 3f * Mathf.sign(soul.id % 2 == 0);
@@ -185,6 +238,13 @@ public final class MonolithUnitTypes{
                 }
 
                 Draw.reset();
+            }
+
+            @Override
+            public void drawEyes(MonolithSoul soul){
+                for(int sign : Mathf.signs){
+
+                }
             }
 
             @Override

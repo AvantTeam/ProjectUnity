@@ -54,11 +54,11 @@ public interface SoulHolder extends Position, Sized{
     /** Spreads the nesting souls in this soul holder, typically at death. Called server-side */
     default void spreadSouls(){
         class State{
-            static boolean transferred;
+            static final boolean transferred[] = {false};
         }
 
-        State.transferred = false;
-        spread(team(), souls(), soul -> State.transferred |= apply(soul, State.transferred));
+        State.transferred[0] = false;
+        spread(team(), souls(), soul -> State.transferred[0] |= apply(soul, State.transferred[0]));
     }
 
     default boolean apply(MonolithSoul soul, boolean transferred){

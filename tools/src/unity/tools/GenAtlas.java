@@ -123,6 +123,11 @@ public class GenAtlas extends TextureAtlas{
             u2 = v2 = 1f;
         }
 
+        public GenRegion(String name, String relativePath, Pixmap pixmap){
+            this(name, pixmap);
+            this.relativePath = relativePath;
+        }
+
         @Override
         public boolean found(){
             return pixmap != null;

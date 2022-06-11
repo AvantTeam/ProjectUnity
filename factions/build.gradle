@@ -5,5 +5,7 @@ subprojects{
         compileOnly mindustry(':core')
         compileOnly arc(':arc-core')
         api project(':core')
+
+        annotationProcessor project(':downgrader')
     }
 }

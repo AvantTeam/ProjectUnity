@@ -6,6 +6,8 @@ dependencies{
 
     api project(':factions:vanilla')
     api project(':factions:monolith')
+
+    annotationProcessor project(':downgrader')
 }
 
 import arc.files.*

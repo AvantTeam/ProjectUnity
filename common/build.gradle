@@ -12,7 +12,7 @@ dependencies{
     compileOnly arc(':arc-core')
     compileOnly project(':annotations')
 
-    annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+    annotationProcessor project(':downgrader')
     kapt project(':annotations')
 }
 

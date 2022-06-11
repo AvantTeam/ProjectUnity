@@ -1,9 +1,8 @@
 package unity.annotations.processors;
 
-import arc.files.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.Log;
+import arc.util.*;
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
 import com.sun.tools.javac.api.*;
@@ -20,14 +19,12 @@ import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-import javax.tools.*;
 import javax.tools.Diagnostic.*;
+import javax.tools.*;
 import java.io.*;
-import java.lang.*;
-import java.lang.Class;
 import java.lang.annotation.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.*;
 
 /**

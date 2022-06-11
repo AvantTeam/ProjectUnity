@@ -1,6 +1,7 @@
 package unity.tools;
 
 import arc.util.*;
+import unity.tools.proc.*;
 
 import java.util.concurrent.*;
 
@@ -9,7 +10,7 @@ import java.util.concurrent.*;
  * @author GlennFolker
  */
 public final class Processors{
-    private static final Processor[] processes = {};
+    private static final Processor[] processes = {new MiscRegionProc()};
 
     private Processors(){
         throw new AssertionError();

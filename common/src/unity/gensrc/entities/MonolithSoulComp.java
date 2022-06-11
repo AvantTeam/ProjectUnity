@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -21,7 +22,7 @@ import unity.mod.*;
 
 import static mindustry.Vars.*;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "unused"})
 @EntityComponent
 @EntityDef({MonolithSoulc.class, Unitc.class, Factionc.class})
 abstract class MonolithSoulComp implements Unitc, Factionc{
@@ -73,24 +74,62 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
         }
     }
 
+    void checkInteraction(Cons<Tile> form, Cons<Healthc> join){
+        if(!isLocal()) return;
+        if(!mobile){
+            float mx = Core.input.mouseWorldX(), my = Core.input.mouseWorldY();
+            if(Core.input.keyTap(Binding.select)){
+                Tile tile = world.tileWorld(mx, my);
+                if(tile != null && !formInvalid(tile)) form.get(tile);
+            }else if(Core.input.keyTap(Binding.deselect)){
+                Teamc target = Units.closest(team, mx, my, 1f, other -> !joinInvalid(other));
+                if(target == null) target = world.buildWorld(mx, my);
+
+                if(target instanceof Healthc h && target.team() == team && !joinInvalid(h)) join.get(h);
+            }
+        }else{
+            //TODO
+        }
+    }
+
+    @Override
+    public void draw(){
+        if(isLocal()){
+            checkInteraction(tile -> {
+                float rad = tile.block().size * tilesize / 2f;
+                Tmp.v1.trns(tile.angleTo(this), rad).add(tile);
+
+                Drawf.dashLineDst(Pal.place, x, y, Tmp.v1.x, Tmp.v1.y);
+                Drawf.dashCircle(tile.drawx(), tile.drawy(), rad, Pal.place);
+            }, target -> {
+                float rad = target instanceof Sized size ? (size.hitSize() / 2f) : -1f;
+                if(rad < 0f) return;
+
+                Tmp.v1.trns(target.angleTo(this), rad).add(target);
+
+                Drawf.dashLineDst(Pal.accent, x, y, Tmp.v1.x, Tmp.v1.y);
+                Drawf.dashCircle(target.getX(), target.getY(), rad, Pal.accent);
+            });
+
+            if(forming()){
+                for(Tile tile : forms) Drawf.square(tile.drawx(), tile.drawy(), tile.block().size * tilesize / 2f + 2f, Pal.place);
+            }
+
+            if(joinTarget instanceof Sized e){
+                float rad = e.hitSize() / 2f;
+                Tmp.v1.trns(e.angleTo(this), rad).add(e);
+
+                Drawf.line(Pal.accent, x, y, Tmp.v1.x, Tmp.v1.y);
+                Drawf.circles(e.getX(), e.getY(), rad, Pal.accent);
+            }
+        }
+    }
+
     @Override
     @MethodPriority(-1)
     public void update(){
         ringRotation = Mathf.slerp(ringRotation, joining() ? angleTo(joinTarget) : rotation, props.ringRotateSpeed);
-        if(isLocal()){
-            if(!mobile){
-                float mx = Core.input.mouseWorldX(), my = Core.input.mouseWorldY();
-                if(Core.input.keyTap(Binding.select)){
-                    Tile tile = world.tileWorld(mx, my);
-                    if(tile != null) form(tile);
-                }else if(Core.input.keyTap(Binding.deselect)){
-                    Teamc target = Units.closest(team, mx, my, 1f, other -> !joinInvalid(other));
-                    if(target == null) target = world.buildWorld(mx, my);
-
-                    if(target instanceof Healthc h && target.team() == team) join(h);
-                }
-            }
-        }
+        checkInteraction(this::form, this::join);
 
         if(!net.client() || isLocal()){
             if(!corporeal){

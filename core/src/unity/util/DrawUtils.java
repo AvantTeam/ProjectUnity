@@ -6,11 +6,14 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 
+import static arc.Core.*;
+
 /** Intermediately-shared utility access for rendering operations. */
 public final class DrawUtils{
     public static final float perspectiveDistance = 150f;
 
-    private static final Vec2 vec1 = new Vec2();
+    private static final Color col1 = new Color();
+    private static final Vec2 vec1 = new Vec2(), vec2 = new Vec2();
     private static final Vec2
         a = new Vec2(),
         b = new Vec2(),
@@ -35,16 +38,28 @@ public final class DrawUtils{
         throw new AssertionError();
     }
 
-    public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, float layerLow, float layerHigh){
+    public static void panningCircle(TextureRegion region,
+                                     float x, float y, float w, float h, float radius,
+                                     float arcCone, float arcRotation, Quat rotation,
+                                     float layerLow, float layerHigh){
         panningCircle(region, x, y, w, h, radius, arcCone, arcRotation, rotation, false, layerLow, layerHigh, perspectiveDistance);
     }
 
-    public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, boolean useLinePrecision, float layerLow, float layerHigh){
+    public static void panningCircle(TextureRegion region,
+                                     float x, float y, float w, float h, float radius,
+                                     float arcCone, float arcRotation, Quat rotation,
+                                     boolean useLinePrecision, float layerLow, float layerHigh){
         panningCircle(region, x, y, w, h, radius, arcCone, arcRotation, rotation, useLinePrecision, layerLow, layerHigh, 150f);
     }
 
-    /** @author GlennFolker */
-    public static void panningCircle(TextureRegion region, float x, float y, float w, float h, float radius, float arcCone, float arcRotation, Quat rotation, boolean useLinePrecision, float layerLow, float layerHigh, float perspectiveDst){
+    /**
+     * 3D-rotated circle.
+     * @author GlennFolker
+     */
+    public static void panningCircle(TextureRegion region,
+                                     float x, float y, float w, float h, float radius,
+                                     float arcCone, float arcRotation, Quat rotation,
+                                     boolean useLinePrecision, float layerLow, float layerHigh, float perspectiveDst){
         float z = Draw.z();
 
         float arc = arcCone / 360f;
@@ -86,6 +101,43 @@ public final class DrawUtils{
         Draw.z(z);
     }
 
+    public static void line(float x1, float y1, float x2, float y2){
+        TextureRegion end = atlas.find("hcircle");
+        line(atlas.white(), end, end, x1, y1, x2, y2);
+    }
+
+    /**
+     * Alternative to {@link Lines#line(float, float, float, float, boolean)} that uses textured ends.
+     * @author GlennFolker
+     */
+    public static void line(TextureRegion line, TextureRegion start, TextureRegion end, float x1, float y1, float x2, float y2){
+        float angle = Mathf.angleExact(x2 - x1, y2 - y1), s = Lines.getStroke();
+        vec1.trns(angle, s / 2f).add(x1, y1);
+        vec2.trns(angle + 180f, s / 2f).add(x2, y2);
+
+        Draw.rect(start, x1, y1, s, s, angle);
+        Draw.rect(end, x2, y2, s, s, angle + 180f);
+        Lines.line(line, vec1.x, vec1.y, vec2.x, vec2.y, false);
+    }
+
+    public static void lineFalloff(float x1, float y1, float x2, float y2, Color outer, Color inner, int iterations, float falloff){
+        TextureRegion end = atlas.find("hcircle");
+        lineFalloff(atlas.white(), end, end, x1, y1, x2, y2, outer, inner, iterations, falloff);
+    }
+
+    /** @author GlennFolker */
+    public static void lineFalloff(TextureRegion line, TextureRegion start, TextureRegion end,
+                                   float x1, float y1, float x2, float y2,
+                                   Color outer, Color inner, int iterations, float falloff){
+        float s = Lines.getStroke();
+        for(int i = 0; i < iterations; i++){
+            Lines.stroke(s, col1.set(outer).lerp(inner, i / (iterations - 1f)));
+
+            line(line, start, end, x1, y1, x2, y2);
+            s *= falloff;
+        }
+    }
+
     public static void linePoint(float x, float y, Color col){
         linePoint(x, y, col.toFloatBits(), Draw.z());
     }
@@ -125,6 +177,10 @@ public final class DrawUtils{
         }
     }
 
+    /**
+     * {@link Lines#polyline(float[], int, boolean)} that supports variable color, width, and Z layer.
+     * @author GlennFolker
+     */
     public static void polyLine(float[] items, int offset, int length, boolean wrap){
         if(length < linestr * 2) return;
         for(int i = offset + linestr; i < length - linestr; i += linestr){

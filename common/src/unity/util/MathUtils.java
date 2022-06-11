@@ -84,4 +84,9 @@ public final class MathUtils{
     public static float shade(float normalAngle, float lightAngle){
         return Angles.angleDist(normalAngle, lightAngle - 180f) / 180f;
     }
+
+    /** @author GlennFolker */
+    public static int randomSeedSign(long seed){
+        return Mathf.randomSeed(seed, 0, 1) * 2 - 1;
+    }
 }

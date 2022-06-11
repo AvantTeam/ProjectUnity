@@ -6,6 +6,8 @@ dependencies{
     implementation arc(':natives-desktop')
 
     implementation project(':mod')
+
+    annotationProcessor project(':downgrader')
 }
 
 task proc(dependsOn: [classes, configurations.runtimeClasspath]){

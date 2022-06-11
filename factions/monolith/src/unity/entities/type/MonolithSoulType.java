@@ -16,6 +16,7 @@ import unity.content.*;
 import unity.entities.prop.*;
 import unity.gen.entities.*;
 import unity.graphics.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 import static unity.graphics.MonolithPalettes.*;
@@ -81,7 +82,7 @@ public class MonolithSoulType extends PUUnitType{
                 }
             }
 
-            if(!soul.corporeal()){
+            if(!soul.corporeal){
                 if(trailChance > 0f && Mathf.chanceDelta(trailChance)) trailEffect.at(soul.x, soul.y, Time.time, new Vec2(soul.vel).scl(-0.3f / Time.delta));
                 if(soul.forming()){
                     if(formChance > 0f || formTileChance > 0f || formAbsorbChance > 0f) for(Tile form : soul.forms){
@@ -107,12 +108,17 @@ public class MonolithSoulType extends PUUnitType{
             float z = Draw.z();
             Draw.z(Layer.flyingUnitLow);
 
+            drawSoftShadow(soul);
+
             float trailSize = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation) * trailScl;
             soul.trail.drawCap(engineColor, trailSize);
             soul.trail.draw(engineColor, trailSize);
 
             Draw.z(Layer.effect - 0.01f);
             drawBase(soul);
+
+            Draw.z(Layer.flyingUnit);
+            drawEyes(soul);
 
             Draw.z(Layer.flyingUnit);
             drawForm(soul);
@@ -128,6 +134,8 @@ public class MonolithSoulType extends PUUnitType{
     }
 
     public void drawBase(MonolithSoul soul){}
+
+    public void drawEyes(MonolithSoul soul){}
 
     public void drawForm(MonolithSoul soul){
         for(int i = 0; i < wreckRegions.length; i++){
@@ -151,6 +159,29 @@ public class MonolithSoulType extends PUUnitType{
     @Override
     public MonolithSoul create(Team team){
         return (MonolithSoul)super.create(team);
+    }
+
+    public static void draw(float x, float y, float rotation, float offSideX, float offSideY, float offFront, float offCenter, float offBack){
+        Vec2
+            right = Tmp.v1.trns(rotation - 90f, offSideX, offSideY),
+            left = Tmp.v2.trns(rotation - 90f, -offSideX, offSideY),
+            front = Tmp.v3.trns(rotation, offFront).add(x, y),
+            center = Tmp.v4.trns(rotation, offCenter).add(x, y),
+            back = Tmp.v5.trns(rotation, offBack).add(x, y);
+
+        Draw.color(monolithDark, monolith, 1f - MathUtils.shade(rotation - 45f));
+        Fill.tri(center.x, center.y, front.x, front.y, x + right.x, y + right.y);
+
+        Draw.color(monolithDark, monolith, 1f - MathUtils.shade(rotation - 135f));
+        Fill.tri(center.x, center.y, x + right.x, y + right.y, back.x, back.y);
+
+        Draw.color(monolithDark, monolith, 1f - MathUtils.shade(rotation + 45f));
+        Fill.tri(center.x, center.y, front.x, front.y, x + left.x, y + left.y);
+
+        Draw.color(monolithDark, monolith, 1f - MathUtils.shade(rotation + 135f));
+        Fill.tri(center.x, center.y, x + left.x, y + left.y, back.x, back.y);
+
+        Draw.reset();
     }
 
     public static class StateTrail extends BaseTrail{
