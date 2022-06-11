@@ -17,7 +17,7 @@ import java.util.*;
  * @author GlennFolker
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
-@SupportedAnnotationTypes("*")
+@SupportedAnnotationTypes("java.lang.Override")
 public class Downgrader extends AbstractProcessor{
     static{
         try{
@@ -41,10 +41,13 @@ public class Downgrader extends AbstractProcessor{
         }catch(Throwable t){
             throw new RuntimeException(t);
         }
+
+        System.out.println("sir please");
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
+        System.out.println("sir please");
         return true;
     }
 }
