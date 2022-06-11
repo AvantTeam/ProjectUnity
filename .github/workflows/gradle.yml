@@ -22,13 +22,6 @@ jobs:
         java --version
         d8 --version
 
-#    - name: Crazy hack
-#      run: |
-#        rm -rf downgrader/assets/META-INF/gradle
-#
-#        mkdir downgrader/assets/META-INF/services
-#        echo "unity.downgrader.Downgrader" > downgrader/assets/META-INF/services/javax.annotation.processing.Processor
-
     - name: Build and dexify mod jar file
       run: |
         chmod +x gradlew
