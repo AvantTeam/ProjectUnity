@@ -65,7 +65,7 @@ public class TexturedTrail extends BaseTrail{
     public TexturedTrail(TextureRegion region, int length, TrailAttrib... attributes){
         this(length, attributes);
         this.region = region;
-        if(!headless && region instanceof AtlasRegion reg) capRegion = Core.atlas.find(reg.name + "-cap", "unity-hcircle");
+        if(!headless && region instanceof AtlasRegion regg) capRegion = Core.atlas.find(regg.name + "-cap", "unity-hcircle");
     }
 
     public TexturedTrail(int length, TrailAttrib... attributes){

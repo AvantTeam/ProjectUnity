@@ -66,7 +66,7 @@ public class MonolithSoulType extends PUUnitType{
                 float width = (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * soul.elevation);
                 if(soul.corporeal && !trail.corporeal){
                     Trail copy = trail.trail.copy();
-                    if(copy instanceof BaseTrail t) t.rot = BaseTrail::rot;
+                    if(copy instanceof BaseTrail tt) tt.rot = BaseTrail::rot;
 
                     MonolithFx.trailFadeLow.at(soul.x, soul.y, width, monolithLight, copy);
                     trail.trail = corporealTrail.get(soul);
