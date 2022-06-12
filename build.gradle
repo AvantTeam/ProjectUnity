@@ -146,6 +146,7 @@ configure(project(':common')){
     }
 
     tasks.withType(JavaCompile){
+        sourceCompatibility = compilerVersion
         options.release = 8
     }
 }
@@ -153,6 +154,7 @@ configure(project(':common')){
 configure([project(':core'), project(':mod'), project(':tools')] + project(':factions').subprojects){
     sourceCompatibility = compilerVersion
     tasks.withType(JavaCompile){
+        sourceCompatibility = compilerVersion
         options.release = 8
     }
 }
