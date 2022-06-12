@@ -42,6 +42,27 @@ public final class MonolithFx{
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
 
+    soulSmall = new Effect(27f, e -> {
+        if(!(e.data instanceof Position data)) return;
+
+        blend(Blending.additive);
+        color(monolith, monolithDark, Color.black, e.finpow());
+
+        float
+            time = Time.time - e.rotation, vx = data.getX() * time, vy = data.getY() * time,
+            fin = 1f - e.fin(pow2In);
+
+        randLenVectors(e.id, 1, 3f + e.finpowdown() * 5f, (x, y) -> {
+            alpha(1f);
+            Fill.circle(e.x + x + vx, e.y + y + vy, fin * 1.4f);
+
+            alpha(0.67f);
+            Draw.rect("circle-shadow", e.x + x + vx, e.y + y + vy, fin * 8f, fin * 5.2f);
+        });
+
+        blend();
+    }).layer(Layer.flyingUnitLow - 0.01f),
+
     soul = new Effect(48f, e -> {
         if(!(e.data instanceof Position data)) return;
 
@@ -61,7 +82,7 @@ public final class MonolithFx{
         });
 
         blend();
-    }).layer(Layer.flyingUnit - 0.01f),
+    }).layer(Layer.flyingUnitLow - 0.01f),
 
     soulAbsorb = new Effect(32f, e -> {
         if(!(e.data instanceof Position data)) return;

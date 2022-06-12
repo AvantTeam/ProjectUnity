@@ -68,6 +68,10 @@ public final class MonolithTrails{
         return phantasmal(BaseTrail::rot, length, strandsAmount, scale, magnitude, speedThreshold, offsetY, null);
     }
 
+    public static MultiTrail phantasmal(RotationHandler rot, int length, int strandsAmount, float scale, float magnitude, float speedThreshold, float offsetY){
+        return phantasmal(rot, length, strandsAmount, scale, magnitude, speedThreshold, offsetY, null);
+    }
+
     public static MultiTrail phantasmal(RotationHandler rot, int length, int strandsAmount, float scale, float magnitude, float speedThreshold, float offsetY, VelAttrib vel){
         TrailHold[] trails = new TrailHold[strandsAmount + 2];
         for(int i = 0; i < strandsAmount; i++){

@@ -63,7 +63,7 @@ public final class DrawUtils{
         float z = Draw.z();
 
         float arc = arcCone / 360f;
-        int sides = useLinePrecision ? (int)(Lines.circleVertices(radius) * arc) : (int)((Mathf.PI2 * radius * arc) / w);
+        int sides = useLinePrecision ? (int)(Lines.circleVertices(radius * 3f) * arc) : (int)((Mathf.PI2 * radius * arc) / w);
         float space = arcCone / sides;
         float hstep = (Lines.getStroke() * h / 2f) / Mathf.cosDeg(space / 2f);
         float r1 = radius - hstep, r2 = radius + hstep;
@@ -106,18 +106,20 @@ public final class DrawUtils{
         line(atlas.white(), end, end, x1, y1, x2, y2);
     }
 
+    public static void line(TextureRegion line, TextureRegion end, float x1, float y1, float x2, float y2){
+        line(line, end, end, x1, y1, x2, y2);
+    }
+
     /**
      * Alternative to {@link Lines#line(float, float, float, float, boolean)} that uses textured ends.
      * @author GlennFolker
      */
     public static void line(TextureRegion line, TextureRegion start, TextureRegion end, float x1, float y1, float x2, float y2){
         float angle = Mathf.angleExact(x2 - x1, y2 - y1), s = Lines.getStroke();
-        vec1.trns(angle, s / 2f).add(x1, y1);
-        vec2.trns(angle + 180f, s / 2f).add(x2, y2);
 
-        Draw.rect(start, x1, y1, s, s, angle);
-        Draw.rect(end, x2, y2, s, s, angle + 180f);
-        Lines.line(line, vec1.x, vec1.y, vec2.x, vec2.y, false);
+        Draw.rect(start, x1, y1, s, s, angle + 180f);
+        Draw.rect(end, x2, y2, s, s, angle);
+        Lines.line(line, x1, y1, x2, y2, false);
     }
 
     public static void lineFalloff(float x1, float y1, float x2, float y2, Color outer, Color inner, int iterations, float falloff){
@@ -135,6 +137,21 @@ public final class DrawUtils{
 
             line(line, start, end, x1, y1, x2, y2);
             s *= falloff;
+        }
+    }
+
+    public static void fillSector(float x, float y, float radius, float rotation, float fraction){
+        fillSector(x, y, radius, rotation, fraction, Lines.circleVertices(radius * 3f));
+    }
+
+    /** @author GlennFolker */
+    public static void fillSector(float x, float y, float radius, float rotation, float fraction, int sides){
+        int max = Math.max(Mathf.round(sides * fraction), 1);
+        for(int i = 0; i < max; i++){
+            vec1.trns((float)i / max * fraction * 360f + rotation, radius);
+            vec2.trns((i + 1f) / max * fraction * 360f + rotation, radius);
+
+            Fill.tri(x, y, x + vec1.x, y + vec1.y, x + vec2.x, y + vec2.y);
         }
     }
 

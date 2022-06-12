@@ -1,6 +1,5 @@
 package unity.content;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -28,6 +27,7 @@ import unity.graphics.trail.*;
 import unity.mod.*;
 import unity.util.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 import static unity.gen.entities.EntityRegistry.*;
 import static unity.graphics.MonolithPalettes.*;
@@ -88,9 +88,10 @@ public final class MonolithUnitTypes{
 
             @Override
             public void drawForm(MonolithSoul soul){
+                Draw.z(Layer.effect - 0.01f);
                 Tmp.v1.trns(soul.rotation, 1.8f).add(soul);
 
-                Lines.stroke(2f + Mathf.absin(12f, 0.1f));
+                Lines.stroke(4f + Mathf.absin(12f, 0.1f));
                 for(Tile tile : soul.forms){
                     long seed = soul.id + tile.pos();
                     Tmp.v2.trns(Mathf.randomSeed(seed, 360f) + Time.time * MathUtils.randomSeedSign(seed), 3f).add(tile);
@@ -103,7 +104,9 @@ public final class MonolithUnitTypes{
 
             @Override
             public void drawJoin(MonolithSoul soul){
+                float z = Draw.z();
                 if(soul.joinTarget != null){
+                    Draw.z(Layer.effect - 0.01f);
                     Tmp.v1.trns(soul.rotation, 1.8f).add(soul);
 
                     Lines.stroke(2f + Mathf.absin(12f, 0.1f));
@@ -111,9 +114,10 @@ public final class MonolithUnitTypes{
                     Draw.reset();
                 }
 
+                Draw.z(z);
                 Lines.stroke(1.5f, monolith);
 
-                TextureRegion reg = Core.atlas.white();
+                TextureRegion reg = atlas.white();
                 Quat rot = MathUtils.q1.set(Vec3.Z, soul.ringRotation() + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
                 float
                     t = Interp.pow5Out.apply(soul.joinTime()),
@@ -131,7 +135,7 @@ public final class MonolithUnitTypes{
                 Draw.alpha(a);
 
                 Draw.blend(Blending.additive);
-                DrawUtils.panningCircle(Core.atlas.find("unity-line-shade"),
+                DrawUtils.panningCircle(atlas.find("unity-line-shade"),
                     soul.x, soul.y, s + 6f, s + 6f,
                     rad, 360f, 0f,
                     rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
@@ -144,7 +148,7 @@ public final class MonolithUnitTypes{
         souls[1] = register(Faction.monolith, content("monolith-soul-1", MonolithSoul.class, n -> new MonolithSoulType(n, new MonolithSoulProps(){{
             transferAmount = 2;
             formAmount = 3;
-            formDelta = 0.4f;
+            formDelta = 0.2f;
         }}){
             {
                 health = 180f;
@@ -152,16 +156,27 @@ public final class MonolithUnitTypes{
 
                 hitSize = 9.6f;
                 speed = 3f;
-                rotateSpeed = 7.2f;
+                rotateSpeed = 7.8f;
                 drag = 0.04f;
                 accel = 0.18f;
 
+                trailChance = 1f;
+                trailEffect = MonolithFx.soulSmall;
                 //formTileChance = 0.17f;
                 //formAbsorbChance = 0f;
 
                 engineColor = trailColor = monolithLight;
                 engineSize = 2f;
                 engineOffset = 3.5f;
+
+                trail(20, unit -> new MultiTrail(BaseTrail.rot(unit),
+                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 32, 3, 3.2f, 4.8f, speed, 0f), 0f, engineOffset, monolithLight)
+                ));
+
+                corporealTrail = soul -> new MultiTrail(
+                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(soul), 20, 1, 4.8f, 3.2f, speed, 2f), monolithLight),
+                    new TrailHold(MonolithTrails.singleSoul(6), monolith)
+                );
             }
 
             @Override
@@ -171,14 +186,18 @@ public final class MonolithUnitTypes{
 
             @Override
             public void drawEyes(MonolithSoul soul){
-                Tmp.v1.trns(soul.rotation, 6f);
-                Tmp.v2.trns(soul.rotation, 3f).add(Tmp.v1);
+                float s = 2f;
+                Tmp.v1.trns(soul.rotation, 2.5f).add(soul);
+                Tmp.v2.trns(soul.rotation, 1.8f).add(Tmp.v1);
 
-                Lines.stroke(1.4f * 4f, Tmp.c1.set(0f, 0f, 0f, 0.4f));
-                Lines.line(softShadowRegion, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, true);
+                Lines.stroke(s + 6f, Tmp.c1.set(0f, 0f, 0f, 0.14f));
+                DrawUtils.line(
+                    atlas.find("circle-mid"), atlas.find("unity-circle-end"),
+                    Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
+                );
 
-                Lines.stroke(1.4f);
-                DrawUtils.lineFalloff(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, Tmp.c1.set(monolithDark).a(0.4f), monolithLight, 3, 0.75f);
+                Lines.stroke(s, Tmp.c1.set(monolithLight).lerp(Color.white, 0.5f));
+                DrawUtils.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
                 Draw.reset();
             }
         }));
@@ -186,7 +205,7 @@ public final class MonolithUnitTypes{
         souls[2] = register(Faction.monolith, content("monolith-soul-2", MonolithSoul.class, n -> new MonolithSoulType(n, new MonolithSoulProps(){{
             transferAmount = 4;
             formAmount = 5;
-            formDelta = 0.6f;
+            formDelta = 0.2f;
 
             joinEffect = MonolithFx.soulJoin;
             transferEffect = MonolithFx.soulTransfer;
@@ -197,7 +216,7 @@ public final class MonolithUnitTypes{
 
                 hitSize = 12f;
                 speed = 2.4f;
-                rotateSpeed = 10f;
+                rotateSpeed = 8.2f;
                 drag = 0.08f;
                 accel = 0.2f;
 
@@ -225,7 +244,7 @@ public final class MonolithUnitTypes{
 
             @Override
             public void drawBase(MonolithSoul soul){
-                draw(soul.x, soul.y, soul.rotation, 7f, 1f, 6f, 1f, -7f);
+                draw(soul.x, soul.y, soul.rotation, 7f, 1f, 8f, 1f, -7f);
                 Lines.stroke(1f, monolithDark);
 
                 float rotation = Time.time * 3f * Mathf.sign(soul.id % 2 == 0);
@@ -242,16 +261,41 @@ public final class MonolithUnitTypes{
 
             @Override
             public void drawEyes(MonolithSoul soul){
+                float s = 2f, f = 2.2f, o = 2f;
                 for(int sign : Mathf.signs){
+                    Tmp.v1.trns(soul.rotation - 90f, f * sign, o).add(soul);
+                    Tmp.v2.trns(soul.rotation, 3f).add(Tmp.v1);
 
+                    Lines.stroke(s + 6f, Tmp.c1.set(0f, 0f, 0f, 0.14f));
+                    DrawUtils.line(
+                        atlas.find("circle-mid"), atlas.find("unity-circle-end"),
+                        Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
+                    );
+
+                    Lines.stroke(s, Tmp.c1.set(monolithLight).lerp(Color.white, 0.5f));
+                    DrawUtils.line(
+                        atlas.white(), atlas.find("clear"), atlas.find("hcircle"),
+                        Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
+                    );
+
+                    Draw.color(Tmp.c1.set(monolithLight).lerp(Color.white, 0.5f));
+                    if(sign == -1){
+                        Tmp.v3.trns(soul.rotation - 90f, -f - s / 2f, o).add(soul);
+                        DrawUtils.fillSector(Tmp.v3.x, Tmp.v3.y, s, soul.rotation + 180f, 0.25f);
+                    }else if(sign == 1){
+                        Tmp.v3.trns(soul.rotation - 90f, f + s / 2f, o).add(soul);
+                        DrawUtils.fillSector(Tmp.v3.x, Tmp.v3.y, s, soul.rotation + 90f, 0.25f);
+                    }
                 }
+
+                Draw.reset();
             }
 
             @Override
             public void drawJoin(MonolithSoul soul){
                 Lines.stroke(1.5f, monolith);
 
-                TextureRegion reg = Core.atlas.find("unity-monolith-chain");
+                TextureRegion reg = atlas.find("unity-monolith-chain");
                 Quat rot = MathUtils.q1.set(Vec3.Z, soul.ringRotation() + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
                 float
                     t = Interp.pow3Out.apply(soul.joinTime()),
@@ -269,7 +313,7 @@ public final class MonolithUnitTypes{
                 Draw.alpha(a);
 
                 Draw.blend(Blending.additive);
-                DrawUtils.panningCircle(Core.atlas.find("unity-line-shade"),
+                DrawUtils.panningCircle(atlas.find("unity-line-shade"),
                     soul.x, soul.y, w + 6f, h + 6f,
                     rad, 360f, 0f,
                     rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
@@ -282,7 +326,7 @@ public final class MonolithUnitTypes{
         souls[3] = register(Faction.monolith, content("monolith-soul-3", MonolithSoul.class, n -> new MonolithSoulType(n, new MonolithSoulProps(){{
             transferAmount = 8;
             formAmount = 7;
-            formDelta = 0.8f;
+            formDelta = 0.2f;
         }}){{
 
         }}));

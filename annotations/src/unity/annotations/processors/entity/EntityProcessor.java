@@ -163,6 +163,7 @@ public class EntityProcessor extends BaseProcessor{
                     EntityComponent compAnno = anno(comp, EntityComponent.class);
                     if(!compAnno.vanilla()){
                         TypeSpec.Builder intBuilder = TypeSpec.interfaceBuilder(intName(comp))
+                            .addOriginatingElement(comp)
                             .addModifiers(PUBLIC, ABSTRACT)
                             .addAnnotation(spec(EntityInterface.class))
                             .addAnnotation(
@@ -232,7 +233,10 @@ public class EntityProcessor extends BaseProcessor{
                             if(anno(comp, EntityDef.class) == null){
                                 String tname = baseName(comp);
 
-                                TypeSpec.Builder base = TypeSpec.classBuilder(tname).addModifiers(PUBLIC, ABSTRACT);
+                                TypeSpec.Builder base = TypeSpec.classBuilder(tname)
+                                    .addModifiers(PUBLIC, ABSTRACT)
+                                    .addOriginatingElement(comp);
+
                                 for(ClassSymbol dep : baseDeps){
                                     for(Symbol s : dep.getEnclosedElements()){
                                         if(s.getKind() == FIELD && !isAny(s, PRIVATE, STATIC) && anno(s, Import.class) == null && anno(s, ReadOnly.class) == null){
@@ -353,6 +357,11 @@ public class EntityProcessor extends BaseProcessor{
                                 .addMember("value", "{$S, $S, $S}", "all", "unchecked", "deprecation")
                             .build()
                         );
+                    if(def instanceof ClassSymbol){
+                        builder.addOriginatingElement(def);
+                    }else{
+                        for(ClassSymbol comp : defComps.values()) builder.addOriginatingElement(comp);
+                    }
 
                     syncedFields.clear();
                     allFields.clear();
@@ -745,9 +754,14 @@ public class EntityProcessor extends BaseProcessor{
                     .returns(TypeName.VOID);
 
                 for(ClassSymbol point : pointers){
-                    ClassName name = ClassName.bestGuess(fName(point));
+                    registry.addOriginatingElement(point);
+
+                    //ClassName name = ClassName.bestGuess(fName(point));
+                    ClassName name = ClassName.get(point);
                     register.addStatement("register($S, $T.class, $T::new)", name.canonicalName(), name, name);
                 }
+
+                definitions.flatMap(def -> def.components).distinct().each(registry::addOriginatingElement);
 
                 Seq<String> imports = new Seq<>();
                 for(EntityDefinition def : definitions){
