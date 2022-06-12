@@ -118,6 +118,15 @@ configure([project(':annotations'), project(':downgrader')]){
 }
 
 configure(project(':common')){
+    gradle.taskGraph.whenReady { taskGraph -> 
+        tasks.each {
+            if(it.name == 'kaptGenerateStubsKotlin' || it.name == 'compileKotlin' || it.name == 'inspectClassesForKotlinIC'){
+                it.setOnlyIf { false }
+                it.outputs.upToDateWhen { true }
+            }
+        }
+    }
+
     apply plugin: 'kotlin'
     apply plugin: 'kotlin-kapt'
 
@@ -139,10 +148,6 @@ configure(project(':common')){
 
             option("-ArevisionDirectory=${project(':annotations').projectDir}/assets/revisions")
         }
-    }
-
-    compileKotlin{
-        outputs.upToDateWhen{ true }
     }
 
     tasks.withType(JavaCompile){
