@@ -11,6 +11,7 @@ import unity.mod.*;
 
 import static mindustry.Vars.*;
 
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class MonolithComp implements Unitc, Factionc, SoulHolder{
     @Import boolean spawnedByCore;

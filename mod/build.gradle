@@ -62,8 +62,6 @@ task list(dependsOn: [jar, configurations.runtimeClasspath]){
 
 task deploy(type: Jar, dependsOn: [list, configurations.runtimeClasspath]){
     mustRunAfter list
-
-    outputs.upToDateWhen{ false }
     if(!spritesDir.exists() || taskNames.contains('tools:proc') || taskNames.contains('proc')){
         dependsOn ':tools:proc'
         mustRunAfter ':tools:proc'
@@ -96,6 +94,10 @@ task deploy(type: Jar, dependsOn: [list, configurations.runtimeClasspath]){
 
             file.writeString("${str.substring(0, start)}$modVersion${str.substring(end)}")
         }
+    }
+
+    gradle.taskGraph.whenReady{
+        force(deploy, true)
     }
 }
 

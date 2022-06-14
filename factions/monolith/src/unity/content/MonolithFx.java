@@ -42,7 +42,7 @@ public final class MonolithFx{
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
     })),
 
-    soulSmall = new Effect(27f, e -> {
+    soulMed = new Effect(27f, e -> {
         if(!(e.data instanceof Position data)) return;
 
         blend(Blending.additive);
@@ -63,7 +63,7 @@ public final class MonolithFx{
         blend();
     }).layer(Layer.flyingUnitLow - 0.01f),
 
-    soul = new Effect(48f, e -> {
+    soulLarge = new Effect(48f, e -> {
         if(!(e.data instanceof Position data)) return;
 
         blend(Blending.additive);
@@ -84,7 +84,7 @@ public final class MonolithFx{
         blend();
     }).layer(Layer.flyingUnitLow - 0.01f),
 
-    soulAbsorb = new Effect(32f, e -> {
+    soulLargeAbsorb = new Effect(32f, e -> {
         if(!(e.data instanceof Position data)) return;
 
         Tmp.v1
@@ -108,7 +108,7 @@ public final class MonolithFx{
         blend();
     }).layer(Layer.flyingUnitLow),
 
-    soulTransfer = new Effect(64f, e -> {
+    soulLargeTransfer = new Effect(64f, e -> {
         if(!(e.data instanceof Position data)) return;
 
         Tmp.v1.set(data).sub(e.x, e.y).scl(e.fin(pow2In)).add(e.x, e.y);
@@ -129,7 +129,7 @@ public final class MonolithFx{
         }
     }),
 
-    soulDeath = new Effect(64f, e -> {
+    soulLargeDeath = new Effect(64f, e -> {
         color(monolith, monolithDark, e.fin());
         randLenVectors(e.id, 27, e.finpow() * 56f, (x, y) ->
             Fill.circle(e.x + x, e.y + y, 0.5f + e.fout() * 2.5f)
@@ -150,7 +150,7 @@ public final class MonolithFx{
         });
     }),
 
-    soulJoin = new Effect(72f, e -> {
+    soulLargeJoin = new Effect(72f, e -> {
         if(!(e.data instanceof MonolithSoul soul)) return;
 
         stroke(1.5f, monolith);

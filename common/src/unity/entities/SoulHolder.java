@@ -57,6 +57,7 @@ public interface SoulHolder extends Position, Sized{
         spread(team(), souls(), soul -> transferred[0] |= apply(soul, transferred[0]));
     }
 
+    /** @return If this entity was controlled by a player, returns whether the player has been transferred to a spawned soul. */
     default boolean apply(MonolithSoul soul, boolean transferred){
         Tmp.v1.trns(Mathf.random(360f), Mathf.random(hitSize()));
         soul.set(getX() + Tmp.v1.x, getY() + Tmp.v1.y);

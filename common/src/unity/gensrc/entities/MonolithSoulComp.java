@@ -18,6 +18,8 @@ import unity.entities.*;
 import unity.entities.prop.*;
 import unity.entities.type.*;
 import unity.gen.entities.*;
+import unity.io.PUPackets.*;
+import unity.io.PUPackets.MonolithSoulChangePacket.*;
 import unity.mod.*;
 
 import static mindustry.Vars.*;
@@ -43,7 +45,6 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     @SyncField(true) @SyncLocal float formProgress;
 
     private transient MonolithSoulProps props;
-    private transient boolean wasCorporeal;
 
     @Override
     public Faction faction(){
@@ -59,19 +60,6 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     @Override
     public void setType(UnitType type){
         if(type instanceof PUUnitTypeCommon def) props = def.propReq(MonolithSoulProps.class);
-    }
-
-    @Override
-    public void afterSync(){
-        if(!isLocal()){
-            if(wasCorporeal && !corporeal){
-                crack();
-            }else if(!wasCorporeal && corporeal){
-                form();
-            }
-
-            wasCorporeal = corporeal;
-        }
     }
 
     void checkInteraction(Cons<Tile> form, Cons<Healthc> join){
@@ -141,31 +129,16 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
                 formProgress = Mathf.lerpDelta(formProgress, forming() ? (health / maxHealth) : 0f, props.formWarmup);
             }else if(health <= maxHealth * 0.5f){
                 crack();
+                if(net.active()) MonolithSoulChangePacket.send(self(), Change.crack);
             }
 
             if(isValid()){
                 if(Mathf.equal(joinTime, 1f) && !joinInvalid(joinTarget)){
-                    split(SoulHolder.toSoul(joinTarget).acceptSoul(props.transferAmount));
-                    if(isPlayer()){
-                        Player player = getPlayer();
-                        if(joinTarget instanceof ControlBlock block && !block.isControlled() && block.canControl()){
-                            block.unit().controller(player);
-                        }else if(joinTarget instanceof Unit unit && !unit.isPlayer() && unit.type.playerControllable){
-                            unit.controller(player);
-                        }
-                    }
-
-                    props.joinEffect.at(x, y, ringRotation, this);
-                    props.transferEffect.at(x, y, rotation, joinTarget);
-
-                    Time.run(props.transferDelay, () -> {
-                        if(joinTarget.isValid()){
-                            SoulHolder.toSoul(joinTarget).transferSoul(props.transferAmount);
-                            props.joinSound.at(x, y, Mathf.random(props.joinPitchMin, props.joinPitchMax));
-                        }
-                    });
+                    join();
+                    if(net.active()) MonolithSoulChangePacket.send(self(), Change.join);
                 }else if(!corporeal && Mathf.equal(health, maxHealth)){
                     form();
+                    if(net.active()) MonolithSoulChangePacket.send(self(), Change.form);
                 }
             }
         }
@@ -182,9 +155,32 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
         joinTime = 0f;
     }
 
+    void join(){
+        if(joinTarget == null) return;
+
+        split(SoulHolder.toSoul(joinTarget).acceptSoul(props.transferAmount));
+        if(isPlayer()){
+            Player player = getPlayer();
+            if(joinTarget instanceof ControlBlock block && !block.isControlled() && block.canControl()){
+                block.unit().controller(player);
+            }else if(joinTarget instanceof Unit unit && !unit.isPlayer() && unit.type.playerControllable){
+                unit.controller(player);
+            }
+        }
+
+        props.joinEffect.at(x, y, ringRotation, this);
+        props.transferEffect.at(x, y, rotation, joinTarget);
+        Time.run(props.transferDelay, () -> {
+            if(joinTarget.isValid()){
+                SoulHolder.toSoul(joinTarget).transferSoul(props.transferAmount);
+                props.joinSound.at(x, y, Mathf.random(props.joinPitchMin, props.joinPitchMax));
+            }
+        });
+    }
+
     void form(){
-        props.joinEffect.at(x, y, rotation);
-        props.joinSound.at(x, y, Mathf.random(props.joinPitchMin, props.joinPitchMax));
+        props.formEffect.at(x, y, rotation);
+        props.formSound.at(x, y, Mathf.random(props.formPitchMin, props.formPitchMax));
 
         corporeal = true;
         joinTarget = null;

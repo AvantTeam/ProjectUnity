@@ -11,6 +11,8 @@ import java.lang.invoke.*;
 import java.lang.invoke.MethodHandles.*;
 import java.util.*;
 
+import static com.sun.tools.javac.code.Source.Feature.*;
+
 /**
  * Alternative to Jabel (which takes a really long time to start); faster, but potentially unreliable. Might not work if some
  * illegal access operations aren't permitted.
@@ -27,17 +29,19 @@ public class Downgrader extends AbstractProcessor{
             MethodHandle set = lookup.findSetter(Feature.class, "minLevel", Source.class);
 
             // Downgrade most J8-compatible features.
-            set.invokeExact(Feature.EFFECTIVELY_FINAL_VARIABLES_IN_TRY_WITH_RESOURCES, Source.JDK8);
-            set.invokeExact(Feature.PRIVATE_SAFE_VARARGS, Source.JDK8);
-            set.invokeExact(Feature.DIAMOND_WITH_ANONYMOUS_CLASS_CREATION, Source.JDK8);
-            set.invokeExact(Feature.LOCAL_VARIABLE_TYPE_INFERENCE, Source.JDK8);
-            set.invokeExact(Feature.VAR_SYNTAX_IMPLICIT_LAMBDAS, Source.JDK8);
-            set.invokeExact(Feature.SWITCH_MULTIPLE_CASE_LABELS, Source.JDK8);
-            set.invokeExact(Feature.SWITCH_RULE, Source.JDK8);
-            set.invokeExact(Feature.SWITCH_EXPRESSION, Source.JDK8);
-            set.invokeExact(Feature.TEXT_BLOCKS, Source.JDK8);
-            set.invokeExact(Feature.PATTERN_MATCHING_IN_INSTANCEOF, Source.JDK8);
-            set.invokeExact(Feature.REIFIABLE_TYPES_INSTANCEOF, Source.JDK8);
+            for(Feature feature : new Feature[]{
+                EFFECTIVELY_FINAL_VARIABLES_IN_TRY_WITH_RESOURCES,
+                PRIVATE_SAFE_VARARGS,
+                DIAMOND_WITH_ANONYMOUS_CLASS_CREATION,
+                LOCAL_VARIABLE_TYPE_INFERENCE,
+                VAR_SYNTAX_IMPLICIT_LAMBDAS,
+                SWITCH_MULTIPLE_CASE_LABELS,
+                SWITCH_RULE,
+                SWITCH_EXPRESSION,
+                TEXT_BLOCKS,
+                PATTERN_MATCHING_IN_INSTANCEOF,
+                REIFIABLE_TYPES_INSTANCEOF
+            }) set.invokeExact(feature, Source.JDK8);
         }catch(Throwable t){
             throw new RuntimeException(t);
         }

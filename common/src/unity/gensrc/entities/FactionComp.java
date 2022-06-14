@@ -5,6 +5,7 @@ import unity.annotations.Annotations.*;
 import unity.gen.entities.*;
 import unity.mod.*;
 
+@SuppressWarnings("unused")
 @EntityComponent
 abstract class FactionComp implements Entityc{
     abstract Faction faction();

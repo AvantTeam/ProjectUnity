@@ -1,3 +1,8 @@
+plugins{
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'org.jetbrains.kotlin.kapt' version '1.6.21'
+}
+
 sourceSets.main.java.srcDirs = ['src/', "${compileJava.temporaryDir}/fetched/"]
 
 ext{
@@ -20,6 +25,23 @@ import arc.files.*
 import arc.struct.*
 import arc.util.*
 import arc.util.serialization.*
+
+sourceCompatibility = compilerVersion
+kotlin{
+    jvmToolchain{
+        languageVersion = JavaLanguageVersion.of(compilerVersion)
+    }
+}
+
+kapt{
+    keepJavacAnnotationProcessors = true
+    javacOptions{
+        option('-source', compilerVersion)
+        option('-target', '1.8')
+
+        option("-ArevisionDirectory=${project(':annotations').projectDir}/assets/revisions")
+    }
+}
 
 static String processComp(String source, String fetchPackage){
     return source
@@ -109,6 +131,7 @@ task fetchComps{
 tasks.withType(JavaCompile){
     if(!fetchDir.exists() || !fetchTemp.exists()){
         dependsOn fetchComps
+        mustRunAfter fetchComps
     }else{
         String[] content = fetchTemp.text.split('/')
         String ver = content[0].strip()
@@ -116,8 +139,12 @@ tasks.withType(JavaCompile){
 
         if(ver != "$mindustryVersion" as String || rev != Integer.toString(fetchRevision as int)){
             dependsOn fetchComps
+            mustRunAfter fetchComps
         }
     }
+
+    sourceCompatibility = compilerVersion
+    options.release = 8
 }
 
 tasks.withType(Jar){
@@ -125,4 +152,10 @@ tasks.withType(Jar){
 
     exclude 'unity/fetched/**'
     exclude 'unity/gensrc/**'
+}
+
+gradle.taskGraph.whenReady{
+    force(tasks.kaptGenerateStubsKotlin, false)
+    force(tasks.compileKotlin, false)
+    force(tasks.inspectClassesForKotlinIC, false)
 }

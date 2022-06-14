@@ -84,6 +84,27 @@ public final class MonolithUnitTypes{
             @Override
             public void drawBase(MonolithSoul soul){
                 draw(soul.x, soul.y, soul.rotation, 4f, 0.5f, 4.5f, 1.8f, -4.5f);
+
+                Draw.color(monolith);
+                for(int i = 0; i < 3; i++){
+                    Tmp.v1.trns(soul.rotation + Time.time * 4.6f * MathUtils.randomSeedSign(soul.id) + 360f * i / 3f, 5f).add(soul);
+                    Fill.circle(Tmp.v1.x, Tmp.v1.y, 1f);
+                }
+
+                Draw.reset();
+            }
+
+            @Override
+            public void drawEyes(MonolithSoul soul){
+                Tmp.v1.trns(soul.rotation, 1.8f).add(soul);
+
+                Draw.color(0f, 0f, 0f, 0.14f);
+                Draw.rect(softShadowRegion, Tmp.v1.x, Tmp.v1.y, 8f, 8f);
+
+                Draw.color(monolithLight, Color.white, 0.5f);
+                Fill.circle(Tmp.v1.x, Tmp.v1.y, 1f);
+
+                Draw.reset();
             }
 
             @Override
@@ -127,7 +148,7 @@ public final class MonolithUnitTypes{
                 Draw.alpha(a);
                 DrawUtils.panningCircle(reg,
                     soul.x, soul.y, s, s,
-                    rad, 360f, Time.time * 4f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
+                    rad, 360f, Time.time * 4f * MathUtils.randomSeedSign(soul.id) + soul.id * 30f,
                     rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
                 );
 
@@ -155,13 +176,13 @@ public final class MonolithUnitTypes{
                 range = maxRange = 72f;
 
                 hitSize = 9.6f;
-                speed = 3f;
+                speed = 3.2f;
                 rotateSpeed = 7.8f;
                 drag = 0.04f;
                 accel = 0.18f;
 
-                trailChance = 1f;
-                trailEffect = MonolithFx.soulSmall;
+                trailChance = 0.8f;
+                trailEffect = MonolithFx.soulMed;
                 //formTileChance = 0.17f;
                 //formAbsorbChance = 0f;
 
@@ -182,13 +203,27 @@ public final class MonolithUnitTypes{
             @Override
             public void drawBase(MonolithSoul soul){
                 draw(soul.x, soul.y, soul.rotation, 5.2f, 1f, 6f, 1f, -7f);
+
+                Draw.color(monolithDark, monolith, 0.5f);
+                for(int i = 0; i < 6; i++){
+                    float rotation = soul.rotation + Time.time * 3.8f * MathUtils.randomSeedSign(soul.id) + 360f * i / 6f;
+                    Tmp.v1.trns(rotation - 90f, 7f, 0.5f).add(soul);
+                    if(i % 2 == 0){
+                        Fill.circle(Tmp.v1.x, Tmp.v1.y, 1.4f);
+                    }else{
+                        Draw.rect(atlas.find("hcircle"), Tmp.v1.x, Tmp.v1.y, 2f, 2f, rotation + 90f);
+                        Drawf.tri(Tmp.v1.x, Tmp.v1.y, 2f, 5f, rotation - 90f);
+                    }
+                }
+
+                Draw.reset();
             }
 
             @Override
             public void drawEyes(MonolithSoul soul){
                 float s = 2f;
                 Tmp.v1.trns(soul.rotation, 2.5f).add(soul);
-                Tmp.v2.trns(soul.rotation, 1.8f).add(Tmp.v1);
+                Tmp.v2.trns(soul.rotation, 2.5f).add(Tmp.v1);
 
                 Lines.stroke(s + 6f, Tmp.c1.set(0f, 0f, 0f, 0.14f));
                 DrawUtils.line(
@@ -207,29 +242,29 @@ public final class MonolithUnitTypes{
             formAmount = 5;
             formDelta = 0.2f;
 
-            joinEffect = MonolithFx.soulJoin;
-            transferEffect = MonolithFx.soulTransfer;
+            joinEffect = MonolithFx.soulLargeJoin;
+            transferEffect = MonolithFx.soulLargeTransfer;
         }}){
             {
                 health = 300f;
                 range = maxRange = 96f;
 
                 hitSize = 12f;
-                speed = 2.4f;
+                speed = 2.8f;
                 rotateSpeed = 8.2f;
                 drag = 0.08f;
                 accel = 0.2f;
 
-                trailChance = 1f;
+                trailChance = 0.9f;
                 formTileChance = 0.17f;
                 formAbsorbChance = 0.67f;
                 joinChance = 0.33f;
-                trailEffect = MonolithFx.soul;
+                trailEffect = MonolithFx.soulLarge;
                 formTileEffect = MonolithFx.spark;
-                formAbsorbEffect = MonolithFx.soulAbsorb;
-                joinEffect = MonolithFx.soulAbsorb;
+                formAbsorbEffect = MonolithFx.soulLargeAbsorb;
+                joinEffect = MonolithFx.soulLargeAbsorb;
 
-                deathExplosionEffect = MonolithFx.soulDeath;
+                deathExplosionEffect = MonolithFx.soulLargeDeath;
                 //deathSound = PUSounds.soulDeath;
 
                 engineColor = trailColor = monolithLight;
@@ -247,7 +282,7 @@ public final class MonolithUnitTypes{
                 draw(soul.x, soul.y, soul.rotation, 7f, 1f, 8f, 1f, -7f);
                 Lines.stroke(1f, monolithDark);
 
-                float rotation = Time.time * 3f * Mathf.sign(soul.id % 2 == 0);
+                float rotation = soul.rotation + Time.time * 3f * MathUtils.randomSeedSign(soul.id);
                 for(int i = 0; i < 5; i++){
                     float r = rotation + 72f * i, sect = 60f;
                     Lines.arc(soul.x, soul.y, 10f, sect / 360f, r - sect / 2f);
@@ -305,7 +340,7 @@ public final class MonolithUnitTypes{
                 Draw.alpha(a);
                 DrawUtils.panningCircle(reg,
                     soul.x, soul.y, w, h,
-                    rad, 360f, Time.time * 4f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
+                    rad, 360f, Time.time * 4f * MathUtils.randomSeedSign(soul.id) + soul.id * 30f,
                     rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
                 );
 

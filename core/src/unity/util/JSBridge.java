@@ -50,7 +50,10 @@ public final class JSBridge{
 
     public static void importDefaults(ImporterTopLevel scope){
         if(!supported) return;
+
         for(String pack : packages) importPackage(scope, pack);
+        importPackage(scope, "java.lang");
+        importPackage(scope, "java.util");
     }
 
     public static void importPackage(ImporterTopLevel scope, String packageName){

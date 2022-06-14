@@ -7,6 +7,7 @@ import mindustry.game.EventType.*;
 import unity.assets.list.*;
 import unity.content.*;
 import unity.gen.entities.*;
+import unity.io.*;
 import unity.mod.*;
 import unity.util.*;
 
@@ -62,6 +63,8 @@ public class ProjectUnity extends ProjectUnityCommon{
         Core.app.post(() -> {
             dev.setup();
             JSBridge.setup();
+
+            PUPackets.register();
         });
     }
 

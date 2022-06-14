@@ -16,20 +16,20 @@ buildscript{
 plugins{
     id 'java-library'
     id 'maven-publish'
-
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
-    id 'org.jetbrains.kotlin.kapt' version '1.6.21'
 }
 
 import arc.util.io.*
 import arc.struct.*
 
-final StringMap props = new StringMap()
-props.with{
-    def local = file("$rootDir/local.properties")
+file("$rootDir/local.properties").with{
+    if(it.exists()){
+        def map = new StringMap()
+        it.withReader{ PropertiesUtils.load(map, it) }
 
-    def map = it
-    if(local.exists()) local.withReader{ PropertiesUtils.load(map, it) }
+        configure(allprojects){
+            for(def e : map) ext."$e.key" = e.value
+        }
+    }
 }
 
 configure(allprojects){
@@ -48,15 +48,12 @@ configure(allprojects){
             return "com.github.Anuken.Arc$submodule:$arcVersion"
         }
 
-        hasProp = { String key ->
-            return project.hasProperty(key) || props.containsKey(key)
+        force = { Task task, final boolean run ->
+            task.onlyIf{ run }
+            task.outputs.upToDateWhen{ !run }
         }
 
-        prop = { String key ->
-            return project.hasProperty(key) ? project.property(key) : props.get(key)
-        }
-
-        sdkRoot = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
+        sdkRoot = System.getenv('ANDROID_SDK_ROOT') ?: System.getenv('ANDROID_HOME')
         taskNames = gradle.startParameter.taskNames
         compilerVersion = JavaVersion.current().ordinal() - JavaVersion.VERSION_17.ordinal() + 17
 
@@ -66,7 +63,9 @@ configure(allprojects){
         spritesRawDir = file("$assetsRawDir/sprites")
 
         // `-Pmod.dev` will initiate a developer build. Default is `false`.
-        devBuild = hasProp('mod.dev') && Boolean.parseBoolean(prop('mod.dev'))
+        devBuild = project.hasProperty('mod.dev') && Boolean.parseBoolean(project.property('mod.dev'))
+        // `-Pmod.deprecation` will log usages of deprecated API. Default is `false`.
+        showDeprecate = project.hasProperty('mod.deprecation') && Boolean.parseBoolean(project.property('mod.deprecation'))
     }
 
     repositories{
@@ -103,56 +102,18 @@ configure(allprojects){
     }
 
     tasks.withType(JavaCompile){
-        options.deprecation = true
         options.incremental = true
         options.encoding = 'UTF-8'
+
+        if(showDeprecate) options.deprecation = true
     }
 }
 
 configure([project(':annotations'), project(':downgrader')]){
-    sourceCompatibility = 8
+    sourceCompatibility = compilerVersion
     tasks.withType(JavaCompile){
         sourceCompatibility = 8
         targetCompatibility = 8
-    }
-}
-
-configure(project(':common')){
-    gradle.taskGraph.whenReady { taskGraph -> 
-        tasks.each {
-            if(it.name == 'kaptGenerateStubsKotlin' || it.name == 'compileKotlin' || it.name == 'inspectClassesForKotlinIC'){
-                it.setOnlyIf { false }
-                it.outputs.upToDateWhen { true }
-            }
-        }
-    }
-
-    apply plugin: 'kotlin'
-    apply plugin: 'kotlin-kapt'
-
-    sourceCompatibility = compilerVersion
-    kotlin{
-        jvmToolchain{
-            languageVersion = JavaLanguageVersion.of(compilerVersion)
-        }
-    }
-
-    kapt{
-        useBuildCache = false
-        correctErrorTypes = true
-        keepJavacAnnotationProcessors = true
-
-        javacOptions{
-            option('-source', compilerVersion)
-            option('-target', '1.8')
-
-            option("-ArevisionDirectory=${project(':annotations').projectDir}/assets/revisions")
-        }
-    }
-
-    tasks.withType(JavaCompile){
-        sourceCompatibility = compilerVersion
-        options.release = 8
     }
 }
 
