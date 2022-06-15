@@ -2,6 +2,7 @@ package unity.util;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -12,7 +13,12 @@ import static arc.Core.*;
 public final class DrawUtils{
     public static final float perspectiveDistance = 150f;
 
-    public static final TextureAtlas emptyAtlas = new TextureAtlas();
+    public static final TextureAtlas emptyAtlas = new TextureAtlas(){{
+        white = error = new AtlasRegion(){{
+            u = v = 0f;
+            u2 = v2 = 1f;
+        }};
+    }};
 
     private static final Color col1 = new Color();
     private static final Vec2 vec1 = new Vec2(), vec2 = new Vec2();
