@@ -20,7 +20,7 @@ public final class Processors{
         for(Processor process : processes){
             Time.mark();
 
-            ExecutorService exec = Threads.cachedExecutor(1, Integer.MAX_VALUE, false, "Assets-Process");
+            ExecutorService exec = Threads.unboundedExecutor("Assets-Process");
 
             process.process(exec);
             Threads.await(exec);

@@ -113,7 +113,7 @@ public final class Tools{
         Log.info("Adding regions...");
         Time.mark();
 
-        ExecutorService exec = Threads.cachedExecutor(1, Integer.MAX_VALUE, false, "Atlas-Mapper");
+        ExecutorService exec = Threads.unboundedExecutor("Atlas-Mapper");
         spritesDir.walk(path -> {
             if(!path.extEquals("png")) return;
             exec.submit(() -> atlas.addRegion(path));
