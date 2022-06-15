@@ -753,14 +753,15 @@ public class EntityProcessor extends BaseProcessor{
                     .addModifiers(PUBLIC, STATIC)
                     .returns(TypeName.VOID);
 
+                pointers.sort(Structs.comparing(BaseProcessor::fName));
                 for(ClassSymbol point : pointers){
                     registry.addOriginatingElement(point);
 
-                    //ClassName name = ClassName.bestGuess(fName(point));
                     ClassName name = ClassName.get(point);
                     register.addStatement("register($S, $T.class, $T::new)", name.canonicalName(), name, name);
                 }
 
+                definitions.sort(Structs.comparing(def -> def.name));
                 definitions.flatMap(def -> def.components).distinct().each(registry::addOriginatingElement);
 
                 Seq<String> imports = new Seq<>();
