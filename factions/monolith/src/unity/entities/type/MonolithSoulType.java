@@ -53,16 +53,15 @@ public class MonolithSoulType extends PUUnitType{
 
     @Override
     public void init(){
-        if(!(trailType.get(sample) instanceof StateTrail)){
-            boolean substitute = Core.atlas == null;
-            if(substitute) Core.atlas = DrawUtils.emptyAtlas;
+        boolean substitute = Core.atlas == null;
+        if(substitute) Core.atlas = DrawUtils.emptyAtlas;
 
+        if(!(trailType.get(sample) instanceof StateTrail)){
             Func<Unit, Trail> type = trailType;
             trailType = unit -> new StateTrail(type.get(unit));
-
-            if(substitute) Core.atlas = null;
         }
 
+        if(substitute) Core.atlas = null;
         super.init();
     }
 
