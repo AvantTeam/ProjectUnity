@@ -12,6 +12,8 @@ import static arc.Core.*;
 public final class DrawUtils{
     public static final float perspectiveDistance = 150f;
 
+    public static final TextureAtlas emptyAtlas = new TextureAtlas();
+
     private static final Color col1 = new Color();
     private static final Vec2 vec1 = new Vec2(), vec2 = new Vec2();
     private static final Vec2

@@ -1,11 +1,13 @@
 package unity.entities.type;
 
+import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
+import unity.util.*;
 
 import static mindustry.Vars.*;
 
@@ -94,7 +96,14 @@ public class PUUnitType extends PUUnitTypeCommon{
         super.init();
         for(Props prop : properties.values()) prop.init();
 
-        if(trailLength == -2) trailLength = BaseTrail.length(createTrail(sample));
+        if(trailLength == -2){
+            boolean substitute = Core.atlas == null;
+            if(substitute) Core.atlas = DrawUtils.emptyAtlas;
+
+            trailLength = BaseTrail.length(createTrail(sample));
+
+            if(substitute) Core.atlas = null;
+        }
     }
 
     @Override
