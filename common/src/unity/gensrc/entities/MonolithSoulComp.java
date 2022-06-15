@@ -133,10 +133,10 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
             }
 
             if(isValid()){
-                if(Mathf.equal(joinTime, 1f) && !joinInvalid(joinTarget)){
+                if(joining() && Mathf.equal(joinTime, 1f) && !joinInvalid(joinTarget)){
                     join();
                     if(net.active()) MonolithSoulChangePacket.send(self(), Change.join);
-                }else if(!corporeal && Mathf.equal(health, maxHealth)){
+                }else if(forming() && !corporeal && Mathf.equal(health, maxHealth)){
                     form();
                     if(net.active()) MonolithSoulChangePacket.send(self(), Change.form);
                 }
