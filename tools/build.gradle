@@ -22,7 +22,7 @@ task proc(dependsOn: [classes, configurations.runtimeClasspath]){
 
         javaexec{
             workingDir = assetsDir
-            main = 'unity.tools.Tools'
+            mainClass = 'unity.tools.Tools'
             classpath = sourceSets.main.runtimeClasspath
         }
     }
