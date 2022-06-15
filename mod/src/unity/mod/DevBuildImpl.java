@@ -21,7 +21,6 @@ import static mindustry.Vars.*;
 public class DevBuildImpl implements DevBuild{
     @Override
     public void setup(){
-        enableConsole = true;
         Log.level = LogLevel.debug;
     }
 
