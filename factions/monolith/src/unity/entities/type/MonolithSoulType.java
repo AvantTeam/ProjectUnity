@@ -1,5 +1,6 @@
 package unity.entities.type;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -53,8 +54,13 @@ public class MonolithSoulType extends PUUnitType{
     @Override
     public void init(){
         if(!(trailType.get(sample) instanceof StateTrail)){
+            boolean substitute = Core.atlas == null;
+            if(substitute) Core.atlas = DrawUtils.emptyAtlas;
+
             Func<Unit, Trail> type = trailType;
             trailType = unit -> new StateTrail(type.get(unit));
+
+            if(substitute) Core.atlas = null;
         }
 
         super.init();
