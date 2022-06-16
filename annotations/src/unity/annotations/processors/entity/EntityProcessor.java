@@ -145,15 +145,19 @@ public class EntityProcessor extends BaseProcessor{
                 for(ClassSymbol comp : comps.values()){
                     for(Symbol s : comp.getEnclosedElements()){
                         if(s.getKind() == FIELD){
-                            VariableTree tree = (VariableTree)trees.getTree(s);
-                            JCExpression init = (JCExpression)tree.getInitializer();
+                            JCVariableDecl tree = (JCVariableDecl)trees.getTree(s);
+                            if(tree == null) continue;
 
+                            JCExpression init = (JCExpression)tree.init;
                             if(init != null) varInitializers.put(desc(s), init);
                         }else if(s.getKind() == METHOD && s.getKind() != CONSTRUCTOR){
                             MethodSymbol m = (MethodSymbol)s;
                             if(isAny(m, ABSTRACT, NATIVE)) continue;
 
-                            methodBlocks.put(desc(m), trees.getTree(m).body);
+                            JCMethodDecl tree = trees.getTree(m);
+                            if(tree == null) continue;
+
+                            methodBlocks.put(desc(m), tree.body);
                         }
                     }
 

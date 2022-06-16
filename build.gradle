@@ -71,6 +71,8 @@ allprojects{
         devBuild = project.hasProperty('mod.dev') && Boolean.parseBoolean(project.property('mod.dev'))
         // `-Pmod.deprecation` will log usages of deprecated API. Default is `false`.
         showDeprecate = project.hasProperty('mod.deprecation') && Boolean.parseBoolean(project.property('mod.deprecation'))
+        // `-Pmod.listfiles` will log all files that are to be compiled. Default is `false`.
+        listFiles = project.hasProperty('mod.listfiles') && Boolean.parseBoolean(project.property('mod.listfiles'))
     }
 
     repositories{
@@ -111,14 +113,19 @@ allprojects{
         options.encoding = 'UTF-8'
 
         if(showDeprecate) options.deprecation = true
+        if(listFiles) options.listFiles = true
     }
 }
 
 configure([project(':annotations'), project(':downgrader')]){
     sourceCompatibility = compilerVersion
     tasks.withType(JavaCompile){
-        sourceCompatibility = 8
+        sourceCompatibility = compilerVersion
         targetCompatibility = 8
+
+        doFirst{
+            sourceCompatibility = 8
+        }
     }
 }
 

@@ -8,7 +8,10 @@ import arc.struct.*
 import arc.util.*
 import arc.util.serialization.*
 
-sourceSets.main.java.srcDirs = ['src/', "${compileJava.temporaryDir}/fetched/"]
+sourceSets.main.java.srcDirs = [
+    'src/',
+    "${compileJava.temporaryDir}/fetched/"
+]
 
 ext{
     fetchPackage = 'unity/fetched'

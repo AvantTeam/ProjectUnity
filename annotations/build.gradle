@@ -7,4 +7,6 @@ dependencies{
     implementation mindustry(':core')
     implementation arc(':arc-core')
     implementation "com.squareup:javapoet:$javapoetVersion"
+
+    annotationProcessor project(':downgrader')
 }

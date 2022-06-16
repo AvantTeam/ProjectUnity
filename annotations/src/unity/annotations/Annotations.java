@@ -31,12 +31,12 @@ public final class Annotations{
 
     /** Defines a class providing static entries of IO handlers. */
     @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface TypeIOHandler{}
 
     /** Indicates that this class is an entities component. */
     @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface EntityComponent{
         /** @return Whether this is a fetched component; in that case, do not generate interfaces. */
         boolean vanilla() default false;
@@ -47,16 +47,16 @@ public final class Annotations{
 
     /** All entities components will inherit from this. */
     @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface EntityBaseComponent{}
 
     /** Whether this interface wraps an entities component. */
     @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface EntityInterface{}
 
     /** Generates an entities definition from given components. */
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface EntityDef{
         /** @return The interfaces that will be inherited by the generated entities class. */
         Class<?>[] value();
@@ -73,12 +73,12 @@ public final class Annotations{
 
     /** Indicates that this entities (!) class should be mapped. */
     @Target({ElementType.TYPE})
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface EntityPoint{}
 
     /** Indicates that a field will be interpolated when synced. */
     @Target({ElementType.FIELD})
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface SyncField{
         /** @return True if the field is linearly interpolated. Otherwise, it's interpolated as an angle. */
         boolean value();
@@ -89,22 +89,22 @@ public final class Annotations{
 
     /** Indicates that a field will not be read from the server when syncing the local player state. */
     @Target({ElementType.FIELD})
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface SyncLocal{}
 
     /** Indicates that the field annotated with this came from another component class. */
     @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface Import{}
 
     /** Won't generate a setter for this field. */
     @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface ReadOnly{}
 
     /** Whether this method replaces the actual method in the base class. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface Replace{
         /** @return The priority of this replacer. */
         int value() default 0;
@@ -112,12 +112,12 @@ public final class Annotations{
 
     /** Whether this method is implemented in compile-time. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface InternalImpl{}
 
     /** Used for method appender sorting. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface MethodPriority{
         /** @return The priority. */
         int value();
@@ -125,17 +125,17 @@ public final class Annotations{
 
     /** Appends this {@code add()}/{@code remove()} method before the {@code if([!]added)} check. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface BypassGroupCheck{}
 
     /** Will not replace {@code return;} to {@code break [block];}, hence breaking the entire method statement. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface BreakAll{}
 
     /** Removes a component-specific method implementation. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface Remove{
         /** @return The component specification to remove. */
         Class<?> value();
@@ -143,7 +143,7 @@ public final class Annotations{
 
     /** Will only implement this method if the entities inherits this certain component. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface Extend{
         /** @return The component specification to check. */ //TODO should this be a Class<?>[]?
         Class<?> value();
@@ -151,7 +151,7 @@ public final class Annotations{
 
     /** Inserts this parameter-less method into another void method. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface Insert{
         /**
          * @return The target method described in {@link String} with the format {@code <methodName>(<paramType>...)}.
@@ -169,7 +169,7 @@ public final class Annotations{
 
     /** Wraps a component-specific method implementation with this boolean parameterless method. */
     @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface Wrap{
         /**
          * @return The target method described in {@link String} with the format {@code <methodName>(<paramType>...)}.
@@ -184,7 +184,7 @@ public final class Annotations{
 
     /** Prevents this component from getting added into an entities group, specified by the group's element type. */
     @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.CLASS)
     public @interface ExcludeGroups{
         /** @return The excluded group's element type. */
         Class<?>[] value();
