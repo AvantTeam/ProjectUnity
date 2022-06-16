@@ -21,6 +21,8 @@ plugins{
 import arc.util.io.*
 import arc.struct.*
 
+import java.util.regex.*
+
 file("$rootDir/local.properties").with{
     if(it.exists()){
         def map = new StringMap()
@@ -32,7 +34,7 @@ file("$rootDir/local.properties").with{
     }
 }
 
-configure(allprojects){
+allprojects{
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
@@ -53,8 +55,11 @@ configure(allprojects){
             task.outputs.upToDateWhen{ !run }
         }
 
+        ready = { Action<TaskExecutionGraph> graph ->
+            gradle.taskGraph.whenReady graph
+        }
+
         sdkRoot = System.getenv('ANDROID_SDK_ROOT') ?: System.getenv('ANDROID_HOME')
-        taskNames = gradle.startParameter.taskNames
         compilerVersion = JavaVersion.current().ordinal() - JavaVersion.VERSION_17.ordinal() + 17
 
         assetsDir = file("${project(':mod').projectDir}/assets")
@@ -122,5 +127,14 @@ configure([project(':core'), project(':mod'), project(':tools')] + project(':fac
     tasks.withType(JavaCompile){
         sourceCompatibility = compilerVersion
         options.release = 8
+    }
+}
+
+ready{ TaskExecutionGraph graph ->
+    [':mod', ':plugin'].collect{ file("${project(it).projectDir}/assets/mod.json") }.forEach{ File file ->
+        def str = file.text
+
+        def matcher = Pattern.compile('"version": "(.*)"').matcher(str)
+        if(matcher.find()) file.text = "${str.substring(0, matcher.start(1))}$modVersion${str.substring(matcher.end(1))}"
     }
 }

@@ -1,5 +1,11 @@
 sourceSets.main.java.srcDirs = ['src/']
 
+import arc.files.*
+import arc.struct.*
+import arc.util.*
+
+import java.util.regex.*
+
 dependencies{
     compileOnly mindustry(':core')
     compileOnly arc(':arc-core')
@@ -10,15 +16,10 @@ dependencies{
     annotationProcessor project(':downgrader')
 }
 
-import arc.files.*
-import arc.struct.*
-import arc.util.*
-
-import java.util.regex.*
-
 task list(dependsOn: [jar, configurations.runtimeClasspath]){
+    mustRunAfter ':tools:proc'
     doFirst{
-        def anon = Pattern.compile('\\$\\d+')
+        def forbid = Pattern.compile('\\$\\d+|.+Impl')
 
         Seq<String> classes = new Seq<>(), packages = new Seq<>()
         def procFile = { def self, String pack, Fi dir ->
@@ -33,7 +34,7 @@ task list(dependsOn: [jar, configurations.runtimeClasspath]){
                     self(self, packName, child)
                 }else{
                     def name = child.nameWithoutExtension()
-                    if(child.extEquals('class') && !anon.matcher(name).find()){
+                    if(child.extEquals('class') && !forbid.matcher(name).find()){
                         classes.add("$pack.$name")
                     }
                 }
@@ -61,13 +62,10 @@ task list(dependsOn: [jar, configurations.runtimeClasspath]){
 }
 
 task deploy(type: Jar, dependsOn: [list, configurations.runtimeClasspath]){
-    mustRunAfter list
-    if(!spritesDir.exists() || taskNames.contains('tools:proc') || taskNames.contains('proc')){
-        dependsOn ':tools:proc'
-        mustRunAfter ':tools:proc'
+    final def hasSprites = spritesDir.exists()
 
-        if(!spritesDir.exists() && (taskNames.contains('mod:deploy') || taskNames.contains('deploy'))) println 'Sprites folder not found; automatically generating sprites.'
-    }
+    if(!hasSprites) dependsOn ':tools:proc'
+    mustRunAfter ':tools:proc'
 
     archiveFileName = "${modName}Desktop.jar"
 
@@ -76,38 +74,23 @@ task deploy(type: Jar, dependsOn: [list, configurations.runtimeClasspath]){
     from configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
     from files(assetsDir){ exclude 'sprites/vanilla/**' }
 
-    from(rootDir){
-        include 'mod.json'
-        include 'icon.png'
+    ready{ TaskExecutionGraph graph ->
+        force(deploy, true)
+        if(!hasSprites && graph.hasTask(deploy) && graph.hasTask(':tools:proc')){
+            println 'Sprites folder not found; automatically generating sprites.'
+        }
     }
 
     doFirst{
         println "Deploying ${devBuild ? 'developer' : 'user'} build."
-
-        def file = Fi.get("$rootDir/mod.json")
-        def str = file.readString('UTF-8')
-        def matcher = Pattern.compile('"version": "(.*)"').matcher(str)
-        if(matcher.find()){
-            def start = matcher.start(1), end = matcher.end(1)
-            def prev = str.substring(start, end)
-            if(prev != modVersion) println "Bumped `mod.json` versioning from $prev to $modVersion."
-
-            file.writeString("${str.substring(0, start)}$modVersion${str.substring(end)}")
-        }
-    }
-
-    gradle.taskGraph.whenReady{
-        force(deploy, true)
     }
 }
 
-task dex(type: Jar){
+task dex(type: Jar, dependsOn: deploy){
     archiveFileName = "${modName}.jar"
 
     final def desktopJar = deploy.archiveFile.get().asFile
     final def dexJar = file("$dex.temporaryDir/Dexed.jar")
-
-    if(!desktopJar.exists() || (taskNames.contains('mod:deploy') || taskNames.contains('deploy'))) dependsOn deploy
     doFirst{
         println 'Dexifying...'
         def command = "d8 --min-api $sdkAPI --output $dexJar $desktopJar"
@@ -127,5 +110,5 @@ task dex(type: Jar){
 }
 
 tasks.withType(Jar){
-    if(!devBuild) exclude 'unity/mod/DevBuildImpl*'
+    if(!devBuild) exclude 'unity/DevBuildImpl*'
 }

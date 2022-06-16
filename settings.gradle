@@ -13,6 +13,7 @@ include ':factions:vanilla'
 include ':factions:monolith'
 
 include ':mod'
+include ':plugin'
 include ':tools'
 
 rootProject.name = modName

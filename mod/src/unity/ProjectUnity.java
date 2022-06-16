@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 public class ProjectUnity extends ProjectUnityCommon{
     public ProjectUnity(){
         try{
-            dev = (DevBuild)Class.forName("unity.mod.DevBuildImpl", true, mods.mainLoader()).getConstructor().newInstance();
+            dev = (DevBuild)Class.forName("unity.DevBuildImpl", true, mods.mainLoader()).getConstructor().newInstance();
             Log.info("Successfully instantiated developer build.");
         }catch(ClassNotFoundException | NoClassDefFoundError e){
             Log.info("Defaulting to user build.");

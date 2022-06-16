@@ -1,4 +1,4 @@
-package unity.mod;
+package unity;
 
 import arc.*;
 import arc.struct.*;
@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.Log.*;
 import mindustry.ctype.*;
 import mindustry.world.blocks.environment.*;
+import unity.mod.*;
 import unity.util.*;
 
 import java.util.*;
@@ -18,7 +19,7 @@ import static mindustry.Vars.*;
  * @author GlennFolker
  */
 @SuppressWarnings("unchecked")
-public class DevBuildImpl implements DevBuild{
+class DevBuildImpl implements DevBuild{
     @Override
     public void setup(){
         Log.level = LogLevel.debug;
