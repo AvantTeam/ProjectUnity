@@ -87,7 +87,11 @@ public final class MonolithUnitTypes{
 
                 Draw.color(monolith);
                 for(int i = 0; i < 3; i++){
-                    Tmp.v1.trns(soul.rotation + Time.time * 4.6f * MathUtils.randomSeedSign(soul.id) + 360f * i / 3f, 5f).add(soul);
+                    Tmp.v1.trns(
+                        Time.time * 4.6f * MathUtils.randomSeedSign(soul.id) + 360f * i / 3f,
+                        6f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 8f) + (Mathf.PI2 * 8f) * ((float)i / 3), 8f, 1f)
+                    ).add(soul);
+
                     Fill.circle(Tmp.v1.x, Tmp.v1.y, 1f);
                 }
 
@@ -204,13 +208,19 @@ public final class MonolithUnitTypes{
             public void drawBase(MonolithSoul soul){
                 draw(soul.x, soul.y, soul.rotation, 5.2f, 1f, 6f, 1f, -7f);
 
-                Draw.color(monolithDark, monolith, 0.5f);
                 for(int i = 0; i < 6; i++){
-                    float rotation = soul.rotation + Time.time * 3.8f * MathUtils.randomSeedSign(soul.id) + 360f * i / 6f;
-                    Tmp.v1.trns(rotation - 90f, 7f, 0.5f).add(soul);
+                    float rotation = Time.time * 3.8f * MathUtils.randomSeedSign(soul.id) + 360f * i / 6f;
+                    Tmp.v1.trns(
+                        rotation - 90f,
+                        7f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 6f) + (Mathf.PI2 * 6f) * ((float)i / 6), 6f, 1.2f),
+                        0.5f
+                    ).add(soul);
+
                     if(i % 2 == 0){
+                        Draw.color(monolithDark, monolith, 0.5f);
                         Fill.circle(Tmp.v1.x, Tmp.v1.y, 1.4f);
                     }else{
+                        Draw.color(monolith);
                         Draw.rect(atlas.find("hcircle"), Tmp.v1.x, Tmp.v1.y, 2f, 2f, rotation + 90f);
                         Drawf.tri(Tmp.v1.x, Tmp.v1.y, 2f, 5f, rotation - 90f);
                     }
@@ -282,12 +292,15 @@ public final class MonolithUnitTypes{
                 draw(soul.x, soul.y, soul.rotation, 7f, 1f, 8f, 1f, -7f);
                 Lines.stroke(1f, monolithDark);
 
-                float rotation = soul.rotation + Time.time * 3f * MathUtils.randomSeedSign(soul.id);
+                float rotation = Time.time * 3f * MathUtils.randomSeedSign(soul.id);
                 for(int i = 0; i < 5; i++){
-                    float r = rotation + 72f * i, sect = 60f;
-                    Lines.arc(soul.x, soul.y, 10f, sect / 360f, r - sect / 2f);
+                    float
+                        r = rotation + 72f * i, sect = 60f,
+                        rad = 10f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 5f) + (Mathf.PI2 * 5f) * ((float)i / 5), 5f, 0.8f);
 
-                    Tmp.v1.trns(r, 10f).add(soul);
+                    Lines.arc(soul.x, soul.y, rad, sect / 360f, r - sect / 2f);
+
+                    Tmp.v1.trns(r, rad).add(soul);
                     Drawf.tri(Tmp.v1.x, Tmp.v1.y, 2.5f, 6f, r);
                 }
 

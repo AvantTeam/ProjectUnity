@@ -24,7 +24,7 @@ public final class ReflectUtils{
         try{
             return (Class<T>)Class.forName(name, true, mods.mainLoader());
         }catch(Throwable t){
-            throw new RuntimeException(t);
+            return null;
         }
     }
     
@@ -125,7 +125,7 @@ public final class ReflectUtils{
     }
 
     public static <T> T inst(Class<?> type, Object... args){
-        return inst(type, args, (Class<?>)null);
+        return inst(type, args, (Class<?>[])null);
     }
 
     public static <T> T inst(Class<?> type, Object[] args, @Nullable Class<?>... params){
@@ -137,9 +137,9 @@ public final class ReflectUtils{
         return inst(findct(type, params), args);
     }
 
-    public static <T> T inst(Constructor<T> method, Object... args){
+    public static <T> T inst(Constructor<T> constr, Object... args){
         try{
-            return (T)method.newInstance(args);
+            return (T)constr.newInstance(args);
         }catch(Throwable t){
             throw new RuntimeException(t);
         }

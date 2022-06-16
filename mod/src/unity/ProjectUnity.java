@@ -18,12 +18,17 @@ import static mindustry.Vars.*;
 public class ProjectUnity extends ProjectUnityCommon{
     public ProjectUnity(){
         try{
-            dev = (DevBuild)Class.forName("unity.DevBuildImpl", true, mods.mainLoader()).getConstructor().newInstance();
-            Log.info("Successfully instantiated developer build.");
-        }catch(ClassNotFoundException | NoClassDefFoundError e){
-            Log.info("Defaulting to user build.");
+            Class<DevBuildImpl> type = ReflectUtils.findc("unity.DevBuildImpl");
+            if(type != null){
+                dev = ReflectUtils.inst(type);
+                Log.info("Successfully instantiated developer build.");
+            }
         }catch(Throwable t){
-            Log.err("Error while trying to instantiate developer build", t);
+            if(t.getCause() instanceof ClassNotFoundException || t.getCause() instanceof NoClassDefFoundError){
+                Log.info("Defaulting to user build.");
+            }else{
+                Log.err("Error while trying to instantiate developer build", t);
+            }
         }finally{
             if(dev == null) dev = new DevBuild(){};
         }
@@ -45,15 +50,7 @@ public class ProjectUnity extends ProjectUnityCommon{
                     }
                 }
 
-                classes.removeAll(str -> {
-                    try{
-                        Class.forName(str, true, mods.mainLoader());
-                        return false;
-                    }catch(ClassNotFoundException | NoClassDefFoundError ex){
-                        Log.warn("Class not found: '@'.", str);
-                        return true;
-                    }
-                });
+                classes.removeAll(str -> ReflectUtils.findc(str) == null);
             }catch(IOException ex){
                 throw new RuntimeException(ex);
             }
