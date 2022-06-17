@@ -7,7 +7,6 @@ import arc.struct.ObjectMap.*;
 import arc.util.*;
 import arc.util.pooling.Pool.*;
 import com.squareup.javapoet.*;
-import com.sun.source.tree.*;
 import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Attribute.*;
 import com.sun.tools.javac.code.Symbol.*;
@@ -89,7 +88,7 @@ public class EntityProcessor extends BaseProcessor{
     @Override
     protected void process() throws Exception{
         switch(round){
-            case 1: {
+            case 1 -> {
                 for(ClassSymbol t : this.<ClassSymbol>with(EntityComponent.class)) comps.put(name(t), t);
                 for(ClassSymbol t : this.<ClassSymbol>with(EntityBaseComponent.class)) baseComps.add(t);
                 for(Symbol s : with(EntityDef.class)) defs.add(s);
@@ -148,7 +147,7 @@ public class EntityProcessor extends BaseProcessor{
                             JCVariableDecl tree = (JCVariableDecl)trees.getTree(s);
                             if(tree == null) continue;
 
-                            JCExpression init = (JCExpression)tree.init;
+                            JCExpression init = tree.init;
                             if(init != null) varInitializers.put(desc(s), init);
                         }else if(s.getKind() == METHOD && s.getKind() != CONSTRUCTOR){
                             MethodSymbol m = (MethodSymbol)s;
@@ -274,9 +273,9 @@ public class EntityProcessor extends BaseProcessor{
                         if(base != null) baseClassTypes.put(name, base);
                     }
                 }
-            } break;
+            }
 
-            case 2: {
+            case 2 -> {
                 for(ClassSymbol t : this.<ClassSymbol>with(EntityInterface.class)) inters.put(name(t), t);
 
                 OrderedSet<String> registers = new OrderedSet<>();
@@ -1065,7 +1064,7 @@ public class EntityProcessor extends BaseProcessor{
 
     @Override
     public Set<String> getSupportedAnnotationTypes(){
-        return set(
+        return Set.of(
             fName(EntityComponent.class),
             fName(EntityBaseComponent.class),
             fName(EntityDef.class),
@@ -1075,7 +1074,7 @@ public class EntityProcessor extends BaseProcessor{
 
     @Override
     public Set<String> getSupportedOptions(){
-        return set("revisionDirectory");
+        return Set.of("revisionDirectory");
     }
 
     protected static class EntityDefinition{

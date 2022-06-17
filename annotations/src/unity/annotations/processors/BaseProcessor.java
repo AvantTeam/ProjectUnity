@@ -50,6 +50,7 @@ public abstract class BaseProcessor implements Processor{
     public JavacRoundEnvironment roundEnv;
 
     protected int round = 0, rounds = 1;
+    protected long initTime;
 
     static{
         Vars.loadLogger();
@@ -66,12 +67,17 @@ public abstract class BaseProcessor implements Processor{
         types = procEnv.getTypeUtils();
         trees = JavacTrees.instance(context);
         maker = TreeMaker.instance(context);
+
+        initTime = Time.millis();
+        Log.info("@ started.", getClass().getSimpleName());
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
-        if(round++ >= rounds) return false;
         this.roundEnv = (JavacRoundEnvironment)roundEnv;
+        if(roundEnv.processingOver()) Log.info("Time taken for @: @s", getClass().getSimpleName(), (Time.millis() - initTime) / 1000f);
+
+        if(round++ >= rounds) return true;
 
         try{
             process();
@@ -168,48 +174,19 @@ public abstract class BaseProcessor implements Processor{
         return (T)types.asElement(type);
     }
 
-    @SafeVarargs
-    public static <T> Set<T> set(T... items){
-        return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(items)));
-    }
-
-    @SafeVarargs
-    public static <T> Set<T> set(Set<T> base, T... items){
-        Set<T> out = new HashSet<>(base);
-        Collections.addAll(out, items);
-
-        return Collections.unmodifiableSet(out);
-    }
-
     public static boolean isPrimitive(String type){
-        switch(type){
-            case "boolean":
-            case "byte":
-            case "short":
-            case "int":
-            case "long":
-            case "float":
-            case "double":
-            case "char": return true;
-            default: return false;
-        }
+        return switch(type){
+            case "boolean", "byte", "short", "int", "long", "float", "double", "char" -> true;
+            default -> false;
+        };
     }
 
     public static String getDefault(String value){
-        switch(value){
-            case "float":
-            case "double":
-            case "int":
-            case "long":
-            case "short":
-            case "char":
-            case "byte":
-                return "0";
-            case "boolean":
-                return "false";
-            default:
-                return "null";
-        }
+        return switch(value){
+            case "float", "double", "int", "long", "short", "char", "byte" -> "0";
+            case "boolean" -> "false";
+            default -> "null";
+        };
     }
 
     public static boolean is(Element e, Modifier... modifiers){
@@ -332,13 +309,11 @@ public abstract class BaseProcessor implements Processor{
     }
 
     public String desc(Element e){
-        switch(e.getKind()){
-            case FIELD:
-            case LOCAL_VARIABLE: return desc((VariableElement)e);
-            case METHOD: return desc((ExecutableElement)e);
-            default:
-                throw err("desc() only accepts variable and method elements.", e);
-        }
+        return switch(e.getKind()){
+            case FIELD, LOCAL_VARIABLE -> desc((VariableElement)e);
+            case METHOD -> desc((ExecutableElement)e);
+            default -> throw err("desc() only accepts variable and method elements.", e);
+        };
     }
 
     public String desc(VariableElement e){
