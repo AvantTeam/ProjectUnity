@@ -141,7 +141,7 @@ public abstract class BaseProcessor implements Processor{
     }
 
     public <T extends Symbol> Set<T> with(Class<? extends Annotation> annotation){
-        return (Set<T>) roundEnv.getElementsAnnotatedWith(annotation);
+        return (Set<T>)roundEnv.getElementsAnnotatedWith(annotation);
     }
 
     public boolean instanceOf(String type, String other){
@@ -305,7 +305,7 @@ public abstract class BaseProcessor implements Processor{
             return conv(e.getTypeMirror());
         }
 
-        throw new IllegalArgumentException("types() is used for getting annotation values of a class type.");
+        throw new IllegalArgumentException("type() is used for getting annotation values of a class type.");
     }
 
     public String desc(Element e){

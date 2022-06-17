@@ -1,6 +1,6 @@
 plugins{
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
-    id 'org.jetbrains.kotlin.kapt' version '1.6.21'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.0'
+    id 'org.jetbrains.kotlin.kapt' version '1.7.0'
 }
 
 import arc.files.*
@@ -18,6 +18,19 @@ ext{
     fetchDir = file("${compileJava.temporaryDir}/fetched/$fetchPackage")
     fetchTemp = file("${compileJava.temporaryDir}/fetch.txt")
     fetchRevision = 0
+
+    final def fetchPackageDef = fetchPackage.replace('/', '.')
+    processComp = { String source ->
+        return source
+            .replace('mindustry.entities.comp', fetchPackageDef)
+            .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
+            .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, vanilla = true)\n')
+            .replaceAll('@Component\n*', '@EntityComponent(vanilla = true)\n')
+            .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
+            .replaceAll('@CallSuper\n*', '')
+            .replaceAll('@Final\n*', '')
+            .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
+    }
 }
 
 dependencies{
@@ -46,26 +59,12 @@ kapt{
     }
 }
 
-static String processComp(String source, String fetchPackage){
-    return source
-        .replace('mindustry.entities.comp', fetchPackage)
-        .replace('mindustry.annotations.Annotations.*', 'unity.annotations.Annotations.*')
-        .replaceAll('@Component\\((base = true|.)+\\)\n*', '@EntityComponent(base = true, vanilla = true)\n')
-        .replaceAll('@Component\n*', '@EntityComponent(vanilla = true)\n')
-        .replaceAll('@BaseComponent\n*', '@EntityBaseComponent\n')
-        .replaceAll('@CallSuper\n*', '')
-        .replaceAll('@Final\n*', '')
-        .replaceAll('@EntityDef\\(*.*\\)*\n*', '')
-}
-
 task procComps{
     doFirst{
-        def fetch = fetchPackage.replace('/', '.')
-
         Fi dir = new Fi(fetchDir)
         for(Fi fi : dir.list()){
             if(!fi.extEquals("java")) continue;
-            fi.writeString(processComp(fi.readString()), fetch)
+            fi.writeString(processComp(fi.readString()))
         }
     }
 }
@@ -75,7 +74,6 @@ task fetchComps{
         delete{ delete fetchDir }
         fetchDir.mkdir()
 
-        final def fetchPack = fetchPackage.replace('/', '.')
         def amount = 0
 
         final ObjectSet<UnsafeRunnable> fetches = new ObjectSet<>()
@@ -96,7 +94,7 @@ task fetchComps{
                             .error({ final t -> throw new RuntimeException(t) })
                             .block({ final comp ->
                                 final def fi = Fi.get("$fetchDir/$filename")
-                                fi.writeString(processComp(comp.getResultAsString(), fetchPack), false)
+                                fi.writeString(processComp(comp.getResultAsString()), false)
 
                                 synchronized(fetches){ amount-- }
                             })
