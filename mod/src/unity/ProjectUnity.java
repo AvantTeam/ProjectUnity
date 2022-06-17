@@ -78,6 +78,8 @@ public class ProjectUnity extends ProjectUnityCommon{
 
         PUStatusEffects.load();
 
+        MonolithAttributes.load();
         MonolithUnitTypes.load();
+        MonolithBlocks.load();
     }
 }
