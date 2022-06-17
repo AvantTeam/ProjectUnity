@@ -23,7 +23,7 @@ public class EnergyRingWeapon extends Weapon{
     public float aggressionSpeed = 0.2f;
     public float cooldownSpeed = 0.08f;
 
-    public Color eyeColor = monolithLight;
+    public Color eyeColor = monolithLighter;
     public float eyeRadius = 2.5f;
 
     public EnergyRingWeapon(){
@@ -86,7 +86,7 @@ public class EnergyRingWeapon extends Weapon{
     public void drawOutline(Unit unit, WeaponMount mount){}
 
     public static class Ring{
-        public Color color = monolithLight;
+        public Color color = monolithLighter;
 
         public float thickness = 1.5f;
         public float radius = 4.5f;

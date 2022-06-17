@@ -15,8 +15,8 @@ import static unity.graphics.MonolithPalettes.*;
 public class HelixLaserBulletType extends LaserBulletType{
     public int swirlAmount = 3;
     public Color
-        swirlColor = monolithLight, swirlColorDark = monolithDark,
-        dashColor = monolith, dashColorDark = monolithDark;
+        swirlColor = monolithLighter, swirlColorDark = monolithMid,
+        dashColor = monolithLight, dashColorDark = monolithMid;
 
     public float
         swirlScale = 12f, swirlMagnitude = 6f, swirlThickness = 1f,

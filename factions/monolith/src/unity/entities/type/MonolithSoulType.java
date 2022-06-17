@@ -74,14 +74,14 @@ public class MonolithSoulType extends PUUnitType{
                     Trail copy = trail.trail.copy();
                     if(copy instanceof BaseTrail t) t.rot = BaseTrail::rot;
 
-                    MonolithFx.trailFadeLow.at(soul.x, soul.y, width, monolithLight, copy);
+                    MonolithFx.trailFadeLow.at(soul.x, soul.y, width, monolithLighter, copy);
                     trail.trail = corporealTrail.get(soul);
                     trail.corporeal = true;
                 }else if(!soul.corporeal && trail.corporeal){
                     Trail copy = trail.trail.copy();
                     if(copy instanceof BaseTrail t) t.rot = BaseTrail::rot;
 
-                    MonolithFx.trailFadeLow.at(soul.x, soul.y, width, monolithLight, copy);
+                    MonolithFx.trailFadeLow.at(soul.x, soul.y, width, monolithLighter, copy);
                     trail.trail = kickstartTrail(soul, createTrail(soul));
                     trail.corporeal = false;
                 }
@@ -174,16 +174,16 @@ public class MonolithSoulType extends PUUnitType{
             center = Tmp.v4.trns(rotation, offCenter).add(x, y),
             back = Tmp.v5.trns(rotation, offBack).add(x, y);
 
-        Draw.color(monolithDark, monolith, 1f - MathUtils.shade(rotation - 45f));
+        Draw.color(monolithMid, monolithLight, 1f - MathUtils.shade(rotation - 45f));
         Fill.tri(center.x, center.y, front.x, front.y, x + right.x, y + right.y);
 
-        Draw.color(monolithDark, monolith, 1f - MathUtils.shade(rotation - 135f));
+        Draw.color(monolithMid, monolithLight, 1f - MathUtils.shade(rotation - 135f));
         Fill.tri(center.x, center.y, x + right.x, y + right.y, back.x, back.y);
 
-        Draw.color(monolithDark, monolith, 1f - MathUtils.shade(rotation + 45f));
+        Draw.color(monolithMid, monolithLight, 1f - MathUtils.shade(rotation + 45f));
         Fill.tri(center.x, center.y, front.x, front.y, x + left.x, y + left.y);
 
-        Draw.color(monolithDark, monolith, 1f - MathUtils.shade(rotation + 135f));
+        Draw.color(monolithMid, monolithLight, 1f - MathUtils.shade(rotation + 135f));
         Fill.tri(center.x, center.y, x + left.x, y + left.y, back.x, back.y);
 
         Draw.reset();

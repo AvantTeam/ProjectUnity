@@ -36,7 +36,7 @@ public final class MonolithFx{
     trailFadeLow = CoreFx.trailFadeLow,
 
     spark = new Effect(60f, e -> randLenVectors(e.id, 2, e.rotation, (x, y) -> {
-        color(monolith, monolithDark, e.fin());
+        color(monolithLight, monolithMid, e.fin());
 
         float w = 1f + e.fout() * 4f;
         Fill.rect(e.x + x, e.y + y, w, w, 45f);
@@ -46,7 +46,7 @@ public final class MonolithFx{
         if(!(e.data instanceof Position data)) return;
 
         blend(Blending.additive);
-        color(monolith, monolithDark, Color.black, e.finpow());
+        color(monolithLight, monolithMid, Color.black, e.finpow());
 
         float
             time = Time.time - e.rotation, vx = data.getX() * time, vy = data.getY() * time,
@@ -67,7 +67,7 @@ public final class MonolithFx{
         if(!(e.data instanceof Position data)) return;
 
         blend(Blending.additive);
-        color(monolith, monolithDark, Color.black, e.finpow());
+        color(monolithLight, monolithMid, Color.black, e.finpow());
 
         float
             time = Time.time - e.rotation, vx = data.getX() * time, vy = data.getY() * time,
@@ -97,7 +97,7 @@ public final class MonolithFx{
         float fin = 0.3f + e.fin() * 1.4f;
 
         blend(Blending.additive);
-        color(Color.black, monolithDark, e.fin());
+        color(Color.black, monolithMid, e.fin());
 
         alpha(1f);
         Fill.circle(Tmp.v3.x, Tmp.v3.y, fin);
@@ -113,30 +113,30 @@ public final class MonolithFx{
 
         Tmp.v1.set(data).sub(e.x, e.y).scl(e.fin(pow2In)).add(e.x, e.y);
 
-        color(monolithDark, monolith, e.fslope());
+        color(monolithMid, monolithLight, e.fslope());
         randLenVectors(e.id, 5, pow3Out.apply(e.fslope()) * 8f, 360f, 0f, 8f, (x, y) ->
             Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 0.5f + e.fslope() * 2.7f)
         );
 
         float size = e.fin(pow10Out) * e.foutpowdown();
 
-        color(monolith);
+        color(monolithLight);
         Fill.circle(Tmp.v1.x, Tmp.v1.y, size * 4.8f);
 
-        color(monolithLight);
+        color(monolithLighter);
         for(int i = 0; i < 4; i++){
             Drawf.tri(Tmp.v1.x, Tmp.v1.y, size * 6.4f, size * 27f, e.rotation + 90f * i + e.finpow() * 45f * Mathf.sign(e.id % 2 == 0));
         }
     }),
 
     soulLargeDeath = new Effect(64f, e -> {
-        color(monolith, monolithDark, e.fin());
+        color(monolithLight, monolithMid, e.fin());
         randLenVectors(e.id, 27, e.finpow() * 56f, (x, y) ->
             Fill.circle(e.x + x, e.y + y, 0.5f + e.fout() * 2.5f)
         );
 
         e.scaled(48f, i -> {
-            stroke(i.fout() * 2.5f, monolithLight);
+            stroke(i.fout() * 2.5f, monolithLighter);
             Lines.circle(e.x, e.y, i.fin(pow10Out) * 32f);
 
             float thick = i.foutpowdown() * 4f;
@@ -153,7 +153,7 @@ public final class MonolithFx{
     soulLargeJoin = new Effect(72f, e -> {
         if(!(e.data instanceof MonolithSoul soul)) return;
 
-        stroke(1.5f, monolith);
+        stroke(1.5f, monolithLight);
 
         TextureRegion reg = atlas.find("unity-monolith-chain");
         Quat rot = MathUtils.q1.set(Vec3.Z, e.rotation + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
@@ -168,7 +168,7 @@ public final class MonolithFx{
             rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
-        color(Color.black, monolithDark, 0.67f);
+        color(Color.black, monolithMid, 0.67f);
         alpha(a);
 
         blend(Blending.additive);
@@ -182,7 +182,7 @@ public final class MonolithFx{
     }).layer(Layer.flyingUnit),
 
     strayShoot = new Effect(12f, e -> {
-        color(monolithLight, monolith, monolithDark, e.finpowdown());
+        color(monolithLighter, monolithLight, monolithMid, e.finpowdown());
         stroke(e.fout() * 1.2f + 0.5f);
 
         randLenVectors(e.id, 2, 22f * e.finpow(), e.rotation, 50f, (x, y) ->
@@ -197,7 +197,7 @@ public final class MonolithFx{
             t = e.finpow(), rad = 9f + t * 8f,
             w = (Mathf.PI2 * rad) / (reg.width * scl * 0.4f), h = w * ((float)reg.height / reg.width);
 
-        color(monolith);
+        color(monolithLight);
         alpha(e.foutpowdown());
 
         DrawUtils.panningCircle(reg,
@@ -206,7 +206,7 @@ public final class MonolithFx{
             MathUtils.q1, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
-        color(Color.black, monolithDark, 0.67f);
+        color(Color.black, monolithMid, 0.67f);
         alpha(e.foutpowdown());
 
         blend(Blending.additive);
@@ -223,7 +223,7 @@ public final class MonolithFx{
         class State extends EffectState{
             @Override
             public void remove(){
-                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, monolithLight, trail.trail.copy());
+                if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, monolithLighter, trail.trail.copy());
                 super.remove();
             }
         } return Pools.obtain(State.class, State::new);
@@ -241,7 +241,7 @@ public final class MonolithFx{
     }, 40f, e -> {
         if(!(e.data instanceof TrailHold[] data)) return;
 
-        color(monolith, monolithLight, e.fin());
+        color(monolithLight, monolithLighter, e.fin());
         randLenVectors(e.id, 8, 8f + e.foutpow() * 32f, (x, y) ->
             Fill.circle(e.x + x, e.y + y, 0.5f + e.fin() * 2.5f)
         );
@@ -255,17 +255,17 @@ public final class MonolithFx{
             float w = hold.width * e.fin();
             if(!state.isPaused()) hold.trail.update(Tmp.v1.x, Tmp.v1.y, w);
 
-            col.set(monolith).lerp(monolithLight, e.finpowdown());
+            col.set(monolithLight).lerp(monolithLighter, e.finpowdown());
             hold.trail.drawCap(col, w);
             hold.trail.draw(col, w);
         }
 
-        stroke(Mathf.curve(e.fin(), 0.5f) * 1.4f, monolithLight);
+        stroke(Mathf.curve(e.fin(), 0.5f) * 1.4f, monolithLighter);
         Lines.circle(e.x, e.y, e.fout() * 64f);
     }),
 
     tendenceHit = new Effect(52f, e -> {
-        color(monolithLight, monolith, monolithDark, e.fin());
+        color(monolithLighter, monolithLight, monolithMid, e.fin());
         for(int sign : Mathf.signs){
             randLenVectors(e.id + sign, 3, e.fin(pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
                 Fill.square(e.x + x, e.y + y, e.foutpowdown() * 2.5f, e.id * 30f + e.finpow() * 90f * sign)

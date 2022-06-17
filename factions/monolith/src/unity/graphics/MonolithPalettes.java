@@ -9,11 +9,13 @@ import unity.mod.*;
  */
 public final class MonolithPalettes{
     public static final Color
-        monolith = Palettes.monolith,
-        monolithLight = new Color(0x9cd4f8ff),
-        monolithDark = new Color(0x4679cfff),
+    monolithLighter = new Color(0x9cd4f8ff),
+    monolithLight = new Color(0x72a2d7ff),
+    monolithMid = Palettes.monolith,
+    monolithDark = new Color(0x354d97ff),
+    monolithDarker = new Color(0x253080ff),
 
-        monolithOutline = Palettes.darkOutline;
+    monolithOutline = Palettes.darkOutline;
 
     private MonolithPalettes(){
         throw new AssertionError();

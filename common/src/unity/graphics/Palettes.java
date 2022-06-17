@@ -11,11 +11,11 @@ import static mindustry.graphics.Pal.*;
  */
 public final class Palettes{
     public static final Color
-        monolith = new Color(0x6bb4f0ff),
+    monolith = new Color(0x5379b7ff),
 
-        outline = darkerMetal,
-        darkOutline = new Color(0x38383dff),
-        darkerOutline = new Color(0x2e3142ff);
+    outline = darkerMetal,
+    darkOutline = new Color(0x38383dff),
+    darkerOutline = new Color(0x2e3142ff);
 
     private Palettes(){
         throw new AssertionError();
