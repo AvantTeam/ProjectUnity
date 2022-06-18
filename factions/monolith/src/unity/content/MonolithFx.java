@@ -31,6 +31,7 @@ import static unity.graphics.MonolithPalettes.*;
  */
 public final class MonolithFx{
     private static final Color col = new Color();
+    private static final Rand rand = new Rand();
 
     public static final Effect
     trailFadeLow = CoreFx.trailFadeLow,
@@ -270,6 +271,34 @@ public final class MonolithFx{
             randLenVectors(e.id + sign, 3, e.fin(pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
                 Fill.square(e.x + x, e.y + y, e.foutpowdown() * 2.5f, e.id * 30f + e.finpow() * 90f * sign)
             );
+        }
+    }),
+
+    erodedEneraphyteSteam = new Effect(100f, e -> {
+        color(monolithMid, monolithDark, monolithDarker, e.fin(smoother));
+        alpha(e.fslope() * 0.5f);
+
+        float len = 1f + e.finpow() * 4f;
+        rand.setSeed(e.id);
+
+        int amount = rand.random(2, 4);
+        for(int i = 0; i < amount; i++){
+            Tmp.v1.trns(rand.random(360f), rand.random(len)).add(e.x, e.y);
+            Fill.circle(Tmp.v1.x, Tmp.v1.y, rand.random(0.6f, 1.7f) + e.fslope() * 0.75f);
+        }
+    }),
+
+    eneraphyteSteam = new Effect(120f, e -> {
+        color(monolithLighter, monolithMid, monolithDarker, e.fin(smoother));
+        alpha(e.fslope() * 0.7f);
+
+        float len = 1f + e.finpow() * 5f;
+        rand.setSeed(e.id);
+
+        int amount = rand.random(3, 5);
+        for(int i = 0; i < amount; i++){
+            Tmp.v1.trns(rand.random(360f), rand.random(len)).add(e.x, e.y);
+            Fill.circle(Tmp.v1.x, Tmp.v1.y, rand.random(0.8f, 2f) + e.fslope() * 0.9f);
         }
     });
 

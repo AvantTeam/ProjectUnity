@@ -8,6 +8,7 @@ import mindustry.gen.*;
 
 /**
  * Effect entity types that support custom state and data provider.
+ * @author EyeOfDarkness
  * @author GlennFolker
  */
 public class PUEffect extends Effect{
