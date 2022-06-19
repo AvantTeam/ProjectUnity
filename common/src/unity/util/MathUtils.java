@@ -10,6 +10,7 @@ public final class MathUtils{
     public static final Interp pow25In = new PowIn(25f);
 
     public static final Quat q1 = new Quat(), q2 = new Quat();
+    public static final Mat3D m31 = new Mat3D(), m32 = new Mat3D();
 
     private static final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
