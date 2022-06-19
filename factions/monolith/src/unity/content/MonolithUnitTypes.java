@@ -475,7 +475,7 @@ public final class MonolithUnitTypes{
                     spikeOffset = 1.5f;
                     spikeWidth = 2f;
                     spikeLength = 4f;
-                    color = monolithMid.cpy().lerp(monolithLight, 0.5f);
+                    color = monolithLighter;
                 }}, new Ring(){{
                     shootY = radius = 2.5f;
                     rotate = false;
@@ -592,7 +592,7 @@ public final class MonolithUnitTypes{
                     spikeOffset = 1.5f;
                     spikeWidth = 2f;
                     spikeLength = 4f;
-                    color = monolithMid.cpy().lerp(monolithLight, 0.5f);
+                    color = monolithLighter;
                 }}, new Ring(){{
                     shootY = radius = 3f;
                     rotate = false;
@@ -732,7 +732,7 @@ public final class MonolithUnitTypes{
                     spikeOffset = 1.5f;
                     spikeWidth = 2f;
                     spikeLength = 4f;
-                    color = monolithMid.cpy().lerp(monolithLight, 0.5f);
+                    color = monolithLighter;
                 }}, new Ring(){{
                     shootY = radius = 5.6f;
                     rotate = false;
