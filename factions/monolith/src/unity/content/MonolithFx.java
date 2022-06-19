@@ -32,6 +32,8 @@ import static unity.graphics.MonolithPalettes.*;
 public final class MonolithFx{
     private static final Color col = new Color();
     private static final Rand rand = new Rand();
+    
+    private static final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
     public static final Effect
     trailFadeLow = CoreFx.trailFadeLow,
@@ -88,12 +90,12 @@ public final class MonolithFx{
     soulLargeAbsorb = new Effect(32f, e -> {
         if(!(e.data instanceof Position data)) return;
 
-        Tmp.v1
+        v1
             .trns(Angles.angle(e.x, e.y, data.getX(), data.getY()) - 90f, Mathf.randomSeedRange(e.id, 3f))
             .scl(pow3Out.apply(e.fslope()));
-        Tmp.v2.trns(Mathf.randomSeed(e.id + 1, 360f), e.fin(pow4Out));
-        Tmp.v3.set(data).sub(e.x, e.y).scl(e.fin(pow4In))
-            .add(Tmp.v2).add(Tmp.v1).add(e.x, e.y);
+        v2.trns(Mathf.randomSeed(e.id + 1, 360f), e.fin(pow4Out));
+        v3.set(data).sub(e.x, e.y).scl(e.fin(pow4In))
+            .add(v2).add(v1).add(e.x, e.y);
 
         float fin = 0.3f + e.fin() * 1.4f;
 
@@ -101,10 +103,10 @@ public final class MonolithFx{
         color(Color.black, monolithMid, e.fin());
 
         alpha(1f);
-        Fill.circle(Tmp.v3.x, Tmp.v3.y, fin);
+        Fill.circle(v3.x, v3.y, fin);
 
         alpha(0.67f);
-        Draw.rect("circle-shadow", Tmp.v3.x, Tmp.v3.y, fin + 6f, fin + 6f);
+        Draw.rect("circle-shadow", v3.x, v3.y, fin + 6f, fin + 6f);
 
         blend();
     }).layer(Layer.flyingUnitLow),
@@ -112,21 +114,21 @@ public final class MonolithFx{
     soulLargeTransfer = new Effect(64f, e -> {
         if(!(e.data instanceof Position data)) return;
 
-        Tmp.v1.set(data).sub(e.x, e.y).scl(e.fin(pow2In)).add(e.x, e.y);
+        v1.set(data).sub(e.x, e.y).scl(e.fin(pow2In)).add(e.x, e.y);
 
         color(monolithMid, monolithLight, e.fslope());
         randLenVectors(e.id, 5, pow3Out.apply(e.fslope()) * 8f, 360f, 0f, 8f, (x, y) ->
-            Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 0.5f + e.fslope() * 2.7f)
+            Fill.circle(v1.x + x, v1.y + y, 0.5f + e.fslope() * 2.7f)
         );
 
         float size = e.fin(pow10Out) * e.foutpowdown();
 
         color(monolithLight);
-        Fill.circle(Tmp.v1.x, Tmp.v1.y, size * 4.8f);
+        Fill.circle(v1.x, v1.y, size * 4.8f);
 
         color(monolithLighter);
         for(int i = 0; i < 4; i++){
-            Drawf.tri(Tmp.v1.x, Tmp.v1.y, size * 6.4f, size * 27f, e.rotation + 90f * i + e.finpow() * 45f * Mathf.sign(e.id % 2 == 0));
+            Drawf.tri(v1.x, v1.y, size * 6.4f, size * 27f, e.rotation + 90f * i + e.finpow() * 45f * Mathf.sign(e.id % 2 == 0));
         }
     }),
 
@@ -231,11 +233,11 @@ public final class MonolithFx{
     }, () -> {
         TrailHold[] trails = new TrailHold[12];
         for(int i = 0; i < trails.length; i++){
-            Tmp.v1.trns(Mathf.random(360f), Mathf.random(24f, 64f));
+            v1.trns(Mathf.random(360f), Mathf.random(24f, 64f));
             MultiTrail trail = MonolithTrails.soul(26);
             if(trail.trails[trail.trails.length - 1].trail instanceof TexturedTrail tr) tr.trailChance = 0.1f;
 
-            trails[i] = new TrailHold(trail, Tmp.v1.x, Tmp.v1.y, Mathf.random(1f, 2f));
+            trails[i] = new TrailHold(trail, v1.x, v1.y, Mathf.random(1f, 2f));
         }
 
         return trails;
@@ -249,12 +251,12 @@ public final class MonolithFx{
 
         color();
         for(TrailHold hold : data){
-            Tmp.v1.set(hold.x, hold.y);
-            Tmp.v2.trns(Tmp.v1.angle() - 90f, Mathf.sin(hold.width * 2.6f, hold.width * 8f * pow2Out.apply(e.fslope())));
-            Tmp.v1.scl(e.foutpowdown()).add(Tmp.v2).add(e.x, e.y);
+            v1.set(hold.x, hold.y);
+            v2.trns(v1.angle() - 90f, Mathf.sin(hold.width * 2.6f, hold.width * 8f * pow2Out.apply(e.fslope())));
+            v1.scl(e.foutpowdown()).add(v2).add(e.x, e.y);
 
             float w = hold.width * e.fin();
-            if(!state.isPaused()) hold.trail.update(Tmp.v1.x, Tmp.v1.y, w);
+            if(!state.isPaused()) hold.trail.update(v1.x, v1.y, w);
 
             col.set(monolithLight).lerp(monolithLighter, e.finpowdown());
             hold.trail.drawCap(col, w);
@@ -275,30 +277,30 @@ public final class MonolithFx{
     }),
 
     erodedEneraphyteSteam = new Effect(100f, e -> {
-        color(monolithMid, monolithDark, monolithDarker, e.fin(smoother));
+        color(monolithLight, monolithDark, monolithDarker, e.fin(smoother));
         alpha(e.fslope() * 0.5f);
 
         float len = 1f + e.finpow() * 4f;
         rand.setSeed(e.id);
 
-        int amount = rand.random(2, 4);
+        int amount = rand.random(1, 3);
         for(int i = 0; i < amount; i++){
-            Tmp.v1.trns(rand.random(360f), rand.random(len)).add(e.x, e.y);
-            Fill.circle(Tmp.v1.x, Tmp.v1.y, rand.random(0.6f, 1.7f) + e.fslope() * 0.75f);
+            v1.trns(rand.random(360f), rand.random(len)).add(e.x, e.y);
+            Fill.circle(v1.x, v1.y, rand.random(0.6f, 1.7f) + smooth.apply(e.fslope()) * 0.75f);
         }
     }),
 
     eneraphyteSteam = new Effect(120f, e -> {
-        color(monolithLighter, monolithMid, monolithDarker, e.fin(smoother));
+        color(monolithLighter, monolithMid, monolithDark, e.fin(smoother));
         alpha(e.fslope() * 0.7f);
 
         float len = 1f + e.finpow() * 5f;
         rand.setSeed(e.id);
 
-        int amount = rand.random(3, 5);
+        int amount = rand.random(1, 3);
         for(int i = 0; i < amount; i++){
-            Tmp.v1.trns(rand.random(360f), rand.random(len)).add(e.x, e.y);
-            Fill.circle(Tmp.v1.x, Tmp.v1.y, rand.random(0.8f, 2f) + e.fslope() * 0.9f);
+            v1.trns(rand.random(360f), rand.random(len)).add(e.x, e.y);
+            Fill.circle(v1.x, v1.y, rand.random(0.8f, 2f) + smooth.apply(e.fslope()) * 0.9f);
         }
     });
 

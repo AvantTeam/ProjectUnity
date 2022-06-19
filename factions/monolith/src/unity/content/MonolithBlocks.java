@@ -48,18 +48,21 @@ public final class MonolithBlocks{
             attributes.set(eneraphyteInfusion, 1f);
         }});
 
-        erodedEneraphyteVent = register(Faction.monolith, new SmallVent("eroded-eneraphyte-vent"){{
+        erodedEneraphyteVent = register(Faction.monolith, new SizedVent("eroded-eneraphyte-vent"){{
             attributes.set(eneraphyteEmission, 0.75f);
             attributes.set(eneraphyteInfusion, 0.24f);
 
+            size = 1;
             parent = blendGroup = infusedErodedSlate;
             effect = MonolithFx.erodedEneraphyteSteam;
+            effectSpacing = 20f;
         }});
 
-        eneraphyteVent = register(Faction.monolith, new SmallVent("eneraphyte-vent"){{
+        eneraphyteVent = register(Faction.monolith, new SizedVent("eneraphyte-vent"){{
             attributes.set(eneraphyteEmission, 1f);
             attributes.set(eneraphyteInfusion, 0.4f);
 
+            size = 1;
             parent = blendGroup = infusedSharpSlate;
             effect = MonolithFx.eneraphyteSteam;
             effectSpacing = 20f;
