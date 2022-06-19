@@ -54,12 +54,12 @@ public final class MonolithPlanets{
                         preRender(params);
                         shader.bind();
                         shader.setUniformMatrix4("u_proj", projection.val);
-                        shader.setUniformMatrix4("u_trans", MathUtils.m31.set(transform).rotate(MathUtils.q1
+                        shader.setUniformMatrix4("u_trans", MathUtils.m31.set(transform).mul(MathUtils.m32.idt().rotate(MathUtils.q1
                             .set(Vec3.Y, Time.globalTime + init1)
                             .mul(MathUtils.q2.set(Vec3.X, Time.globalTime + init2))
-                            .add(MathUtils.q2.set(Vec3.Z, Time.globalTime + init3))
+                            .mul(MathUtils.q2.set(Vec3.Z, Time.globalTime + init3))
                             .nor()
-                        ).val);
+                        )).val);
 
                         shader.apply();
                         mesh.render(shader, Gl.triangles);
