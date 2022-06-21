@@ -35,54 +35,55 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
     protected static final Vec3 rad = new Vec3(), v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3();
 
     public static float
-    volcanoRadius = 0.16f, volcanoFalloff = 0.3f, volcanoEdgeDeviation = 0.04f, volcanoEdge = 0.06f,
-    volcanoHeight = 0.7f, volcanoHeightDeviation = 0.2f, volcanoHeightInner = volcanoHeight - 0.07f;
+    volcanoRadius = 0.16f, volcanoFalloff = 0.3f, volcanoEdgeDeviation = 0.1f, volcanoEdge = 0.06f,
+    volcanoHeight = 0.7f, volcanoHeightDeviation = 0.2f, volcanoHeightInner = volcanoHeight - 0.05f;
 
-    protected final PlanetGrid grid = PlanetGrid.create(6);
-    protected float[] heights = new float[grid.tiles.length];
-    protected int[] flags = new int[grid.tiles.length];
+    protected boolean initialized = false;
+
+    protected PlanetGrid grid;
+    protected float[] heights;
+    protected int[] flags;
 
     protected static final int
         flagFlow = 1;
 
-    {
-        for(int i = 0, tlen = grid.tiles.length; i < tlen; i++){
-            Ptile tile = grid.tiles[i];
-            float height = 0f;
+    @Override
+    public void init(int divisions, boolean lines, float radius, float intensity){
+        grid = PlanetGrid.create(divisions);
+        heights = new float[grid.tiles.length];
+        flags = new int[grid.tiles.length];
 
-            int clen = tile.corners.length;
-            for(int j = 0; j < clen; j++){
-                Corner corner = tile.corners[j];
-                height += (1f + getHeight(corner, v31.set(corner.v))) * 0.2f;
-            }
-
-            heights[i] = height / clen;
-        }
-
-        Cons<Ptile> flow = init -> {
+        calculateHeight(intensity);
+        Cons2<Ptile, Float> flow = (init, pole) -> {
             IntSet used = new IntSet();
-            Queue<Ptile> queue = new Queue<>();
+            Seq<Ptile> queue = new Seq<>();
             Seq<Ptile> candidates = new Seq<>();
 
             queue.add(init);
             used.add(init.id);
 
-            int flowIndex = -1, flowCount = 24;
+            int flowIndex = -1, flowCount = Mathf.randomSeed(init.id, 16, 36);
             while(!queue.isEmpty() && ++flowIndex < flowCount){
-                Ptile current = queue.removeFirst();
+                candidates.clear();
+
+                Ptile current = queue.pop();
                 flags[current.id] |= flagFlow;
 
-                // 0 -> near, 1 -> far.
-                float prog = flowIndex / (flowCount - 1f);
+                float prog = flowIndex / (flowCount - 1f), heightDeviation = 0.2f, dotDeviation = 0.3f;
                 int maxFlood = Mathf.ceilPositive(current.edgeCount * Interp.pow2In.apply(1f - prog));
 
-                float height = heights[current.id] * 0.93f;
-                for(Ptile neighbor : current.tiles) if(heights[neighbor.id] <= height) candidates.add(neighbor);
+                float height = heights[current.id] * 1.1f;
+                for(Ptile neighbor : current.tiles){
+                    if(!used.contains(neighbor.id) && heights[neighbor.id] <= height + Mathf.randomSeed(neighbor.id, heightDeviation) && v31.set(neighbor.v).sub(init.v).dot(0f, pole, 0f) <= 0.5f + Mathf.randomSeedRange(neighbor.id + 1, dotDeviation / 2f)){
+                        candidates.add(neighbor);
+                    }
+                }
 
                 if(candidates.isEmpty()){
-                    candidates.add(Structs.findMin(current.tiles, tile -> heights[tile.id]));
+                    candidates.add(Structs.findMin(current.tiles, tile -> used.contains(tile.id) ? Float.MAX_VALUE : heights[tile.id]));
+                    if(v31.set(candidates.first().v).sub(init.v).dot(0f, pole, 0f) > 0.5f + Mathf.randomSeed(candidates.first().id + 1, dotDeviation / 2f)) candidates.clear();
                 }else{
-                    candidates.sort(tile -> heights[tile.id]);
+                    candidates.sort(tile -> heights[tile.id] * -(v31.set(tile.v).sub(init.v).dot(0f, pole, 0f) + Mathf.randomSeed(tile.id + 1, dotDeviation / 2f)));
                 }
 
                 for(int i = 0, max = Math.min(maxFlood, candidates.size); i < max; i++){
@@ -92,8 +93,32 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
             }
         };
 
-        flow.get(Structs.find(grid.tiles, t -> t.v.epsilonEquals(0f, 1f, 0f, 0.1f)));
-        flow.get(Structs.find(grid.tiles, t -> t.v.epsilonEquals(0f, -1f, 0f, 0.1f)));
+        for(int sign : Mathf.signs){
+            for(long i = 0; i < 12; i++){
+                Tmp.v1.trns(i / 12f * 360f + Mathf.randomSeed(seed + i * sign, 1 / 12f * 360f * 0.67f), 1f).setLength(volcanoRadius(v31.set(Tmp.v1.x, 0.25f * sign, Tmp.v1.y)));
+                v31.set(Tmp.v1.x, sign, Tmp.v1.y);
+
+                flow.get(Structs.findMin(grid.tiles, t -> t.v.dst2(v31)), (float)sign);
+            }
+        }
+
+        initialized = true;
+        calculateHeight(intensity);
+    }
+
+    protected void calculateHeight(float intensity){
+        for(int i = 0, tlen = grid.tiles.length; i < tlen; i++){
+            Ptile tile = grid.tiles[i];
+            float height = 0f;
+
+            int clen = tile.corners.length;
+            for(int j = 0; j < clen; j++){
+                Corner corner = tile.corners[j];
+                height += (1f + getHeight(corner, v31.set(corner.v))) * intensity;
+            }
+
+            heights[i] = height / clen;
+        }
     }
 
     protected float volcanoRadius(Vec3 position){
@@ -110,7 +135,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
 
         // Volcano stream.
         //TODO eneraphyte liquid block
-        if((flags[tile.id] & flagFlow) == flagFlow) block = Blocks.slag;
+        if((flags[tile.id] & flagFlow) == flagFlow || Math.min(position.dst(0f, 1f, 0f), position.dst(0f, -1f, 0f)) <= volcanoRadius(position)) block = Blocks.slag;
 
         return block;
     }
@@ -126,15 +151,17 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
             volcanoDst = Math.min(position.dst(0f, 1f, 0f), position.dst(0f, -1f, 0f));
         if(volcanoDst <= volcanoRad + volcanoFalloff){
             // 0 -> near, 1 -> far.
-            float volcanoProg = Mathf.clamp((volcanoDst - volcanoRad) / volcanoFalloff);
+            float volcanoProg = (volcanoDst - volcanoRad) / volcanoFalloff;
+            if(initialized) volcanoProg = Mathf.clamp(volcanoProg);
+
             // Raw terrain height goes down, the volcano height goes up.
             height = Mathf.lerp(
-                height * Interp.pow2Out.apply(volcanoProg),
+                height * Interp.pow5Out.apply(volcanoProg),
                 (volcanoHeight + Simplex.noise3d(seed, 3d, 0.5d, 0.56d, position.x, position.y, position.z) * volcanoHeightDeviation) * Interp.smoother.apply(1f - volcanoProg),
                 1f - volcanoProg
             );
 
-            if(volcanoDst <= volcanoRad) height = Mathf.lerp(height, volcanoHeightInner, Interp.smoother.apply(1f - Mathf.clamp((volcanoDst - volcanoRad) / volcanoEdge)));
+            if(initialized && volcanoDst <= volcanoRad) height = Mathf.lerp(height, volcanoHeightInner, Interp.smoother.apply(1f - Mathf.clamp((volcanoDst - volcanoRad) / volcanoEdge)));
         }
 
         return height;
@@ -149,13 +176,13 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
     @Override
     public float getHeight(Vec3 position){
         v33.set(position).nor();
-        return getHeight(Structs.find(grid.corners, c -> v32.set(c.v).nor().epsilonEquals(v33, 0.01f)), position);
+        return getHeight(Structs.findMin(grid.corners, c -> v32.set(c.v).nor().dst2(v33)), position);
     }
 
     @Override
     public Color getColor(Vec3 position){
         v33.set(position).nor();
-        return getColor(Structs.find(grid.tiles, t -> v32.set(t.v).nor().epsilonEquals(v33, 0.01f)), position);
+        return getColor(Structs.findMin(grid.tiles, t -> v32.set(t.v).nor().dst2(v33)), position);
     }
 
     @Override
@@ -177,7 +204,8 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
 
     @Override
     protected void genTile(Vec3 position, TileGen tile){
-        tile.floor = getBlock(sector.tile, position);
+        v33.set(position).nor();
+        tile.floor = getBlock(Structs.findMin(grid.tiles, t -> v32.set(t.v).nor().dst2(v33)), position);
         tile.block = tile.floor.asFloor().wall;
 
         if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 20f) > 0.67f) tile.block = Blocks.air;

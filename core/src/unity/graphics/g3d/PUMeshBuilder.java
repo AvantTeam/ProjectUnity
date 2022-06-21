@@ -38,6 +38,7 @@ public final class PUMeshBuilder{
         if(mesher instanceof PlanetGenerator generator) generator.seed = generator.baseSeed;
         begin();
 
+        mesher.init(divisions, lines, radius, intensity);
         for(Ptile tile : grid.tiles){
             if(mesher.skip(tile, tile.v)) continue;
             Corner[] c = tile.corners;
@@ -194,5 +195,7 @@ public final class PUMeshBuilder{
         default boolean skip(Ptile tile, Vec3 position){
             return skip(position);
         }
+
+        default void init(int divisions, boolean lines, float radius, float intensity){}
     }
 }
