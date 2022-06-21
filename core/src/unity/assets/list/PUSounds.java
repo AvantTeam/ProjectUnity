@@ -4,7 +4,7 @@ import arc.audio.*;
 
 import static mindustry.Vars.*;
 
-/** Lists all sounds the mod has to load. */
+/** Lists all {@link Sound}s the mod has to load. */
 public final class PUSounds{
     public static Sound
     chainyShot,

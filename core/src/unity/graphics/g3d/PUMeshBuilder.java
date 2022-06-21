@@ -4,6 +4,9 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.graphics.g3d.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.maps.generators.*;
 
 /** Convenient {@link Mesh} builder for creating some shapes. */
 public final class PUMeshBuilder{
@@ -15,12 +18,60 @@ public final class PUMeshBuilder{
         v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3(), v34 = new Vec3(),
         nor = new Vec3();
 
-    private static final int vertSize = 7; // Position + Normal + Color.
+    private static final int vertSize = 3 + 3 + 1; // Position + Normal + Color.
     private static final FloatSeq builder = new FloatSeq(vertSize * 2000);
     private static boolean building;
 
     private PUMeshBuilder(){
         throw new AssertionError();
+    }
+
+    /**
+     * {@link MeshBuilder#buildHex(HexMesher, int, boolean, float, float)}, but gives the {@linkplain Corner corner} and
+     * {@linkplain Ptile tile} info to the mesher.
+     * @author Anuke
+     * @author GlennFolker
+     */
+    public static Mesh createHexGrid(PUHexMesher mesher, int divisions, boolean lines, float radius, float intensity){
+        PlanetGrid grid = PlanetGrid.create(divisions);
+
+        if(mesher instanceof PlanetGenerator generator) generator.seed = generator.baseSeed;
+        begin();
+
+        for(Ptile tile : grid.tiles){
+            if(mesher.skip(tile, tile.v)) continue;
+            Corner[] c = tile.corners;
+
+            for(Corner corner : c){
+                corner.v.setLength((1f + mesher.getHeight(corner, v31.set(corner.v)) * intensity) * radius);
+            }
+
+            Vec3 nor = normal(c[0].v, c[2].v, c[4].v);
+            float color = mesher.getColor(tile, v31.set(tile.v)).toFloatBits();
+
+            if(lines){
+                nor.set(1f, 1f, 1f);
+
+                for(int i = 0; i < c.length; i++){
+                    Vec3 v1 = c[i].v;
+                    Vec3 v2 = c[(i + 1) % c.length].v;
+
+                    vert(v1, nor, color);
+                    vert(v2, nor, color);
+                }
+            }else{
+                verts(c[0].v, c[1].v, c[2].v, nor, color);
+                verts(c[0].v, c[2].v, c[3].v, nor, color);
+                verts(c[0].v, c[3].v, c[4].v, nor, color);
+
+                if(c.length > 5) verts(c[0].v, c[4].v, c[5].v, nor, color);
+            }
+
+            // Restore mutated corners.
+            for(Corner corner : c) corner.v.nor();
+        }
+
+        return end();
     }
 
     public static Mesh createToroid(float radius, float thickness, float depth, Color color){
@@ -73,8 +124,13 @@ public final class PUMeshBuilder{
 
                 // Create a plane with the same normal values for each vertex.
                 Vec3 nor = normal(bl, br, tr);
-                verts(bl, br, tr, nor, c1);
-                verts(br, tr, tl, nor, c2);
+                vert(bl, nor, c2);
+                vert(br, nor, c1);
+                vert(tr, nor, c1);
+
+                vert(tr, nor, c1);
+                vert(tl, nor, c2);
+                vert(bl, nor, c2);
             }
         }
 
@@ -115,5 +171,28 @@ public final class PUMeshBuilder{
 
         out.setVertices(builder.items, 0, builder.size);
         return out;
+    }
+
+    /**
+     * A {@link HexMesher} with additional {@linkplain Ptile tile} and {@linkplain Corner corner} information.
+     * @author GlennFolker
+     */
+    public interface PUHexMesher extends HexMesher{
+        @Override
+        default float getHeight(Vec3 position){
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        default Color getColor(Vec3 position){
+            throw new UnsupportedOperationException();
+        }
+
+        float getHeight(Corner corner, Vec3 position);
+        Color getColor(Ptile tile, Vec3 position);
+
+        default boolean skip(Ptile tile, Vec3 position){
+            return skip(position);
+        }
     }
 }

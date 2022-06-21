@@ -35,6 +35,7 @@ public class ProjectUnity extends ProjectUnityCommon{
 
         Events.on(FileTreeInitEvent.class, e -> Core.app.post(() -> {
             PUSounds.load();
+            PUShaders.load();
 
             try(Reader file = tree.get("meta/classes.out").reader();
                 BufferedReader reader = new BufferedReader(file)
