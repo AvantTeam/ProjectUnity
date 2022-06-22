@@ -38,6 +38,15 @@ public final class MonolithFx{
     public static final Effect
     trailFadeLow = CoreFx.trailFadeLow,
 
+    eneraphyteVapor = new Effect(140f, e -> {
+        color(monolithLight, monolithLighter, monolithDarker, e.finpowdown());
+        alpha(Interp.smoother.apply(Mathf.curve(e.fin(), 0f, 0.17f)) - Interp.pow3In.apply(Mathf.curve(e.fin(), 0.17f)));
+
+        randLenVectors(e.id, 4, 2f + e.finpow() * 10f, (x, y) ->
+            Fill.circle(e.x + x, e.y + y, 0.6f + e.finpow() * 4f)
+        );
+    }),
+
     spark = new Effect(60f, e -> randLenVectors(e.id, 2, e.rotation, (x, y) -> {
         color(monolithLight, monolithMid, e.fin());
 

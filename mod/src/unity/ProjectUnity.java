@@ -7,6 +7,7 @@ import mindustry.game.EventType.*;
 import unity.assets.list.*;
 import unity.content.*;
 import unity.gen.entities.*;
+import unity.graphics.*;
 import unity.io.*;
 import unity.mod.*;
 import unity.util.*;
@@ -24,7 +25,8 @@ public class ProjectUnity extends ProjectUnityCommon{
                 Log.info("Successfully instantiated developer build.");
             }
         }catch(Throwable t){
-            if(t.getCause() instanceof ClassNotFoundException || t.getCause() instanceof NoClassDefFoundError){
+            Throwable cause = t.getCause();
+            if(cause instanceof ClassNotFoundException || cause instanceof NoClassDefFoundError){
                 Log.info("Defaulting to user build.");
             }else{
                 Log.err("Error while trying to instantiate developer build", t);
@@ -36,6 +38,7 @@ public class ProjectUnity extends ProjectUnityCommon{
         Events.on(FileTreeInitEvent.class, e -> Core.app.post(() -> {
             PUSounds.load();
             PUShaders.load();
+            PUCacheLayer.load();
 
             try(Reader file = tree.get("meta/classes.out").reader();
                 BufferedReader reader = new BufferedReader(file)
@@ -79,6 +82,8 @@ public class ProjectUnity extends ProjectUnityCommon{
 
         PUStatusEffects.load();
 
+        MonolithStatusEffects.load();
+        MonolithFluids.load();
         MonolithAttributes.load();
         MonolithUnitTypes.load();
         MonolithBlocks.load();

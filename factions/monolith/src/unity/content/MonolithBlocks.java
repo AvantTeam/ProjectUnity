@@ -2,6 +2,7 @@ package unity.content;
 
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import unity.graphics.*;
 import unity.mod.*;
 import unity.world.blocks.environment.*;
 
@@ -14,6 +15,8 @@ import static unity.mod.FactionRegistry.*;
  */
 public final class MonolithBlocks{
     public static Block
+    liquefiedEneraphyte,
+
     erodedSlate, infusedErodedSlate, archaicErodedSlate, sharpSlate, infusedSharpSlate, archaicSharpSlate,
     erodedEneraphyteVent, eneraphyteVent,
 
@@ -24,6 +27,19 @@ public final class MonolithBlocks{
     }
 
     public static void load(){
+        liquefiedEneraphyte = register(Faction.monolith, new Floor("liquefied-eneraphyte"){{
+            speedMultiplier = 0.5f;
+            variants = 0;
+            status = MonolithStatusEffects.eneraphyteSupercharge;
+            statusDuration = 60f;
+            liquidDrop = MonolithFluids.eneraphyte;
+            isLiquid = true;
+            drownTime = 360f;
+            cacheLayer = PUCacheLayer.eneraphyte;
+            albedo = 0.9f;
+            supportsOverlay = true;
+        }});
+
         erodedSlate = register(Faction.monolith, new Floor("eroded-slate"){{
             attributes.set(eneraphyteInfusion, 0.08f);
         }});

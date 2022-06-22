@@ -4,6 +4,7 @@ import mindustry.world.meta.*;
 import unity.mod.*;
 
 import static mindustry.world.meta.Attribute.*;
+import static unity.mod.FactionRegistry.*;
 
 /**
  * Defines all {@linkplain Faction#monolith monolith} environmental block attributes.
@@ -21,7 +22,7 @@ public final class MonolithAttributes{
     }
 
     public static void load(){
-        eneraphyteInfusion = add("unity-eneraphyte-infusion");
-        eneraphyteEmission = add("unity-eneraphyte-emission");
+        eneraphyteInfusion = register(Faction.monolith, add("unity-eneraphyte-infusion"));
+        eneraphyteEmission = register(Faction.monolith, add("unity-eneraphyte-emission"));
     }
 }

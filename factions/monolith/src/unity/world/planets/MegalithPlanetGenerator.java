@@ -7,7 +7,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -17,14 +16,17 @@ import mindustry.world.*;
 import unity.content.*;
 import unity.graphics.g3d.PUMeshBuilder.*;
 
+import static unity.content.MonolithBlocks.*;
+import static unity.graphics.MonolithPalettes.*;
+
 /**
- * Planet mesh and sector generator for the {@linkplain MonolithPlanets#megalith megalith} planet.
- * Terrain:
+ * Planet mesh and sector generator for the {@linkplain MonolithPlanets#megalith megalith} planet:
  * <ul>
+ *     <li>Streams of (hot) liquefied eneraphyte from both poles, goes thinner as it approaches the equator.</li>
+ *     <li>The eneraphyte stream gradually vaporizes as it approaches the equator.</li>
  *     <li>Temperature is cold around the poles, hot across the equator.</li>
  *     <li>Air pressure is more intense across the equator, due to the amount of eneraphyte in the air.</li>
  *     <li>Terrain is dominated by rocks, mostly slates. Most of them erodes and discolors due to temperature and pressure.</li>
- *     <li>Streams of (hot) liquefied eneraphyte from both poles, goes thinner as it approaches the equator.</li>
  *     <li>Crater... somewhere. Barely any exposed ground liquid. Lots of eneraphyte infusion, emission, and crystals.</li>
  *     <li>Ruinous structures, progressively more common near the crater.</li>
  * </ul>
@@ -128,14 +130,18 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
         return volcanoRadius + Simplex.noise3d(seed + 1, 3d, 0.5d, 0.7d, rad.x, rad.y, rad.z) * volcanoEdgeDeviation;
     }
 
-    protected Block getBlock(Ptile tile, Vec3 position){
+    protected Block getBlock(@Nullable Ptile tile, Vec3 position){
         // Raw block, yet to be processed further.
         //TODO floor noise
-        Block block = MonolithBlocks.erodedSlate;
+        Block block = erodedSlate;
 
         // Volcano stream.
-        //TODO eneraphyte liquid block
-        if((flags[tile.id] & flagFlow) == flagFlow || Math.min(position.dst(0f, 1f, 0f), position.dst(0f, -1f, 0f)) <= volcanoRadius(position)) block = Blocks.slag;
+        if(tile != null){
+            if(
+                (flags[tile.id] & flagFlow) == flagFlow ||
+                    Math.min(position.dst(0f, 1f, 0f), position.dst(0f, -1f, 0f)) <= volcanoRadius(position)
+            ) block = liquefiedEneraphyte;
+        }
 
         return block;
     }
@@ -170,7 +176,11 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
     @Override
     public Color getColor(Ptile tile, Vec3 position){
         Block block = getBlock(tile, position);
-        return color.set(block.mapColor).a(1f - block.albedo);
+
+        Color color = block.mapColor;
+        if(block == liquefiedEneraphyte) color = monolithLighter;
+
+        return color.set(color).a(1f - block.albedo);
     }
 
     @Override
@@ -205,9 +215,10 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
     @Override
     protected void genTile(Vec3 position, TileGen tile){
         v33.set(position).nor();
-        tile.floor = getBlock(Structs.findMin(grid.tiles, t -> v32.set(t.v).nor().dst2(v33)), position);
-        tile.block = tile.floor.asFloor().wall;
+        //tile.floor = getBlock(Structs.findMin(grid.tiles, t -> v32.set(t.v).nor().dst2(v33)), position);
+        tile.floor = getBlock(null, position);
+        //tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 20f) > 0.67f) tile.block = Blocks.air;
+        //if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 20f) > 0.67f) tile.block = Blocks.air;
     }
 }

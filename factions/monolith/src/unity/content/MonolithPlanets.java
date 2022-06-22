@@ -17,6 +17,7 @@ import unity.util.*;
 import unity.world.planets.*;
 
 import static unity.graphics.MonolithPalettes.*;
+import static unity.mod.FactionRegistry.*;
 
 /**
  * Defines all {@linkplain Faction#monolith monolith} planets.
@@ -30,7 +31,7 @@ public final class MonolithPlanets{
     }
 
     public static void load(){
-        megalith = new Planet("megalith", Planets.sun, 1f, 3){{
+        megalith = register(Faction.monolith, new Planet("megalith", Planets.sun, 1f, 3){{
             Color[] colors = {monolithMid, monolithLight, monolithLighter};
             float[] speeds = new float[72];
             for(int i = 0; i < speeds.length; i++){
@@ -130,6 +131,6 @@ public final class MonolithPlanets{
                 ring.get(1),
                 ring.get(2)
             );
-        }};
+        }});
     }
 }
