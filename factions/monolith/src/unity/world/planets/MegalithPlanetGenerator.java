@@ -13,6 +13,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
+import mindustry.type.Sector.*;
 import mindustry.world.*;
 import unity.content.*;
 import unity.graphics.g3d.PUMeshBuilder.*;
@@ -35,23 +36,55 @@ import static unity.graphics.MonolithPal.*;
  * @author GlennFolker
  */
 public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMesher{
-    protected static final Color color = new Color();
-    protected static final Vec3 rad = new Vec3(), v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3(), v34 = new Vec3();
+    protected static final Color col1 = new Color(), col2 = new Color();
+    protected static final Vec3
+        rad = new Vec3(), vert = new Vec3(), o = new Vec3(), d = new Vec3(),
+        v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3();
+    protected static final Vec2
+        v1 = new Vec2();
 
-    public static float
+    protected static final float
     volcanoRadius = 0.16f, volcanoFalloff = 0.3f, volcanoEdgeDeviation = 0.1f, volcanoEdge = 0.06f,
     volcanoHeight = 0.7f, volcanoHeightDeviation = 0.2f, volcanoHeightInner = volcanoHeight - 0.05f;
+
+    protected static final int flowMin = 24, flowMax = 48;
+
+    protected Block[] terrain = {sharpSlate};
 
     protected boolean initialized = false;
     protected Planet planet;
 
     protected PlanetGrid grid;
     protected float[] heights;
-    protected int[] flags;
+    protected long[] tileFlags;
     protected int[][] secTiles;
+    protected Vec3[] secTilePos;
+
+    protected final FloatSeq vertices = new FloatSeq();
+    protected final IntMap<short[]> indices = new IntMap<>();
 
     protected static final int
-        flagFlow = 1;
+    flagFlow = 1; // Eneraphyte stream flow. Contains an int value.
+
+    protected static long tile(long target, int flag, int val){
+        return flag(target) | tile(flag, val);
+    }
+
+    protected static long tile(int flag, int val){
+        return ((long)flag << 32L) | val;
+    }
+
+    protected static int flag(long tile){
+        return (int)(tile >>> 32L);
+    }
+
+    protected static boolean hasFlag(long tile, int flag){
+        return (flag(tile) & flag) == flag;
+    }
+
+    protected static int val(long tile){
+        return (int)tile;
+    }
 
     @Override
     public void init(int divisions, boolean lines, float radius, float intensity){
@@ -62,7 +95,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
         grid = PlanetGrid.create(divisions);
 
         heights = new float[grid.tiles.length];
-        flags = new int[grid.tiles.length];
+        tileFlags = new long[grid.tiles.length];
 
         calculateHeight(intensity);
         Cons2<Ptile, Float> flow = (init, pole) -> {
@@ -73,12 +106,12 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
             queue.add(init);
             used.add(init.id);
 
-            int flowIndex = -1, flowCount = Mathf.randomSeed(init.id, 16, 36);
+            int flowIndex = -1, flowCount = Mathf.randomSeed(init.id, flowMin, flowMax);
             while(!queue.isEmpty() && ++flowIndex < flowCount){
                 candidates.clear();
 
                 Ptile current = queue.pop();
-                flags[current.id] |= flagFlow;
+                tileFlags[current.id] = tile(tileFlags[current.id], flagFlow, flowCount - flowIndex);
 
                 float prog = flowIndex / (flowCount - 1f), heightDeviation = 0.2f, dotDeviation = 0.3f;
                 int maxFlood = Mathf.ceilPositive(current.edgeCount * Interp.pow2In.apply(1f - prog));
@@ -120,43 +153,69 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
         Log.debug("Generating sector-divided planet tiles.");
         Time.mark();
 
-        FloatSeq vertices = new FloatSeq(6 * 3);
-        short[]
-            index5 = {0, 1, 5, 1, 2, 5, 2, 3, 5, 3, 4, 5, 4, 0, 5},
-            index6 = {0, 1, 6, 1, 2, 6, 2, 3, 6, 3, 4, 6, 4, 5, 6, 5, 0, 6};
+        int secSize = planet.sectors.size;
+        secTiles = new int[secSize][];
+        secTilePos = new Vec3[secSize];
 
-        secTiles = new int[planet.sectors.size][];
         IntSeq array = new IntSeq();
-
-        for(Sector sector : planet.sectors){
-            vertices.clear();
-            for(Corner corner : sector.tile.corners){
-                v31.set(corner.v).nor();
-                vertices.add(v31.x, v31.y, v31.z);
-            }
-
-            v31.setZero();
-            int len = vertices.size;
-            float[] items = vertices.items;
-
-            for(int i = 0; i < len; i += 3) v31.add(items[i], items[i + 1], items[i + 2]);
-            v31.scl(1f / (len / 3f));
-            vertices.add(v31.x, v31.y, v31.z);
+        for(int i = 0; i < secSize; i++){
+            Sector sector = planet.sectors.get(i);
 
             array.clear();
-            for(Ptile tile : grid.tiles){
-                if(Intersector3D.intersectRayTriangles(MathUtils.ray1.set(v32.setZero(), v33.set(tile.v).nor()), vertices.items, switch(sector.tile.edgeCount){
-                    case 5 -> index5;
-                    case 6 -> index6;
-                    default -> throw new IllegalStateException("Unhandled corner index: " + vertices.size);
-                }, 3, null)) array.add(tile.id);
-            }
+            for(Ptile tile : grid.tiles) if(in(tile, sector.tile)) array.add(tile.id);
 
-            secTiles[sector.id] = array.toArray();
+            secTiles[i] = array.toArray();
+            secTilePos[i] = new Vec3(sector.tile.v).nor();
         }
 
         Log.debug("Sector-divided planet tiles generated in @ms.", Time.elapsed());
     }
+
+    protected boolean in(Ptile planetTile, Ptile sectorTile){
+        vertices.clear();
+        for(Corner corner : sectorTile.corners){
+            vert.set(corner.v).nor().scl(0.98f);
+            vertices.add(vert.x, vert.y, vert.z);
+        }
+
+        vert.setZero();
+        int len = vertices.size;
+        float[] items = vertices.items;
+
+        for(int i = 0; i < len; i += 3) vert.add(items[i], items[i + 1], items[i + 2]);
+        vert.scl((1f / (len / 3f)) * 0.98f);
+        vertices.add(vert.x, vert.y, vert.z);
+
+        int edgeCount = sectorTile.edgeCount;
+        return Intersector3D.intersectRayTriangles(
+            MathUtils.ray1.set(o.setZero(), d.set(planetTile.v).nor()),
+            vertices.items, indices.get(edgeCount, () -> {
+                short[] indices = new short[edgeCount * 3];
+                for(short i = 0, end = (short)edgeCount; i < end; i++){
+                    short next = (short)(i + 1);
+                    if(next == end) next = 0;
+
+                    int ind = i * 3;
+                    indices[ind] = i;
+                    indices[ind + 1] = next;
+                    indices[ind + 2] = end;
+                }
+
+                return indices;
+            }),
+            3, null
+        );
+    }
+
+    //might not be necessary, but let's see...
+    /*protected boolean edge(Ptile planetTile, Ptile sectorTile){
+        int[] tiles = secTiles[sectorTile.id];
+        return
+            // Must be in the sector tile.
+            MathUtils.contains(planetTile.id, tiles) &&
+            // Must have a neighbor that is *not* in the sector tile.
+            Structs.contains(planetTile.tiles, t -> !MathUtils.contains(t.id, tiles));
+    }*/
 
     protected void calculateHeight(float intensity){
         for(int i = 0, tlen = grid.tiles.length; i < tlen; i++){
@@ -166,7 +225,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
             int clen = tile.corners.length;
             for(int j = 0; j < clen; j++){
                 Corner corner = tile.corners[j];
-                height += (1f + getHeight(corner, v31.set(corner.v))) * intensity;
+                height += (1f + getHeight(corner, v31.set(corner.v).nor())) * intensity;
             }
 
             heights[i] = height / clen;
@@ -180,6 +239,14 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
         return volcanoRadius + Simplex.noise3d(seed + 1, 3d, 0.5d, 0.7d, rad.x, rad.y, rad.z) * volcanoEdgeDeviation;
     }
 
+    protected boolean inVolcano(Vec3 position){
+        return inVolcano(position, volcanoRadius(position));
+    }
+
+    protected boolean inVolcano(Vec3 position, float radius){
+        return Math.min(position.dst(0f, 1f, 0f), position.dst(0f, -1f, 0f)) <= radius;
+    }
+
     protected Block getBlock(@Nullable Ptile tile, Vec3 position){
         // Raw block, yet to be processed further.
         //TODO floor noise
@@ -187,10 +254,7 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
 
         // Volcano stream.
         if(tile != null){
-            if(
-                (flags[tile.id] & flagFlow) == flagFlow ||
-                    Math.min(position.dst(0f, 1f, 0f), position.dst(0f, -1f, 0f)) <= volcanoRadius(position)
-            ) block = liquefiedEneraphyte;
+            if(hasFlag(tileFlags[tile.id], flagFlow) || inVolcano(position)) block = liquefiedEneraphyte;
         }
 
         return block;
@@ -220,17 +284,23 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
             if(initialized && volcanoDst <= volcanoRad) height = Mathf.lerp(height, volcanoHeightInner, Interp.smoother.apply(1f - Mathf.clamp((volcanoDst - volcanoRad) / volcanoEdge)));
         }
 
-        return height;
+        return height * height * 1.3f;
     }
 
     @Override
     public Color getColor(Ptile tile, Vec3 position){
         Block block = getBlock(tile, position);
+        Color col = block.mapColor;
 
-        Color color = block.mapColor;
-        if(block == liquefiedEneraphyte) color = monolithLighter;
+        long t = tileFlags[tile.id];
+        if(inVolcano(position)){
+            col = monolithLighter;
+        }else if(hasFlag(t, flagFlow)){
+            float in = val(t) / (flowMax - 1f);
+            col = col2.set(monolithMid).lerp(monolithLight, Mathf.curve(in, 0f, 0.5f)).lerp(monolithLighter, Mathf.curve(in, 0.5f));
+        }
 
-        return color.set(color).a(1f - block.albedo);
+        return col1.set(col).a(1f - block.albedo);
     }
 
     @Override
@@ -265,16 +335,76 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
     @Override
     protected void genTile(Vec3 position, TileGen tile){
         v33.set(position).nor();
-        //very funny hexagonal eneraphyte river
-        //tile.floor = getBlock(grid.tiles[MathUtils.min(i -> v32.set(grid.tiles[i].v).nor().dst2(v33), secTiles[sector.id])], position);
         tile.floor = getBlock(null, position);
-        tile.block = tile.floor.asFloor().wall;
+        //tile.block = tile.floor.asFloor().wall;
 
         if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 20f) > 0.67f) tile.block = Blocks.air;
     }
 
     @Override
     protected void generate(){
-        //TODO i need to resolve my skill issue.
+        class FlowData{
+            final int x;
+            final int y;
+            final int level;
+
+            FlowData(int x, int y, int level){
+                this.x = x;
+                this.y = y;
+                this.level = level;
+            }
+        }
+
+        Seq<FlowData> river = new Seq<>();
+        SectorRect srect = sector.rect;
+
+        int[] ptiles = secTiles[sector.id];
+        for(int tileIndex : ptiles){
+            Ptile ptile = grid.tiles[tileIndex];
+            long t = tileFlags[tileIndex];
+
+            if(hasFlag(t, flagFlow)){
+                unproject(srect, ptile.v, v1);
+                river.add(new FlowData(wc(v1.x), hc(v1.y), val(t)));
+
+                for(Ptile neighbor : ptile.tiles){
+                    int nid = neighbor.id;
+                    long nflag = tileFlags[nid];
+
+                    if(!hasFlag(nflag, flagFlow) || MathUtils.contains(nid, ptiles)) continue;
+
+                    unproject(srect, neighbor.v, v1);
+                    river.add(new FlowData(w(v1.x), h(v1.y), val(nflag)));
+                }
+            }
+        }
+
+        river.each(d -> {
+            Tile tile = tiles.get(d.x, d.y);
+            if(tile != null) tile.setFloor(liquefiedEneraphyte.asFloor());
+        });
+    }
+    
+    protected Vec2 unproject(SectorRect rect, Vec3 position, Vec2 out){
+        return out.set(
+            Mathf.clamp((position.dot(rect.right) / rect.right.len2() + 1f) / 2f),
+            Mathf.clamp((position.dot(rect.top) / rect.top.len2() + 1f) / 2f)
+        );
+    }
+
+    protected int w(float frac){
+        return (int)(frac * width);
+    }
+
+    protected int h(float frac){
+        return (int)(frac * height);
+    }
+
+    protected int wc(float frac){
+        return Mathf.clamp(w(frac), 0, width - 1);
+    }
+
+    protected int hc(float frac){
+        return Mathf.clamp(h(frac), 0, height - 1);
     }
 }

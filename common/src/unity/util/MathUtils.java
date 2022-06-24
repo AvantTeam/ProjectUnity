@@ -114,7 +114,73 @@ public final class MathUtils{
         return result;
     }
 
+    /**
+     * {@link #min(IntExtractor, int...)} with additional filter.
+     * @author GlennFolker
+     */
+    public static int min(IntPredicate pred, IntExtractor ext, int... values){
+        if(values == null || values.length <= 0) return 0;
+        int result = 0;
+
+        float min = Float.MAX_VALUE;
+        for(int value : values){
+            if(!pred.get(value)) continue;
+
+            float val = ext.get(value);
+            if(val < min){
+                result = value;
+                min = val;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * {@link Structs#contains(Object[], Object)} for integer array.
+     * @author GlennFolker
+     */
+    public static boolean contains(int target, int... values){
+        for(int value : values) if(value == target) return true;
+        return false;
+    }
+
+    /**
+     * Inverse linear interpolation; gets the progression (0-1) from the given interpolated value.
+     * @author GlennFolker
+     */
+    public static float invLerp(float from, float to, float value){
+        return (value - from) / (to - from);
+    }
+
+    /**
+     * {@link #invLerp(float, float, float)} for 2D vectors. Parameters should be collinear.
+     * @author GlennFolker
+     */
+    public static Vec2 invLerp(Vec2 from, Vec2 to, Vec2 value, Vec2 out){
+        return out.set(
+            invLerp(from.x, to.x, value.x),
+            invLerp(from.y, to.y, value.y)
+        );
+    }
+
+    /**
+     * {@link #invLerp(float, float, float)} for 3D vectors. Parameters should be collinear.
+     * @author GlennFolker
+     */
+    public static Vec3 invLerp(Vec3 from, Vec3 to, Vec3 value, Vec3 out){
+        return out.set(
+            invLerp(from.x, to.x, value.x),
+            invLerp(from.y, to.y, value.y),
+            invLerp(from.z, to.z, value.z)
+        );
+    }
+
     public interface IntExtractor{
         float get(int value);
+    }
+
+    public interface IntPredicate{
+        boolean get(int value);
     }
 }

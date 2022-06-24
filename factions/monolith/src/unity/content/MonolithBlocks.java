@@ -2,6 +2,7 @@ package unity.content;
 
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.meta.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.world.blocks.environment.*;
@@ -13,12 +14,16 @@ import static unity.mod.FactionRegistry.*;
  * Defines all {@linkplain Faction#monolith monolith} block types.
  * @author GlennFolker
  */
+//TODO env{ludellyte-wall}, ore{proximite}
 public final class MonolithBlocks{
     public static Block
     liquefiedEneraphyte,
 
+    ludellyte,
     erodedSlate, infusedErodedSlate, archaicErodedSlate, sharpSlate, infusedSharpSlate, archaicSharpSlate,
     erodedEneraphyteVent, eneraphyteVent,
+
+    oreEneraphyteCrystal,
 
     erodedSlateWall, infusedErodedSlateWall, archaicErodedSlateWall, sharpSlateWall, infusedSharpSlateWall, archaicSharpSlateWall;
 
@@ -40,31 +45,42 @@ public final class MonolithBlocks{
             supportsOverlay = true;
         }});
 
+        ludellyte = register(Faction.monolith, new Floor("ludellyte"){{
+            attributes.set(Attribute.water, -0.1f);
+        }});
+
         erodedSlate = register(Faction.monolith, new Floor("eroded-slate"){{
+            attributes.set(Attribute.water, -0.3f);
             attributes.set(eneraphyteInfusion, 0.08f);
         }});
 
         infusedErodedSlate = register(Faction.monolith, new Floor("infused-eroded-slate"){{
+            attributes.set(Attribute.water, -0.3f);
             attributes.set(eneraphyteInfusion, 0.24f);
         }});
 
         archaicErodedSlate = register(Faction.monolith, new Floor("archaic-eroded-slate"){{
+            attributes.set(Attribute.water, -0.3f);
             attributes.set(eneraphyteInfusion, 0.65f);
         }});
 
         sharpSlate = register(Faction.monolith, new Floor("sharp-slate"){{
+            attributes.set(Attribute.water, -0.2f);
             attributes.set(eneraphyteInfusion, 0.15f);
         }});
 
         infusedSharpSlate = register(Faction.monolith, new Floor("infused-sharp-slate"){{
+            attributes.set(Attribute.water, -0.2f);
             attributes.set(eneraphyteInfusion, 0.4f);
         }});
 
         archaicSharpSlate = register(Faction.monolith, new Floor("archaic-sharp-slate"){{
+            attributes.set(Attribute.water, -0.2f);
             attributes.set(eneraphyteInfusion, 1f);
         }});
 
         erodedEneraphyteVent = register(Faction.monolith, new SizedVent("eroded-eneraphyte-vent"){{
+            attributes.set(Attribute.water, -0.3f);
             attributes.set(eneraphyteEmission, 0.75f);
             attributes.set(eneraphyteInfusion, 0.24f);
 
@@ -75,6 +91,7 @@ public final class MonolithBlocks{
         }});
 
         eneraphyteVent = register(Faction.monolith, new SizedVent("eneraphyte-vent"){{
+            attributes.set(Attribute.water, -0.2f);
             attributes.set(eneraphyteEmission, 1f);
             attributes.set(eneraphyteInfusion, 0.4f);
 
@@ -83,6 +100,8 @@ public final class MonolithBlocks{
             effect = MonolithFx.eneraphyteSteam;
             effectSpacing = 20f;
         }});
+
+        oreEneraphyteCrystal = register(Faction.monolith, new OreBlock("ore-eneraphyte-crystal", MonolithItems.eneraphyteCrystal));
 
         erodedSlateWall = register(Faction.monolith, new StaticWall("eroded-slate-wall"){{
             attributes.set(eneraphyteInfusion, 0.08f);

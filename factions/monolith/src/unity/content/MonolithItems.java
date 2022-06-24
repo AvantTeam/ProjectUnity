@@ -12,7 +12,7 @@ import static unity.graphics.MonolithPal.*;
  */
 public final class MonolithItems{
     public static Item
-    proximite;
+    proximite, eneraphyteCrystal;
 
     private MonolithItems(){
         throw new AssertionError();
@@ -20,5 +20,7 @@ public final class MonolithItems{
 
     public static void load(){
         proximite = new PUItem("proximite", monolithLight);
+
+        eneraphyteCrystal = new PUItem("eneraphyte-crystal", monolithLighter);
     }
 }
