@@ -20,7 +20,7 @@ import unity.graphics.*;
 import unity.util.*;
 
 import static mindustry.Vars.*;
-import static unity.graphics.MonolithPalettes.*;
+import static unity.graphics.MonolithPal.*;
 
 /**
  * Convenience class for {@link MonolithSoul} types.

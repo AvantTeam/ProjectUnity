@@ -9,7 +9,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.util.*;
 
-import static unity.graphics.MonolithPalettes.*;
+import static unity.graphics.MonolithPal.*;
 
 /** @author GlennFolker */
 public class HelixLaserBulletType extends LaserBulletType{

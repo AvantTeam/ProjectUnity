@@ -11,7 +11,7 @@ import unity.graphics.trail.*;
 import unity.mod.*;
 import unity.util.*;
 
-import static unity.graphics.MonolithPalettes.*;
+import static unity.graphics.MonolithPal.*;
 
 /**
  * Provides various types of trails used by {@linkplain Faction#monolith monolith} entities.

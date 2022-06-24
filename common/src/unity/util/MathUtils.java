@@ -1,8 +1,10 @@
 package unity.util;
 
+import arc.func.*;
 import arc.math.*;
 import arc.math.Interp.*;
 import arc.math.geom.*;
+import arc.util.*;
 
 /** Shared utility access for mathematical operations. */
 @SuppressWarnings({"SuspiciousNameCombination", "UnusedReturnValue"})
@@ -11,6 +13,7 @@ public final class MathUtils{
 
     public static final Quat q1 = new Quat(), q2 = new Quat();
     public static final Mat3D m31 = new Mat3D(), m32 = new Mat3D();
+    public static final Ray ray1 = new Ray();
 
     private static final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
@@ -89,5 +92,29 @@ public final class MathUtils{
     /** @author GlennFolker */
     public static int randomSeedSign(long seed){
         return Mathf.randomSeed(seed, 0, 1) * 2 - 1;
+    }
+
+    /**
+     * {@link Structs#findMin(Object[], Floatf)} for integer array.
+     * @author GlennFolker
+     */
+    public static int min(IntExtractor ext, int... values){
+        if(values == null || values.length <= 0) return 0;
+        int result = 0;
+
+        float min = Float.MAX_VALUE;
+        for(int value : values){
+            float val = ext.get(value);
+            if(val < min){
+                result = value;
+                min = val;
+            }
+        }
+
+        return result;
+    }
+
+    public interface IntExtractor{
+        float get(int value);
     }
 }

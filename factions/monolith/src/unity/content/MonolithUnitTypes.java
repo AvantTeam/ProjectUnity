@@ -30,7 +30,7 @@ import unity.util.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static unity.gen.entities.EntityRegistry.*;
-import static unity.graphics.MonolithPalettes.*;
+import static unity.graphics.MonolithPal.*;
 import static unity.mod.FactionRegistry.*;
 
 /**

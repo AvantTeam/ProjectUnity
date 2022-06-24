@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -15,9 +16,10 @@ import mindustry.type.*;
 import mindustry.world.*;
 import unity.content.*;
 import unity.graphics.g3d.PUMeshBuilder.*;
+import unity.util.*;
 
 import static unity.content.MonolithBlocks.*;
-import static unity.graphics.MonolithPalettes.*;
+import static unity.graphics.MonolithPal.*;
 
 /**
  * Planet mesh and sector generator for the {@linkplain MonolithPlanets#megalith megalith} planet:
@@ -34,24 +36,31 @@ import static unity.graphics.MonolithPalettes.*;
  */
 public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMesher{
     protected static final Color color = new Color();
-    protected static final Vec3 rad = new Vec3(), v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3();
+    protected static final Vec3 rad = new Vec3(), v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3(), v34 = new Vec3();
 
     public static float
     volcanoRadius = 0.16f, volcanoFalloff = 0.3f, volcanoEdgeDeviation = 0.1f, volcanoEdge = 0.06f,
     volcanoHeight = 0.7f, volcanoHeightDeviation = 0.2f, volcanoHeightInner = volcanoHeight - 0.05f;
 
     protected boolean initialized = false;
+    protected Planet planet;
 
     protected PlanetGrid grid;
     protected float[] heights;
     protected int[] flags;
+    protected int[][] secTiles;
 
     protected static final int
         flagFlow = 1;
 
     @Override
     public void init(int divisions, boolean lines, float radius, float intensity){
+        Log.debug("Generating volcano flow...");
+        Time.mark();
+
+        planet = MonolithPlanets.megalith;
         grid = PlanetGrid.create(divisions);
+
         heights = new float[grid.tiles.length];
         flags = new int[grid.tiles.length];
 
@@ -106,6 +115,47 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
 
         initialized = true;
         calculateHeight(intensity);
+
+        Log.debug("Volcano flow generated in @ms.", Time.elapsed());
+        Log.debug("Generating sector-divided planet tiles.");
+        Time.mark();
+
+        FloatSeq vertices = new FloatSeq(6 * 3);
+        short[]
+            index5 = {0, 1, 5, 1, 2, 5, 2, 3, 5, 3, 4, 5, 4, 0, 5},
+            index6 = {0, 1, 6, 1, 2, 6, 2, 3, 6, 3, 4, 6, 4, 5, 6, 5, 0, 6};
+
+        secTiles = new int[planet.sectors.size][];
+        IntSeq array = new IntSeq();
+
+        for(Sector sector : planet.sectors){
+            vertices.clear();
+            for(Corner corner : sector.tile.corners){
+                v31.set(corner.v).nor();
+                vertices.add(v31.x, v31.y, v31.z);
+            }
+
+            v31.setZero();
+            int len = vertices.size;
+            float[] items = vertices.items;
+
+            for(int i = 0; i < len; i += 3) v31.add(items[i], items[i + 1], items[i + 2]);
+            v31.scl(1f / (len / 3f));
+            vertices.add(v31.x, v31.y, v31.z);
+
+            array.clear();
+            for(Ptile tile : grid.tiles){
+                if(Intersector3D.intersectRayTriangles(MathUtils.ray1.set(v32.setZero(), v33.set(tile.v).nor()), vertices.items, switch(sector.tile.edgeCount){
+                    case 5 -> index5;
+                    case 6 -> index6;
+                    default -> throw new IllegalStateException("Unhandled corner index: " + vertices.size);
+                }, 3, null)) array.add(tile.id);
+            }
+
+            secTiles[sector.id] = array.toArray();
+        }
+
+        Log.debug("Sector-divided planet tiles generated in @ms.", Time.elapsed());
     }
 
     protected void calculateHeight(float intensity){
@@ -215,10 +265,16 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
     @Override
     protected void genTile(Vec3 position, TileGen tile){
         v33.set(position).nor();
-        //tile.floor = getBlock(Structs.findMin(grid.tiles, t -> v32.set(t.v).nor().dst2(v33)), position);
+        //very funny hexagonal eneraphyte river
+        //tile.floor = getBlock(grid.tiles[MathUtils.min(i -> v32.set(grid.tiles[i].v).nor().dst2(v33), secTiles[sector.id])], position);
         tile.floor = getBlock(null, position);
-        //tile.block = tile.floor.asFloor().wall;
+        tile.block = tile.floor.asFloor().wall;
 
-        //if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 20f) > 0.67f) tile.block = Blocks.air;
+        if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 20f) > 0.67f) tile.block = Blocks.air;
+    }
+
+    @Override
+    protected void generate(){
+        //TODO i need to resolve my skill issue.
     }
 }

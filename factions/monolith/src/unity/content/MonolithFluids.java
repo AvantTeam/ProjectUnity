@@ -1,9 +1,10 @@
 package unity.content;
 
 import mindustry.type.*;
+import unity.content.type.*;
 import unity.mod.*;
 
-import static unity.graphics.MonolithPalettes.*;
+import static unity.graphics.MonolithPal.*;
 import static unity.mod.FactionRegistry.*;
 
 /**
@@ -19,7 +20,7 @@ public final class MonolithFluids{
     }
 
     public static void load(){
-        eneraphyte = register(Faction.monolith, new Liquid("eneraphyte", monolithLighter){{
+        eneraphyte = register(Faction.monolith, new PUFluid("eneraphyte", monolithLighter){{
             gas = true;
             temperature = 0.7f;
             heatCapacity = 0.1f;

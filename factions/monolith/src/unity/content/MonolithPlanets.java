@@ -16,7 +16,7 @@ import unity.mod.*;
 import unity.util.*;
 import unity.world.planets.*;
 
-import static unity.graphics.MonolithPalettes.*;
+import static unity.graphics.MonolithPal.*;
 import static unity.mod.FactionRegistry.*;
 
 /**

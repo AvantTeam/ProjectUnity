@@ -46,7 +46,7 @@ public final class PUShaders{
      * texture list should be named as {@code u_texture[n + 1]} (e.g. {@code u_texture1}, {@code u_texture2}, ...), whereas the
      * frame buffer texture uniform can be of any name (e.g. {@code u_noise}, {@code u_texture}, ...).</p>
      *
-     * <p>There are also 3 preset uniforms: {@code u_campos}, {@code u_resolution}, {@code u_viewport} and {@code u_time};
+     * <p>There are also 4 preset uniforms: {@code u_campos}, {@code u_resolution}, {@code u_viewport} and {@code u_time};
      * corresponds to the camera position, the camera dimension, the screen dimension, and {@link Time#time time}.</p>
      *
      * <p><b>The shader only supports up to 8 textures</b>: 1 frame buffer texture and 7 additional textures.</p>

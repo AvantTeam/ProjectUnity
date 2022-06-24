@@ -7,7 +7,7 @@ import unity.mod.*;
  * {@linkplain Faction#monolith Monolith}-specific palettes.
  * @author GlennFolker
  */
-public final class MonolithPalettes{
+public final class MonolithPal{
     public static final Color
     monolithLighter = new Color(0x9cd4f8ff),
     monolithLight = new Color(0x72a2d7ff),
@@ -17,7 +17,7 @@ public final class MonolithPalettes{
 
     monolithOutline = Palettes.darkOutline;
 
-    private MonolithPalettes(){
+    private MonolithPal(){
         throw new AssertionError();
     }
 }
