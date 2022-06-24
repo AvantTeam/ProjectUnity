@@ -387,8 +387,8 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
     
     protected Vec2 unproject(SectorRect rect, Vec3 position, Vec2 out){
         return out.set(
-            Mathf.clamp((position.dot(rect.right) / rect.right.len2() + 1f) / 2f),
-            Mathf.clamp((position.dot(rect.top) / rect.top.len2() + 1f) / 2f)
+            (position.dot(rect.right) / rect.right.len2() + 1f) / 2f,
+            (position.dot(rect.top) / rect.top.len2() + 1f) / 2f
         );
     }
 
