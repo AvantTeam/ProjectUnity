@@ -176,6 +176,20 @@ public final class MathUtils{
         );
     }
 
+    /** @author EyeOfDarkness */
+    public static float slope(float fin, float bias){
+        return (fin < bias ? (fin / bias) : 1f - (fin - bias) / (1f - bias));
+    }
+
+    public static float angleDistSigned(float a, float b){
+        a = Mathf.mod(a, 360f);
+        b = Mathf.mod(b, 360f);
+
+        float d = Math.abs(a - b) % 360f;
+        int sign = (a - b >= 0f && a - b <= 180f) || (a - b <= -180f && a - b >= -360f) ? 1 : -1;
+        return (d > 180f ? 360f - d : d) * sign;
+    }
+
     public interface IntExtractor{
         float get(int value);
     }
