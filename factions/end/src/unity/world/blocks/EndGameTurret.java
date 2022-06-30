@@ -17,12 +17,13 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
+import unity.content.*;
 import unity.graphics.*;
 import unity.util.*;
 
 /** @author EyeOfDarkness */
 public class EndGameTurret extends Turret{
-    static Seq<Posc> tmpTargets = new Seq<>();
+    static Seq<Posc> tmpTargets = new Seq<>(Posc.class);
     static float targetScore = 0f;
     static Healthc bestTarget;
 
@@ -41,7 +42,7 @@ public class EndGameTurret extends Turret{
             }}};
     Vec2[] ringPos = {new Vec2(44.25f, 18f), new Vec2(30.5f, 0f), new Vec2(19.5f, 7.5f)};
     int[] ringDirection = {1, -1, 1};
-    float mainRange = 700f;
+    float mainRange = 750f;
 
     public EndGameTurret(String name){
         super(name);
@@ -95,12 +96,14 @@ public class EndGameTurret extends Turret{
     }
 
     public class EndGameTurretBuild extends TurretBuild{
+        float trueHealth, trueMaxHealth, excessDamage;
         float eyeAlpha, eyeRetarget;
         float[] ringRotations = new float[3], ringMovementTime = new float[3], targetRotations = new float[3], ringReloads = new float[3];
         int[] ringIdx = new int[3];
         int totalEyeTargets;
         Posc[] targets = new Posc[8 * 3];
         Vec2 eyeOffset = new Vec2(), visualEyeOffset = new Vec2();
+        Vec2[] eyePosition = new Vec2[8 * 3];
 
         float sinAlpha(int i){
             float absin = Mathf.sinDeg((Time.time * 2f) + i * 25f) * 0.7f + 0.3f;
@@ -160,24 +163,25 @@ public class EndGameTurret extends Turret{
                     //float ox = visualEyeOffset.x * eyeMoveScl[i], oy = visualEyeOffset.y * eyeMoveScl[i];
                     Draw.blend(Blending.additive);
                     for(int j = 0; j < 8; j++){
-                        Vec2 v = eyePos(i, j);
-                        Tmp.c1.set(EndPalettes.endMid).mul(1f, colS, colC, 1f);
+                        //Vec2 v = eyePos(i, j);
+                        Vec2 v = eyePosition[i * 8 + j];
+                        Tmp.c1.set(EndPal.endMid).mul(1f, colS, colC, 1f);
                         Draw.color(Tmp.c1);
                         Fill.circle(v.x, v.y, (0.8f * eyeMoveScl[i] + Mathf.absin(Time.time + i * 4f, 6f, 0.125f)) * eyeAlpha);
                     }
                 }
             }
             if(eyeAlpha > 0.0001f){
-                float radS = Mathf.absin(Time.time + 12f, 6f, 0.75f);
+                float radS = Mathf.absin(Time.time + 12f, 6f, 0.75f) * eyeAlpha;
                 float colS = Mathf.sin(Time.time + 20, 15, 0.1f) + 0.9f;
                 float colC = Mathf.cos(Time.time + 20, 15, 0.1f) + 0.9f;
                 Vec2 v = eyePosCenter();
 
                 Draw.blend(Blending.normal);
-                Tmp.c1.set(EndPalettes.endLight).mul(1f, colS, colC, 1f);
+                Tmp.c1.set(EndPal.endLight).mul(1f, colS, colC, 1f);
                 Draw.color(Tmp.c1);
 
-                DrawPU.shiningCircle(id + 10, v.x, v.y, 6f * eyeAlpha + radS, 5, 60f, 0.5f, 90f, 25f, 4f, 0.3f);
+                DrawPU.shiningCircle(id + 10, v.x, v.y, 6f * eyeAlpha + radS, 5, 60f, 0.5f, 90f, 25f, 4f * eyeAlpha, 0.3f);
                 Draw.color(Color.white);
                 Fill.circle(v.x, v.y, 4f * eyeAlpha + radS);
             }
@@ -238,10 +242,10 @@ public class EndGameTurret extends Turret{
                 ringRotations[i] -= r;
             }
 
-            if(power.status > 0.0001){
-                eyeAlpha = Mathf.lerpDelta(eyeAlpha, 1f, 0.1f * power.status);
+            if(power.status > 0.0001f){
+                eyeAlpha = Mathf.lerpDelta(eyeAlpha, 1f, 0.05f * power.status);
             }else{
-                eyeAlpha = Mathf.lerpDelta(eyeAlpha, 0f, 0.1f * (1 - power.status));
+                eyeAlpha = Mathf.lerpDelta(eyeAlpha, 0f, 0.05f * (1 - power.status));
             }
 
             if(isControlled()){
@@ -265,16 +269,26 @@ public class EndGameTurret extends Turret{
             boolean controlled = isControlled();
 
             for(int i = 0; i < targets.length; i++){
-                if(targets[i] != null && (invalidateTarget(targets[i]) || controlled)){
+                if(targets[i] != null && (controlled || invalidateTarget(targets[i]))){
                     targets[i] = null;
                     totalEyeTargets--;
                 }
             }
-            if(target != null && (invalidateTarget(target) || controlled)){
+
+            if(target != null && (controlled || invalidateTarget(target))){
                 target = null;
                 if(totalEyeTargets > 0 && !controlled){
                     findMainTarget(targets, targets.length);
                 }
+            }
+
+            if(eyePosition[0] == null){
+                for(int i = 0; i < eyePosition.length; i++){
+                    eyePosition[i] = new Vec2();
+                }
+            }
+            for(int i = 0; i < eyePosition.length; i++){
+                eyePosition[i].set(eyePos(i / 8, i % 8));
             }
 
             if(!canConsume()) return;
@@ -316,22 +330,55 @@ public class EndGameTurret extends Turret{
         }
 
         void eyeShoot(int ring, int idx, boolean controlled){
-            Vec2 v = eyePos(ring, idx);
+            //Vec2 v = eyePos(ring, idx);
+            Vec2 v = eyePosition[ring * 8 + idx];
             //float ox = visualEyeOffset.x * eyeMoveScl[ring], oy = visualEyeOffset.y * eyeMoveScl[ring];
             if(!controlled){
                 Posc t = targets[ring * 8 + idx];
                 if(t != null){
-                    float rot = v.angleTo(t);
-                    ringBullets[ring].create(this, team, v.x, v.y, rot);
+                    //float rot = v.angleTo(t);
+                    //ringBullets[ring].create(this, team, v.x, v.y, rot);
+
+                    eyeDamage((Healthc)t, ring, v);
+
+                    EndFx.LaserEffectData d = new EndFx.LaserEffectData();
+                    d.a = v;
+                    d.b = t;
+                    EndFx.endgameEyeLaser.at(v.x, v.y, ring != 2 ? 1f : 0.6f, d);
                 }
             }else{
-                ringBullets[ring].create(this, team, v.x, v.y, v.angleTo(targetPos));
+                Vec2 l = Tmp.v2.set(targetPos).sub(this).limit(range).add(this);
+                Teamc t = Units.closestTarget(team, l.x, l.y, 2f);
+
+                //ringBullets[ring].create(this, team, v.x, v.y, v.angleTo(l));
+
+                if(t != null) eyeDamage((Healthc)t, ring, v);
+
+                EndFx.LaserEffectData d = new EndFx.LaserEffectData();
+                d.a = v;
+                d.b = t == null ? new Vec2(l) : t;
+                EndFx.endgameEyeLaser.at(v.x, v.y, ring != 2 ? 1f : 0.6f, d);
             }
+        }
+
+        void eyeDamage(Healthc e, int ring, Vec2 v){
+            float d = ring == 2 ? 300f : 650f;
+            float scl = ring == 2 ? 250f : 150f;
+            float h = e.maxHealth() / 150000f;
+            float scl2 = Math.max(1f, h * h * h);
+            e.damagePierce((d + (e.maxHealth() / scl)) * scl2);
+
+            if(ring != 2){
+                EndFx.endRingHit.at(e.x(), e.y(), v.angleTo(e));
+                Damage.damage(team, e.x(), e.y(), 110f, 150f * scl2);
+            }
+
+            //ringBullets[ring].create(this, team, e.getX(), e.getY(), v.angleTo(e));
         }
 
         void findMainTarget(Posc[] targets, int size){
             if(target != null) return;
-            targetScore = 0f;
+            targetScore = -Float.MAX_VALUE;
             bestTarget = null;
 
             for(int i = 0; i < size; i++){
