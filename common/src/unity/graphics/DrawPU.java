@@ -11,8 +11,13 @@ public class DrawPU{
     private static final Rand rand = new Rand(), rand2 = new Rand();
     private static final float[] vertices = new float[6];
 
-    public static void diamond(){
-
+    public static void diamond(float x, float y, float width, float length, float rotation){
+        float tx1 = Angles.trnsx(rotation + 90f, width), ty1 = Angles.trnsy(rotation + 90f, width),
+                tx2 = Angles.trnsx(rotation, length), ty2 = Angles.trnsy(rotation, length);
+        Fill.quad(x + tx1, y + ty1,
+                x + tx2, y + ty2,
+                x - tx1, y - ty1,
+                x - tx2, y - ty2);
     }
 
     /** @author EyeOfDarkness */

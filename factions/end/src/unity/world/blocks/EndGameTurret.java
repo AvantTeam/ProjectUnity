@@ -11,7 +11,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -30,25 +29,16 @@ public class EndGameTurret extends Turret{
     TextureRegion[] ringRegions = new TextureRegion[6];
     TextureRegion baseRegion, baseLightRegion1, baseLightRegion2;
     float[] ringReloadTimes = {15, 10, 5}, eyeMoveScl = {0.9f, 0.9f, 0.6f}, ringMoveDuration = {120f, 60f, 30f}, ringMoveSpeed = {2f, 4f, 8f};
-    BulletType[] ringBullets = {
-            ((PowerTurret)Blocks.lancer).shootType,
-            ((PowerTurret)Blocks.lancer).shootType,
-            new BasicBulletType(5.5f, 18){{
-                width = 9f;
-                height = 12f;
-                reloadMultiplier = 0.6f;
-                ammoMultiplier = 4;
-                lifetime = 60f;
-            }}};
     Vec2[] ringPos = {new Vec2(44.25f, 18f), new Vec2(30.5f, 0f), new Vec2(19.5f, 7.5f)};
     int[] ringDirection = {1, -1, 1};
     float mainRange = 750f;
+    float chargeTime = 7f * 60f;
 
     public EndGameTurret(String name){
         super(name);
         size = 16;
         health = 89000;
-        reload = 350f;
+        reload = 12f * 60f;
         absorbLasers = true;
         shake = 2.2f;
         noUpdateDisabled = true;
@@ -97,7 +87,7 @@ public class EndGameTurret extends Turret{
 
     public class EndGameTurretBuild extends TurretBuild{
         float trueHealth, trueMaxHealth, excessDamage;
-        float eyeAlpha, eyeRetarget;
+        float eyeAlpha, eyeRetarget, chargeTimeCounter;
         float[] ringRotations = new float[3], ringMovementTime = new float[3], targetRotations = new float[3], ringReloads = new float[3];
         int[] ringIdx = new int[3];
         int totalEyeTargets;
@@ -132,6 +122,55 @@ public class EndGameTurret extends Turret{
                 Draw.color(Tmp.c1);
                 Draw.blend(Blending.additive);
                 Draw.rect(baseLightRegion2, x, y);
+
+                Rand r = MathUtils.seedr, r2 = MathUtils.seedr2;
+                r.setSeed(id * 9999L);
+                float amount = reloadCounter / 20f;
+
+                Lines.stroke(1.5f);
+                Draw.blend(Blending.normal);
+                Draw.color(EndPal.endLight);
+
+                for(int i = 0; i < Mathf.ceil(amount); i++){
+                    float fin = Math.min(1f, amount - i);
+                    float duration = r.random(20f, 35f);
+                    float t = Math.max(chargeTimeCounter, 1) + r.random(duration);
+                    int tseed = (int)(t / duration) + r.nextInt();
+                    float fin2 = (t / duration) % 1f;
+
+                    r2.setSeed(tseed);
+                    float len = r2.random(30f, 55f);
+                    float angle = r2.random(360f);
+                    Vec2 v = Tmp.v1.trns(angle, len * (1f - fin2)).add(this);
+                    Lines.lineAngleCenter(v.x, v.y, angle, 12f * Mathf.slope(fin2) * fin, false);
+                }
+            }
+
+            if(reloadCounter > reload){
+                Draw.blend(Blending.normal);
+                Draw.color(Color.black);
+
+                Rand r = MathUtils.seedr, r2 = MathUtils.seedr2;
+                r.setSeed(id * 9999L + 2);
+                float charge = (reloadCounter - reload) / chargeTime;
+                float charge2 = charge * 7f;
+                int amount = Mathf.ceil(charge2);
+                for(int i = 0; i < amount; i++){
+                    for(int j = 0; j < 3; j++){
+                        float fin = Math.min(1f, charge2 - i);
+                        float duration = r.random(50f, 80f);
+                        float t = Time.time + r.random(duration);
+                        //int tseed = (int)(t / duration) + r.nextInt();
+                        float fin2 = (t / duration) % 1f;
+                        float fin3 = Interp.pow3Out.apply(charge);
+
+                        r2.setSeed((int)(t / duration) + r.nextInt());
+                        float width = r2.random(11f, 22f);
+                        float length = width * r2.random(3f, 3.8f) * Mathf.slope(fin2) * fin * fin3;
+
+                        DrawPU.diamond(x, y, width * Mathf.curve(1f - fin2, 0.5f, 1f) * fin * fin3, length, r2.random(360f) + r2.range(15f) * fin2);
+                    }
+                }
             }
 
             for(int i = 0; i < 3; i++){
@@ -171,6 +210,7 @@ public class EndGameTurret extends Turret{
                     }
                 }
             }
+
             if(eyeAlpha > 0.0001f){
                 float radS = Mathf.absin(Time.time + 12f, 6f, 0.75f) * eyeAlpha;
                 float colS = Mathf.sin(Time.time + 20, 15, 0.1f) + 0.9f;
@@ -297,19 +337,38 @@ public class EndGameTurret extends Turret{
                 eyeRetarget = 0f;
             }
 
-            for (int i = 0; i < ringReloads.length; i++){
+            for(int i = 0; i < ringReloads.length; i++){
                 if(ringReloads[i] > 0f) ringReloads[i] -= rspeed;
             }
 
             if(((totalEyeTargets > 0 && !controlled) || (controlled && unit.isShooting()))){
-                for (int i = 0; i < ringReloads.length; i++){
-                    //ringReloads[i] -= rspeed;
+                for(int i = 0; i < ringReloads.length; i++){
                     if(ringReloads[i] <= 0f){
                         eyeShoot(i, ringIdx[i], controlled);
                         ringReloads[i] = ringReloadTimes[i];
                         ringIdx[i] = Mathf.mod(ringIdx[i] + ringDirection[i], 8);
                     }
                 }
+            }
+
+            if(reloadCounter < reload) reloadCounter = Math.min(reloadCounter + rspeed, reload);
+
+            if(reloadCounter >= reload && ((controlled && unit.isShooting()) || (target != null && within(target, mainRange + (target instanceof Sized s ? s.hitSize() / 2f : 0f))))){
+                reloadCounter += rspeed;
+            }else if(reloadCounter > reload){
+                reloadCounter = Math.max(reload, reloadCounter - Time.delta);
+            }
+
+            chargeTimeCounter += Math.min(1f, reloadCounter / reload) * Time.delta;
+
+            if(reloadCounter > reload){
+                float charge = ((reloadCounter - reload) / chargeTime);
+                chargeTimeCounter -= charge * charge * 2f * Time.delta;
+            }
+
+            if(reloadCounter >= reload + chargeTime){
+                reloadCounter = 0f;
+                chargeTimeCounter = Mathf.random(1000000f);
             }
         }
 

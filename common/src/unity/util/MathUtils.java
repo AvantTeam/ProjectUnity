@@ -14,6 +14,7 @@ public final class MathUtils{
     public static final Quat q1 = new Quat(), q2 = new Quat();
     public static final Mat3D m31 = new Mat3D(), m32 = new Mat3D();
     public static final Ray ray1 = new Ray();
+    public static final Rand seedr = new Rand(), seedr2 = new Rand();
 
     private static final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
