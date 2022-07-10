@@ -123,8 +123,8 @@ public class TexturedTrail extends BaseTrail{
         Draw.blend(blend);
         for(int i = 0, ind = 0; i < psize; i += stride, ind++){
             float
-                x1 = items[i], y1 = items[i + 1], w1 = items[i + 2], r1 = items[i + 3], rv1 = Mathf.clamp(items[i + 4]),
-                x2, y2, w2, r2, rv2;
+            x1 = items[i], y1 = items[i + 1], w1 = items[i + 2], r1 = items[i + 3], rv1 = Mathf.clamp(items[i + 4]),
+            x2, y2, w2, r2, rv2;
 
             if(i < psize - stride){
                 x2 = items[i + stride];
@@ -141,20 +141,20 @@ public class TexturedTrail extends BaseTrail{
             }
 
             float
-                fs1 = Mathf.map(rv1, 1f - shrink, 1f) * width * w1,
-                fs2 = Mathf.map(rv2, 1f - shrink, 1f) * width * w2,
+            fs1 = Mathf.map(rv1, 1f - shrink, 1f) * width * w1,
+            fs2 = Mathf.map(rv2, 1f - shrink, 1f) * width * w2,
 
-                cx = Mathf.sin(r1) * fs1, cy = Mathf.cos(r1) * fs1,
-                nx = Mathf.sin(r2) * fs2, ny = Mathf.cos(r2) * fs2,
+            cx = Mathf.sin(r1) * fs1, cy = Mathf.cos(r1) * fs1,
+            nx = Mathf.sin(r2) * fs2, ny = Mathf.cos(r2) * fs2,
 
-                mv1 = Mathf.lerp(v, v2, rv1), mv2 = Mathf.lerp(v, v2, rv2),
-                cv1 = rv1 * fadeAlpha + (1f - fadeAlpha), cv2 = rv2 * fadeAlpha + (1f - fadeAlpha),
-                col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv1)).a(fadeInterp.apply(cv1)).clamp().toFloatBits(),
-                col1h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv1)).a(sideFadeInterp.apply(cv1)).clamp().toFloatBits(),
-                col2 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv2)).a(fadeInterp.apply(cv2)).clamp().toFloatBits(),
-                col2h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv2)).a(sideFadeInterp.apply(cv2)).clamp().toFloatBits(),
-                mix1 = tmp.set(color).a(mixInterp.apply(rv1 * mixAlpha)).clamp().toFloatBits(),
-                mix2 = tmp.set(color).a(mixInterp.apply(rv2 * mixAlpha)).clamp().toFloatBits();
+            mv1 = Mathf.lerp(v, v2, rv1), mv2 = Mathf.lerp(v, v2, rv2),
+            cv1 = rv1 * fadeAlpha + (1f - fadeAlpha), cv2 = rv2 * fadeAlpha + (1f - fadeAlpha),
+            col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv1)).a(fadeInterp.apply(cv1)).clamp().toFloatBits(),
+            col1h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv1)).a(sideFadeInterp.apply(cv1)).clamp().toFloatBits(),
+            col2 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv2)).a(fadeInterp.apply(cv2)).clamp().toFloatBits(),
+            col2h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv2)).a(sideFadeInterp.apply(cv2)).clamp().toFloatBits(),
+            mix1 = tmp.set(color).a(mixInterp.apply(rv1 * mixAlpha)).clamp().toFloatBits(),
+            mix2 = tmp.set(color).a(mixInterp.apply(rv2 * mixAlpha)).clamp().toFloatBits();
 
             vertices[0] = x1 - cx;
             vertices[1] = y1 - cy;
@@ -230,23 +230,23 @@ public class TexturedTrail extends BaseTrail{
         int psize = points.size;
         if(psize > 0){
             float
-                rv = (float)psize / stride / length,
-                alpha = rv * fadeAlpha + (1f - fadeAlpha),
-                w = Mathf.map(rv, 1f - shrink, 1f) * width * lastWidth * 2f,
-                h = ((float)capRegion.height / capRegion.width) * w,
+            rv = (float)psize / stride / length,
+            alpha = rv * fadeAlpha + (1f - fadeAlpha),
+            w = Mathf.map(rv, 1f - shrink, 1f) * width * lastWidth * 2f,
+            h = ((float)capRegion.height / capRegion.width) * w,
 
-                angle = unconvRot(lastAngle) - 90f,
-                u = capRegion.u, v = capRegion.v2, u2 = capRegion.u2, v2 = capRegion.v, uh = Mathf.lerp(u, u2, 0.5f),
-                cx = Mathf.cosDeg(angle) * w / 2f, cy = Mathf.sinDeg(angle) * w / 2f,
-                x1 = lastX, y1 = lastY,
-                x2 = lastX + Mathf.cosDeg(angle + 90f) * h, y2 = lastY + Mathf.sinDeg(angle + 90f) * h,
+            angle = unconvRot(lastAngle) - 90f,
+            u = capRegion.u, v = capRegion.v2, u2 = capRegion.u2, v2 = capRegion.v, uh = Mathf.lerp(u, u2, 0.5f),
+            cx = Mathf.cosDeg(angle) * w / 2f, cy = Mathf.sinDeg(angle) * w / 2f,
+            x1 = lastX, y1 = lastY,
+            x2 = lastX + Mathf.cosDeg(angle + 90f) * h, y2 = lastY + Mathf.sinDeg(angle + 90f) * h,
 
-                col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).clamp().toFloatBits(),
-                col1h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(sideFadeInterp.apply(alpha)).clamp().toFloatBits(),
-                col2 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).clamp().toFloatBits(),
-                col2h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(sideFadeInterp.apply(alpha)).clamp().toFloatBits(),
-                mix1 = tmp.set(color).a(mixInterp.apply(rv * mixAlpha)).clamp().toFloatBits(),
-                mix2 = tmp.set(color).a(mixInterp.apply(rv * mixAlpha)).clamp().toFloatBits();
+            col1 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).clamp().toFloatBits(),
+            col1h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(sideFadeInterp.apply(alpha)).clamp().toFloatBits(),
+            col2 = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(fadeInterp.apply(alpha)).clamp().toFloatBits(),
+            col2h = tmp.set(Draw.getColor()).lerp(fadeColor, gradientInterp.apply(1f - rv)).a(sideFadeInterp.apply(alpha)).clamp().toFloatBits(),
+            mix1 = tmp.set(color).a(mixInterp.apply(rv * mixAlpha)).clamp().toFloatBits(),
+            mix2 = tmp.set(color).a(mixInterp.apply(rv * mixAlpha)).clamp().toFloatBits();
 
             Draw.blend(blend);
             vertices[0] = x1 - cx;
@@ -323,8 +323,8 @@ public class TexturedTrail extends BaseTrail{
         float speed = super.update(x, y, width, angle);
         if(trailChance > 0f && Mathf.chanceDelta(trailChance * Mathf.clamp(speed / trailThreshold))){
             trailEffect.at(
-                x, y, lastWidth * trailWidth,
-                tmp.set(trailColor).a(fadeInterp.apply(Mathf.clamp(((float)points.size / stride / length) * fadeAlpha + (1f - fadeAlpha))))
+            x, y, lastWidth * trailWidth,
+            tmp.set(trailColor).a(fadeInterp.apply(Mathf.clamp(((float)points.size / stride / length) * fadeAlpha + (1f - fadeAlpha))))
             );
         }
 
@@ -346,8 +346,8 @@ public class TexturedTrail extends BaseTrail{
             float maxDst = 0f;
             for(int i = 0; i < psize; i += stride){
                 float
-                    x = items[i], y = items[i + 1],
-                    dst = i < psize - stride ? Mathf.dst(x, y, items[i + stride], items[i + stride + 1]) : Mathf.dst(x, y, lastX, lastY);
+                x = items[i], y = items[i + 1],
+                dst = i < psize - stride ? Mathf.dst(x, y, items[i + stride], items[i + stride + 1]) : Mathf.dst(x, y, lastX, lastY);
 
                 items[i + 4] = maxDst;
                 maxDst += dst;

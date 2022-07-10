@@ -39,7 +39,7 @@ public class GenAtlas extends TextureAtlas{
         }
     }
 
-    /** @inheritDocs. The name should be prefixed with {@code unity-} */
+    /** {@inheritDoc} The name should be prefixed with {@code unity-} */
     @Override
     public GenRegion addRegion(String name, TextureRegion textureRegion){
         synchronized(regions){
@@ -50,7 +50,7 @@ public class GenAtlas extends TextureAtlas{
         }
     }
 
-    /** @inheritDocs. The name should be prefixed with {@code unity-} */
+    /** {@inheritDoc} The name should be prefixed with {@code unity-} */
     @Override
     public GenRegion addRegion(String name, Texture texture, int x, int y, int width, int height){
         Pixmap pixmap = texture.getTextureData().getPixmap();

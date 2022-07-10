@@ -50,7 +50,6 @@ public final class PUShaders{
      * corresponds to the camera position, the camera dimension, the screen dimension, and {@link Time#time time}.</p>
      *
      * <p><b>The shader only supports up to 8 textures</b>: 1 frame buffer texture and 7 additional textures.</p>
-     *
      * @author GlennFolker
      */
     public static class PUSurfaceShader extends Shader{

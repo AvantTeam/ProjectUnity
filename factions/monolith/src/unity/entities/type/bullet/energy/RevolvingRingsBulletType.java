@@ -20,8 +20,8 @@ public class RevolvingRingsBulletType extends BasicBulletType{
     public Color[] colors = {}, glows = {};
 
     public float
-        rotateSpeed = 6f,
-        layerLow = Layer.flyingUnitLow - 0.01f, layerHigh = Layer.flyingUnit;
+    rotateSpeed = 6f,
+    layerLow = Layer.flyingUnitLow - 0.01f, layerHigh = Layer.flyingUnit;
 
     public RevolvingRingsBulletType(float speed, float damage){
         this(speed, damage, "bullet");
@@ -49,18 +49,18 @@ public class RevolvingRingsBulletType extends BasicBulletType{
             Lines.stroke(thickness[i]);
 
             DrawUtils.panningCircle(reg,
-                b.x, b.y, 1f, 1f,
-                radius[i], 360f, 0f,
-                MathUtils.q1, true, layerLow, layerHigh
+            b.x, b.y, 1f, 1f,
+            radius[i], 360f, 0f,
+            MathUtils.q1, true, layerLow, layerHigh
             );
 
             Draw.color(glows[i]);
             Draw.blend(Blending.additive);
 
             DrawUtils.panningCircle(light,
-                b.x, b.y, 5f, 5f,
-                radius[i], 360f, 0f,
-                MathUtils.q1, true, layerLow, layerHigh
+            b.x, b.y, 5f, 5f,
+            radius[i], 360f, 0f,
+            MathUtils.q1, true, layerLow, layerHigh
             );
 
             Draw.blend();

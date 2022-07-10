@@ -108,8 +108,8 @@ public class BaseTrail extends Trail{
         float size = width / (psize / (float)stride);
         for(int i = 0, ind = 0; i < psize; i += stride, ind++){
             float
-                x1 = items[i], y1 = items[i + 1], w1 = items[i + 2], r1 = items[i + 3],
-                x2, y2, w2, r2;
+            x1 = items[i], y1 = items[i + 1], w1 = items[i + 2], r1 = items[i + 3],
+            x2, y2, w2, r2;
 
             if(i < psize - stride){
                 x2 = items[i + stride];
@@ -124,16 +124,16 @@ public class BaseTrail extends Trail{
             }
 
             float
-                cx = Mathf.sin(r1) * ind * size * w1,
-                cy = Mathf.cos(r1) * ind * size * w1,
-                nx = Mathf.sin(r2) * (ind + 1) * size * w2,
-                ny = Mathf.cos(r2) * (ind + 1) * size * w2;
+            cx = Mathf.sin(r1) * ind * size * w1,
+            cy = Mathf.cos(r1) * ind * size * w1,
+            nx = Mathf.sin(r2) * (ind + 1) * size * w2,
+            ny = Mathf.cos(r2) * (ind + 1) * size * w2;
 
             Fill.quad(
-                x1 - cx, y1 - cy,
-                x1 + cx, y1 + cy,
-                x2 + nx, y2 + ny,
-                x2 - nx, y2 - ny
+            x1 - cx, y1 - cy,
+            x1 + cx, y1 + cy,
+            x2 + nx, y2 + ny,
+            x2 - nx, y2 - ny
             );
         }
 
@@ -154,15 +154,15 @@ public class BaseTrail extends Trail{
 
             int i = psize - stride;
             float
-                x = items[i], y = items[i + 1],
-                w = items[i + 2] * width / (points.size / (float)stride) * (i / (float)stride) * 2f;
+            x = items[i], y = items[i + 1],
+            w = items[i + 2] * width / (points.size / (float)stride) * (i / (float)stride) * 2f;
 
             Draw.rect("hcircle", x, y, w, w, unconvRot(lastAngle));
             Draw.reset();
         }
     }
 
-    /** @inheritDocs. Should not be called at the same tick with {@link #update(float, float, float, float)}. */
+    /** {@inheritDoc} Should not be called at the same tick with {@link #update(float, float, float, float)}. */
     @Override
     public void shorten(){
         length = super.length;
@@ -225,7 +225,7 @@ public class BaseTrail extends Trail{
         this.length = super.length = length;
     }
 
-    /** Forces angle recalculation using the default angle calculator.  */
+    /** Forces angle recalculation using the default angle calculator. */
     public void recalculateAngle(){
         float[] items = points.items;
         int psize = points.size, stride = this.stride;

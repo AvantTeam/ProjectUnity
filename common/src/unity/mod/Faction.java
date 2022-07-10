@@ -10,7 +10,8 @@ import static mindustry.Vars.*;
 /** @author GlennFolker */
 public enum Faction{
     monolith("monolith", Palettes.monolith),
-    end("end", Palettes.end);
+    end("end", Palettes.end),
+    youngcha("youngcha", Palettes.youngcha);
 
     public static final Faction[] all = values();
 

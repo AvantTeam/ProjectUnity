@@ -37,16 +37,16 @@ public class PUUnitEngine extends UnitEngine{
 
         Draw.color(color);
         Fill.circle(
-            unit.x + ex,
-            unit.y + ey,
-            (radius + Mathf.absin(Time.time, 2f, radius / 4f)) * scale
+        unit.x + ex,
+        unit.y + ey,
+        (radius + Mathf.absin(Time.time, 2f, radius / 4f)) * scale
         );
 
         Draw.color(type.engineColorInner);
         Fill.circle(
-            unit.x + ex - Angles.trnsx(rot + rotation, 1f),
-            unit.y + ey - Angles.trnsy(rot + rotation, 1f),
-            (radius + Mathf.absin(Time.time, 2f, radius / 4f)) / 2f  * scale
+        unit.x + ex - Angles.trnsx(rot + rotation, 1f),
+        unit.y + ey - Angles.trnsy(rot + rotation, 1f),
+        (radius + Mathf.absin(Time.time, 2f, radius / 4f)) / 2f * scale
         );
     }
 }

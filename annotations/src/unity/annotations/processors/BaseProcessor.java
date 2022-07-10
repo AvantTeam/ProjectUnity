@@ -97,9 +97,9 @@ public abstract class BaseProcessor implements Processor{
         builder.fieldSpecs.sort(Structs.comparing(f -> f.name));
 
         JavaFile file = JavaFile.builder(packageName, builder.build())
-            .indent("    ")
-            .skipJavaLangImports(true)
-            .build();
+        .indent("    ")
+        .skipJavaLangImports(true)
+        .build();
 
         if(imports == null || imports.isEmpty()){
             file.writeTo(filer);
@@ -219,8 +219,8 @@ public abstract class BaseProcessor implements Processor{
 
     private static <T extends Annotation> T createAnno(Element e, Class<T> type){
         return AnnotationProxyMaker.generateAnnotation(Reflect.invoke(
-            AnnoConstruct.class, e, "getAttribute",
-            new Object[]{type}, Class.class
+        AnnoConstruct.class, e, "getAttribute",
+        new Object[]{type}, Class.class
         ), type);
     }
 
@@ -329,8 +329,8 @@ public abstract class BaseProcessor implements Processor{
         if(params.size() == 0) return name(e) + "()";
 
         StringBuilder builder = new StringBuilder(name(e))
-            .append("(")
-            .append(params.get(0).asType());
+        .append("(")
+        .append(params.get(0).asType());
 
         for(int i = 1; i < params.size(); i++) builder.append(", ").append(params.get(i).asType());
         return builder.append(")").toString();

@@ -60,8 +60,8 @@ public class PUUnitType extends PUUnitTypeCommon{
         float offset = engineOffset / 2f + engineOffset / 2f * scale;
 
         float
-            cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset),
-            cy = unit.y + Angles.trnsy(unit.rotation + 180f, offset);
+        cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset),
+        cy = unit.y + Angles.trnsy(unit.rotation + 180f, offset);
 
         trail.kickstart(cx, cy);
         return trail;

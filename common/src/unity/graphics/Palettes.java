@@ -13,6 +13,7 @@ public final class Palettes{
     public static final Color
     monolith = new Color(0x5379b7ff),
     end = new Color(0xf53036ff),
+    youngcha = new Color(Color.yellow),
 
     outline = darkerMetal,
     darkOutline = new Color(0x38383dff),

@@ -29,9 +29,11 @@ public abstract class PUUnitTypeCommon extends UnitType{
     /** Unit type properties, e.g. copter regions, soul amounts, etc. */
     public static class Props{
         public void preInit(){}
+
         public void init(){}
 
         public void preLoad(){}
+
         public void load(){}
     }
 }

@@ -248,7 +248,7 @@ public class EndGameTurret extends Turret{
 
         boolean invalidateTarget(Posc target){
             return target == null || !target.isAdded() || (range != Float.MAX_VALUE && !target.within(x, y, range + (target instanceof Sized hb ? hb.hitSize() / 2f : 0f))) ||
-                    (target instanceof Teamc t && t.team() == team) || (target instanceof Healthc h && !h.isValid());
+            (target instanceof Teamc t && t.team() == team) || (target instanceof Healthc h && !h.isValid());
         }
 
         @Override
@@ -383,7 +383,7 @@ public class EndGameTurret extends Turret{
             if(ringPos[ring].y == 0){
                 return Tmp.v1.trns(ringRotations[ring] + idx * 45f, ringPos[ring].x).add(x + ox, y + oy);
             }
-            
+
             float side = Mathf.signs[idx % 2] * ringPos[ring].y;
             return Tmp.v1.trns(ringRotations[ring] + rot * 90f, ringPos[ring].x, side).add(x + ox, y + oy);
         }
@@ -482,7 +482,7 @@ public class EndGameTurret extends Turret{
 
             if(!tmpTargets.isEmpty()){
                 findMainTarget(tmpTargets.items, tmpTargets.size);
-                tmpTargets.sort((Floatf<Posc>) this::dst);
+                tmpTargets.sort((Floatf<Posc>)this::dst);
                 for(int i = 0; i < targets.length; i++){
                     Posc t = tmpTargets.get(i % tmpTargets.size);
                     if(targets[i] == null){

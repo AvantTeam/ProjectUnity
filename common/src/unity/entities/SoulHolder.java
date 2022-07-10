@@ -17,7 +17,9 @@ import unity.mod.*;
  */
 public interface SoulHolder extends Position, Sized{
     int souls();
+
     int maxSouls();
+
     Team team();
 
     default boolean canJoin(){

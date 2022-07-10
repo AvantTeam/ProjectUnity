@@ -31,7 +31,7 @@ public class VelAttrib extends TrailAttrib{
 
     public <T extends BaseTrail, V extends VelAttrib> VelAttrib(float velX, float velY, VelRotationHandler<T, V> rot, float drag){
         super(2);
-        
+
         this.velX = velX;
         this.velY = velY;
         this.drag = drag;

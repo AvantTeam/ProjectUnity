@@ -32,7 +32,7 @@ import static unity.graphics.MonolithPal.*;
 public final class MonolithFx{
     private static final Color col = new Color();
     private static final Rand rand = new Rand();
-    
+
     private static final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
     public static final Effect
@@ -43,7 +43,7 @@ public final class MonolithFx{
         alpha(Interp.smoother.apply(Mathf.curve(e.fin(), 0f, 0.17f)) - Interp.pow3Out.apply(Mathf.curve(e.fin(), 0.17f)));
 
         randLenVectors(e.id, 2, 2f + e.finpow() * 10f, (x, y) ->
-            Fill.circle(e.x + x, e.y + y, 0.6f + e.finpow() * 4f)
+        Fill.circle(e.x + x, e.y + y, 0.6f + e.finpow() * 4f)
         );
     }),
 
@@ -61,8 +61,8 @@ public final class MonolithFx{
         color(monolithLight, monolithMid, Color.black, e.finpow());
 
         float
-            time = Time.time - e.rotation, vx = data.getX() * time, vy = data.getY() * time,
-            fin = 1f - e.fin(pow2In);
+        time = Time.time - e.rotation, vx = data.getX() * time, vy = data.getY() * time,
+        fin = 1f - e.fin(pow2In);
 
         randLenVectors(e.id, 1, 3f + e.finpowdown() * 5f, (x, y) -> {
             alpha(1f);
@@ -82,8 +82,8 @@ public final class MonolithFx{
         color(monolithLight, monolithMid, Color.black, e.finpow());
 
         float
-            time = Time.time - e.rotation, vx = data.getX() * time, vy = data.getY() * time,
-            fin = 1f - e.fin(pow2In);
+        time = Time.time - e.rotation, vx = data.getX() * time, vy = data.getY() * time,
+        fin = 1f - e.fin(pow2In);
 
         randLenVectors(e.id, 1, 5f + e.finpowdown() * 8f, (x, y) -> {
             alpha(1f);
@@ -100,11 +100,11 @@ public final class MonolithFx{
         if(!(e.data instanceof Position data)) return;
 
         v1
-            .trns(Angles.angle(e.x, e.y, data.getX(), data.getY()) - 90f, Mathf.randomSeedRange(e.id, 3f))
-            .scl(pow3Out.apply(e.fslope()));
+        .trns(Angles.angle(e.x, e.y, data.getX(), data.getY()) - 90f, Mathf.randomSeedRange(e.id, 3f))
+        .scl(pow3Out.apply(e.fslope()));
         v2.trns(Mathf.randomSeed(e.id + 1, 360f), e.fin(pow4Out));
         v3.set(data).sub(e.x, e.y).scl(e.fin(pow4In))
-            .add(v2).add(v1).add(e.x, e.y);
+        .add(v2).add(v1).add(e.x, e.y);
 
         float fin = 0.3f + e.fin() * 1.4f;
 
@@ -127,7 +127,7 @@ public final class MonolithFx{
 
         color(monolithMid, monolithLight, e.fslope());
         randLenVectors(e.id, 5, pow3Out.apply(e.fslope()) * 8f, 360f, 0f, 8f, (x, y) ->
-            Fill.circle(v1.x + x, v1.y + y, 0.5f + e.fslope() * 2.7f)
+        Fill.circle(v1.x + x, v1.y + y, 0.5f + e.fslope() * 2.7f)
         );
 
         float size = e.fin(pow10Out) * e.foutpowdown();
@@ -144,7 +144,7 @@ public final class MonolithFx{
     soulLargeDeath = new Effect(64f, e -> {
         color(monolithLight, monolithMid, e.fin());
         randLenVectors(e.id, 27, e.finpow() * 56f, (x, y) ->
-            Fill.circle(e.x + x, e.y + y, 0.5f + e.fout() * 2.5f)
+        Fill.circle(e.x + x, e.y + y, 0.5f + e.fout() * 2.5f)
         );
 
         e.scaled(48f, i -> {
@@ -156,7 +156,7 @@ public final class MonolithFx{
             Fill.circle(e.x, e.y, thick / 2f);
             for(int t = 0; t < 4; t++){
                 Drawf.tri(e.x, e.y, thick, thick * 14f,
-                    Mathf.randomSeed(e.id + 1, 360f) + 90f * t + i.finpow() * 60f * Mathf.sign(e.id % 2 == 0)
+                Mathf.randomSeed(e.id + 1, 360f) + 90f * t + i.finpow() * 60f * Mathf.sign(e.id % 2 == 0)
                 );
             }
         });
@@ -170,14 +170,14 @@ public final class MonolithFx{
         TextureRegion reg = atlas.find("unity-monolith-chain");
         Quat rot = MathUtils.q1.set(Vec3.Z, e.rotation + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
         float
-            t = e.foutpowdown(), rad = t * 25f, a = Mathf.curve(t, 0.25f),
-            w = (Mathf.PI2 * rad) / (reg.width * scl * 0.5f), h = w * ((float)reg.height / reg.width);
+        t = e.foutpowdown(), rad = t * 25f, a = Mathf.curve(t, 0.25f),
+        w = (Mathf.PI2 * rad) / (reg.width * scl * 0.5f), h = w * ((float)reg.height / reg.width);
 
         alpha(a);
         DrawUtils.panningCircle(reg,
-            e.x, e.y, w, h,
-            rad, 360f, Time.time * 6f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
-            rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+        e.x, e.y, w, h,
+        rad, 360f, Time.time * 6f * Mathf.sign(soul.id % 2 == 0) + soul.id * 30f,
+        rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
         color(Color.black, monolithMid, 0.67f);
@@ -185,9 +185,9 @@ public final class MonolithFx{
 
         blend(Blending.additive);
         DrawUtils.panningCircle(atlas.find("unity-line-shade"),
-            e.x, e.y, w + 6f, h + 6f,
-            rad, 360f, 0f,
-            rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+        e.x, e.y, w + 6f, h + 6f,
+        rad, 360f, 0f,
+        rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
         blend();
@@ -198,7 +198,7 @@ public final class MonolithFx{
         stroke(e.fout() * 1.2f + 0.5f);
 
         randLenVectors(e.id, 2, 22f * e.finpow(), e.rotation, 50f, (x, y) ->
-            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f)
+        lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f)
         );
     }).followParent(false),
 
@@ -206,16 +206,16 @@ public final class MonolithFx{
         TextureRegion reg = atlas.find("unity-monolith-chain");
         MathUtils.q1.set(Vec3.Z, e.rotation + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
         float
-            t = e.finpow(), rad = 9f + t * 8f,
-            w = (Mathf.PI2 * rad) / (reg.width * scl * 0.4f), h = w * ((float)reg.height / reg.width);
+        t = e.finpow(), rad = 9f + t * 8f,
+        w = (Mathf.PI2 * rad) / (reg.width * scl * 0.4f), h = w * ((float)reg.height / reg.width);
 
         color(monolithLight);
         alpha(e.foutpowdown());
 
         DrawUtils.panningCircle(reg,
-            e.x, e.y, w, h,
-            rad, 360f, e.fin(pow2Out) * 90f * Mathf.sign(e.id % 2 == 0) + e.id * 30f,
-            MathUtils.q1, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+        e.x, e.y, w, h,
+        rad, 360f, e.fin(pow2Out) * 90f * Mathf.sign(e.id % 2 == 0) + e.id * 30f,
+        MathUtils.q1, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
         color(Color.black, monolithMid, 0.67f);
@@ -223,9 +223,9 @@ public final class MonolithFx{
 
         blend(Blending.additive);
         DrawUtils.panningCircle(atlas.find("unity-line-shade"),
-            e.x, e.y, w + 6f, h + 6f,
-            rad, 360f, 0f,
-            MathUtils.q1, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+        e.x, e.y, w + 6f, h + 6f,
+        rad, 360f, 0f,
+        MathUtils.q1, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
         );
 
         blend();
@@ -238,7 +238,8 @@ public final class MonolithFx{
                 if(data instanceof TrailHold[] data) for(TrailHold trail : data) Fx.trailFade.at(x, y, trail.width, monolithLighter, trail.trail.copy());
                 super.remove();
             }
-        } return Pools.obtain(State.class, State::new);
+        }
+        return Pools.obtain(State.class, State::new);
     }, () -> {
         TrailHold[] trails = new TrailHold[12];
         for(int i = 0; i < trails.length; i++){
@@ -255,7 +256,7 @@ public final class MonolithFx{
 
         color(monolithLight, monolithLighter, e.fin());
         randLenVectors(e.id, 8, 8f + e.foutpow() * 32f, (x, y) ->
-            Fill.circle(e.x + x, e.y + y, 0.5f + e.fin() * 2.5f)
+        Fill.circle(e.x + x, e.y + y, 0.5f + e.fin() * 2.5f)
         );
 
         color();
@@ -280,7 +281,7 @@ public final class MonolithFx{
         color(monolithLighter, monolithLight, monolithMid, e.fin());
         for(int sign : Mathf.signs){
             randLenVectors(e.id + sign, 3, e.fin(pow5Out) * 32f, e.rotation, 30f, 16f, (x, y) ->
-                Fill.square(e.x + x, e.y + y, e.foutpowdown() * 2.5f, e.id * 30f + e.finpow() * 90f * sign)
+            Fill.square(e.x + x, e.y + y, e.foutpowdown() * 2.5f, e.id * 30f + e.finpow() * 90f * sign)
             );
         }
     }),

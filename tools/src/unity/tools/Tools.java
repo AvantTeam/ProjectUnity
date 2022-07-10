@@ -32,7 +32,7 @@ public final class Tools{
     public static ModMeta meta;
 
     public static final Fi
-        assetsDir, spritesDir;
+    assetsDir, spritesDir;
 
     public static GenAtlas atlas;
 
@@ -46,8 +46,8 @@ public final class Tools{
 
         for(ContentType type : ContentType.all){
             int i = type.ordinal();
-            synchronized(initialized){ initialized[i] = new IntSet(); }
-            synchronized(loaded){ loaded[i] = new IntSet(); }
+            synchronized(initialized){initialized[i] = new IntSet();}
+            synchronized(loaded){loaded[i] = new IntSet();}
         }
     }
 
@@ -83,7 +83,7 @@ public final class Tools{
 
         unity = new ProjectUnity();
 
-        meta = new ModMeta(){{ name = "unity"; }};
+        meta = new ModMeta(){{name = "unity";}};
         mod = new LoadedMod(null, null, unity, Tools.class.getClassLoader(), meta);
 
         Reflect.<Seq<LoadedMod>>get(Mods.class, mods, "mods").add(mod);

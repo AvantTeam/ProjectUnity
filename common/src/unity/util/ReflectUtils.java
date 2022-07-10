@@ -15,7 +15,7 @@ public final class ReflectUtils{
     private ReflectUtils(){
         throw new AssertionError();
     }
-    
+
     public static <T> Class<T> known(Class<?> anon){
         return (Class<T>)(anon.isAnonymousClass() ? anon.getSuperclass() : anon);
     }
@@ -27,7 +27,7 @@ public final class ReflectUtils{
             return null;
         }
     }
-    
+
     public static Field findf(Class<?> type, String name){
         for(Class<?> t = type; t != Object.class; t = t.getSuperclass()){
             try{
@@ -139,7 +139,7 @@ public final class ReflectUtils{
 
     public static <T> T inst(Constructor<T> constr, Object... args){
         try{
-            return (T)constr.newInstance(args);
+            return constr.newInstance(args);
         }catch(Throwable t){
             throw new RuntimeException(t);
         }

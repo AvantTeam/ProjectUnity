@@ -38,10 +38,10 @@ import static unity.graphics.MonolithPal.*;
 public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMesher{
     protected static final Color col1 = new Color(), col2 = new Color();
     protected static final Vec3
-        rad = new Vec3(), vert = new Vec3(), o = new Vec3(), d = new Vec3(),
-        v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3();
+    rad = new Vec3(), vert = new Vec3(), o = new Vec3(), d = new Vec3(),
+    v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3();
     protected static final Vec2
-        v1 = new Vec2();
+    v1 = new Vec2();
 
     protected static final float
     volcanoRadius = 0.16f, volcanoFalloff = 0.3f, volcanoEdgeDeviation = 0.1f, volcanoEdge = 0.06f,
@@ -188,22 +188,22 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
 
         int edgeCount = sectorTile.edgeCount;
         return Intersector3D.intersectRayTriangles(
-            MathUtils.ray1.set(o.setZero(), d.set(planetTile.v).nor()),
-            vertices.items, indices.get(edgeCount, () -> {
-                short[] indices = new short[edgeCount * 3];
-                for(short i = 0, end = (short)edgeCount; i < end; i++){
-                    short next = (short)(i + 1);
-                    if(next == end) next = 0;
+        MathUtils.ray1.set(o.setZero(), d.set(planetTile.v).nor()),
+        vertices.items, indices.get(edgeCount, () -> {
+            short[] indices = new short[edgeCount * 3];
+            for(short i = 0, end = (short)edgeCount; i < end; i++){
+                short next = (short)(i + 1);
+                if(next == end) next = 0;
 
-                    int ind = i * 3;
-                    indices[ind] = i;
-                    indices[ind + 1] = next;
-                    indices[ind + 2] = end;
-                }
+                int ind = i * 3;
+                indices[ind] = i;
+                indices[ind + 1] = next;
+                indices[ind + 2] = end;
+            }
 
-                return indices;
-            }),
-            3, null
+            return indices;
+        }),
+        3, null
         );
     }
 
@@ -267,8 +267,8 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
 
         // Volcano height.
         float
-            volcanoRad = volcanoRadius(position),
-            volcanoDst = Math.min(position.dst(0f, 1f, 0f), position.dst(0f, -1f, 0f));
+        volcanoRad = volcanoRadius(position),
+        volcanoDst = Math.min(position.dst(0f, 1f, 0f), position.dst(0f, -1f, 0f));
         if(volcanoDst <= volcanoRad + volcanoFalloff){
             // 0 -> near, 1 -> far.
             float volcanoProg = (volcanoDst - volcanoRad) / volcanoFalloff;
@@ -276,9 +276,9 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
 
             // Raw terrain height goes down, the volcano height goes up.
             height = Mathf.lerp(
-                height * Interp.pow5Out.apply(volcanoProg),
-                (volcanoHeight + Simplex.noise3d(seed, 3d, 0.5d, 0.56d, position.x, position.y, position.z) * volcanoHeightDeviation) * Interp.smoother.apply(1f - volcanoProg),
-                1f - volcanoProg
+            height * Interp.pow5Out.apply(volcanoProg),
+            (volcanoHeight + Simplex.noise3d(seed, 3d, 0.5d, 0.56d, position.x, position.y, position.z) * volcanoHeightDeviation) * Interp.smoother.apply(1f - volcanoProg),
+            1f - volcanoProg
             );
 
             if(initialized && volcanoDst <= volcanoRad) height = Mathf.lerp(height, volcanoHeightInner, Interp.smoother.apply(1f - Mathf.clamp((volcanoDst - volcanoRad) / volcanoEdge)));
@@ -384,11 +384,11 @@ public class MegalithPlanetGenerator extends PlanetGenerator implements PUHexMes
             if(tile != null) tile.setFloor(liquefiedEneraphyte.asFloor());
         });
     }
-    
+
     protected Vec2 unproject(SectorRect rect, Vec3 position, Vec2 out){
         return out.set(
-            (position.dot(rect.right) / rect.right.len2() + 1f) / 2f,
-            (position.dot(rect.top) / rect.top.len2() + 1f) / 2f
+        (position.dot(rect.right) / rect.right.len2() + 1f) / 2f,
+        (position.dot(rect.top) / rect.top.len2() + 1f) / 2f
         );
     }
 

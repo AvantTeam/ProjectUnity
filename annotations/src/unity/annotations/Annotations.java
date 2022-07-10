@@ -320,8 +320,8 @@ public final class Annotations{
                 if(name.equals(name.table.names.java_lang_Class)){
                     ListBuffer<Type> list = new ListBuffer<>();
                     for(Attribute attrib : arr.values){
-                        Type type = attrib instanceof UnresolvedClass ? ((UnresolvedClass) attrib).classType :
-                            ((Attribute.Class) attrib).classType;
+                        Type type = attrib instanceof UnresolvedClass ? ((UnresolvedClass)attrib).classType :
+                        ((Attribute.Class)attrib).classType;
 
                         list.append(type);
                     }

@@ -79,11 +79,10 @@ public class SizedVent extends Floor{
     public boolean clear(Tile tile){
         return switch(size){
             case 1 -> tile.block() == Blocks.air;
-            case 2 ->
-                tile.block() == Blocks.air &&
-                clearSingle(tile.x, tile.y + 1) &&
-                clearSingle(tile.x + 1, tile.y) &&
-                clearSingle(tile.x + 1, tile.y + 1);
+            case 2 -> tile.block() == Blocks.air &&
+            clearSingle(tile.x, tile.y + 1) &&
+            clearSingle(tile.x + 1, tile.y) &&
+            clearSingle(tile.x + 1, tile.y + 1);
 
             default -> {
                 for(Point2 point : getOffsets((size - 1) % 2 + 1)){

@@ -71,13 +71,14 @@ public final class MonolithUnitTypes{
                 engineSize = 2f;
                 engineOffset = 3.5f;
 
-                trail(18, unit -> new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 24, 0), 0f, engineOffset, monolithLighter)
+                trail(18, unit -> new MultiTrail(
+                BaseTrail.rot(unit),
+                new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 24, 0), 0f, engineOffset, monolithLighter)
                 ));
 
                 corporealTrail = soul -> new MultiTrail(
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(soul), 18, 0), monolithLighter),
-                    new TrailHold(MonolithTrails.singleSoul(6), monolithLight)
+                new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(soul), 18, 0), monolithLighter),
+                new TrailHold(MonolithTrails.singleSoul(6), monolithLight)
                 );
             }
 
@@ -88,8 +89,8 @@ public final class MonolithUnitTypes{
                 Draw.color(monolithLight);
                 for(int i = 0; i < 3; i++){
                     Tmp.v1.trns(
-                        Time.time * 4.6f * MathUtils.randomSeedSign(soul.id) + 360f * i / 3f,
-                        6f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 8f) + (Mathf.PI2 * 8f) * ((float)i / 3), 8f, 1f)
+                    Time.time * 4.6f * MathUtils.randomSeedSign(soul.id) + 360f * i / 3f,
+                    6f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 8f) + (Mathf.PI2 * 8f) * ((float)i / 3), 8f, 1f)
                     ).add(soul);
 
                     Fill.circle(Tmp.v1.x, Tmp.v1.y, 1f);
@@ -145,15 +146,15 @@ public final class MonolithUnitTypes{
                 TextureRegion reg = atlas.white();
                 Quat rot = MathUtils.q1.set(Vec3.Z, soul.ringRotation() + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
                 float
-                    t = Interp.pow5Out.apply(soul.joinTime()),
-                    rad = t * 7.2f, a = Mathf.curve(t, 0.25f),
-                    s = Lines.getStroke();
+                t = Interp.pow5Out.apply(soul.joinTime()),
+                rad = t * 7.2f, a = Mathf.curve(t, 0.25f),
+                s = Lines.getStroke();
 
                 Draw.alpha(a);
                 DrawUtils.panningCircle(reg,
-                    soul.x, soul.y, s, s,
-                    rad, 360f, Time.time * 4f * MathUtils.randomSeedSign(soul.id) + soul.id * 30f,
-                    rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                soul.x, soul.y, s, s,
+                rad, 360f, Time.time * 4f * MathUtils.randomSeedSign(soul.id) + soul.id * 30f,
+                rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
                 );
 
                 Draw.color(Color.black, monolithMid, 0.67f);
@@ -161,9 +162,9 @@ public final class MonolithUnitTypes{
 
                 Draw.blend(Blending.additive);
                 DrawUtils.panningCircle(atlas.find("unity-line-shade"),
-                    soul.x, soul.y, s + 6f, s + 6f,
-                    rad, 360f, 0f,
-                    rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                soul.x, soul.y, s + 6f, s + 6f,
+                rad, 360f, 0f,
+                rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
                 );
 
                 Draw.blend();
@@ -194,13 +195,14 @@ public final class MonolithUnitTypes{
                 engineSize = 2f;
                 engineOffset = 3.5f;
 
-                trail(20, unit -> new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 32, 3, 3.2f, 4.8f, speed, 0f), 0f, engineOffset, monolithLighter)
+                trail(20, unit -> new MultiTrail(
+                BaseTrail.rot(unit),
+                new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 32, 3, 3.2f, 4.8f, speed, 0f), 0f, engineOffset, monolithLighter)
                 ));
 
                 corporealTrail = soul -> new MultiTrail(
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(soul), 20, 1, 4.8f, 3.2f, speed, 2f), monolithLighter),
-                    new TrailHold(MonolithTrails.singleSoul(6), monolithLight)
+                new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(soul), 20, 1, 4.8f, 3.2f, speed, 2f), monolithLighter),
+                new TrailHold(MonolithTrails.singleSoul(6), monolithLight)
                 );
             }
 
@@ -211,9 +213,9 @@ public final class MonolithUnitTypes{
                 for(int i = 0; i < 6; i++){
                     float rotation = Time.time * 3.8f * MathUtils.randomSeedSign(soul.id) + 360f * i / 6f;
                     Tmp.v1.trns(
-                        rotation - 90f,
-                        7f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 6f) + (Mathf.PI2 * 6f) * ((float)i / 6), 6f, 1.2f),
-                        0.5f
+                    rotation - 90f,
+                    7f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 6f) + (Mathf.PI2 * 6f) * ((float)i / 6), 6f, 1.2f),
+                    0.5f
                     ).add(soul);
 
                     if(i % 2 == 0){
@@ -237,8 +239,8 @@ public final class MonolithUnitTypes{
 
                 Lines.stroke(s + 6f, Tmp.c1.set(0f, 0f, 0f, 0.14f));
                 DrawUtils.line(
-                    atlas.find("circle-mid"), atlas.find("unity-circle-end"),
-                    Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
+                atlas.find("circle-mid"), atlas.find("unity-circle-end"),
+                Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
                 );
 
                 Lines.stroke(s, Tmp.c1.set(monolithLighter).lerp(Color.white, 0.5f));
@@ -278,10 +280,11 @@ public final class MonolithUnitTypes{
                 //deathSound = PUSounds.soulDeath;
 
                 engineColor = trailColor = monolithLighter;
-                trail(24, unit -> new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 30, 2, 5.6f, 8.4f, speed, 4f, null), monolithLighter),
-                    new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, speed), 4.8f, 6f, 0.56f, monolithLighter),
-                    new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, speed), -4.8f, 6f, 0.56f, monolithLighter)
+                trail(24, unit -> new MultiTrail(
+                BaseTrail.rot(unit),
+                new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 30, 2, 5.6f, 8.4f, speed, 4f, null), monolithLighter),
+                new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, speed), 4.8f, 6f, 0.56f, monolithLighter),
+                new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, speed), -4.8f, 6f, 0.56f, monolithLighter)
                 ));
 
                 corporealTrail = soul -> MonolithTrails.soul(BaseTrail.rot(soul), trailLength, speed);
@@ -295,8 +298,8 @@ public final class MonolithUnitTypes{
                 float rotation = Time.time * 3f * MathUtils.randomSeedSign(soul.id);
                 for(int i = 0; i < 5; i++){
                     float
-                        r = rotation + 72f * i, sect = 60f,
-                        rad = 10f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 5f) + (Mathf.PI2 * 5f) * ((float)i / 5), 5f, 0.8f);
+                    r = rotation + 72f * i, sect = 60f,
+                    rad = 10f + Mathf.sin(Time.time + Mathf.randomSeed(soul.id, Mathf.PI2 * 5f) + (Mathf.PI2 * 5f) * ((float)i / 5), 5f, 0.8f);
 
                     Lines.arc(soul.x, soul.y, rad, sect / 360f, r - sect / 2f);
 
@@ -316,14 +319,14 @@ public final class MonolithUnitTypes{
 
                     Lines.stroke(s + 6f, Tmp.c1.set(0f, 0f, 0f, 0.14f));
                     DrawUtils.line(
-                        atlas.find("circle-mid"), atlas.find("unity-circle-end"),
-                        Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
+                    atlas.find("circle-mid"), atlas.find("unity-circle-end"),
+                    Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
                     );
 
                     Lines.stroke(s, Tmp.c1.set(monolithLighter).lerp(Color.white, 0.5f));
                     DrawUtils.line(
-                        atlas.white(), atlas.find("clear"), atlas.find("hcircle"),
-                        Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
+                    atlas.white(), atlas.find("clear"), atlas.find("hcircle"),
+                    Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y
                     );
 
                     Draw.color(Tmp.c1.set(monolithLighter).lerp(Color.white, 0.5f));
@@ -346,15 +349,15 @@ public final class MonolithUnitTypes{
                 TextureRegion reg = atlas.find("unity-monolith-chain");
                 Quat rot = MathUtils.q1.set(Vec3.Z, soul.ringRotation() + 90f).mul(MathUtils.q2.set(Vec3.X, 75f));
                 float
-                    t = Interp.pow3Out.apply(soul.joinTime()),
-                    rad = t * 25f, a = Mathf.curve(t, 0.33f),
-                    w = (Mathf.PI2 * rad) / (reg.width * Draw.scl * 0.5f), h = w * ((float)reg.height / reg.width);
+                t = Interp.pow3Out.apply(soul.joinTime()),
+                rad = t * 25f, a = Mathf.curve(t, 0.33f),
+                w = (Mathf.PI2 * rad) / (reg.width * Draw.scl * 0.5f), h = w * ((float)reg.height / reg.width);
 
                 Draw.alpha(a);
                 DrawUtils.panningCircle(reg,
-                    soul.x, soul.y, w, h,
-                    rad, 360f, Time.time * 4f * MathUtils.randomSeedSign(soul.id) + soul.id * 30f,
-                    rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                soul.x, soul.y, w, h,
+                rad, 360f, Time.time * 4f * MathUtils.randomSeedSign(soul.id) + soul.id * 30f,
+                rot, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
                 );
 
                 Draw.color(Color.black, monolithMid, 0.67f);
@@ -362,9 +365,9 @@ public final class MonolithUnitTypes{
 
                 Draw.blend(Blending.additive);
                 DrawUtils.panningCircle(atlas.find("unity-line-shade"),
-                    soul.x, soul.y, w + 6f, h + 6f,
-                    rad, 360f, 0f,
-                    rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
+                soul.x, soul.y, w + 6f, h + 6f,
+                rad, 360f, 0f,
+                rot, true, Layer.flyingUnitLow - 0.01f, Layer.flyingUnit
                 );
 
                 Draw.blend();
@@ -398,7 +401,7 @@ public final class MonolithUnitTypes{
         }
 
         stele = register(Faction.monolith, content("stele", MonolithMechUnit.class, n -> new PUUnitType(n){{
-            
+
         }}));
 
         pedestal = register(Faction.monolith, content("pedestal", MonolithMechUnit.class, n -> new PUUnitType(n){{
@@ -455,10 +458,11 @@ public final class MonolithUnitTypes{
                 TexturedTrail left = right.copy();
                 left.attrib(VelAttrib.class).velX *= -1f;
 
-                return new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 16, 2, 3.6f, 6f, speed, 2f, null), monolithLighter),
-                    new TrailHold(right, 4.5f, 2.5f, 0.3f, monolithLighter),
-                    new TrailHold(left, -4.5f, 2.5f, 0.3f, monolithLighter)
+                return new MultiTrail(
+                BaseTrail.rot(unit),
+                new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 16, 2, 3.6f, 6f, speed, 2f, null), monolithLighter),
+                new TrailHold(right, 4.5f, 2.5f, 0.3f, monolithLighter),
+                new TrailHold(left, -4.5f, 2.5f, 0.3f, monolithLighter)
                 );
             });
 
@@ -573,9 +577,10 @@ public final class MonolithUnitTypes{
 
             trail(unit -> {
                 VelAttrib vel = new VelAttrib(-0.18f, 0f, (t, v) -> unit.rotation);
-                return new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 24, speed, vel), 5f, -3.5f, 1f, monolithLighter),
-                    new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 24, speed, vel.flip()), -5f, -3.5f, 1f, monolithLighter)
+                return new MultiTrail(
+                BaseTrail.rot(unit),
+                new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 24, speed, vel), 5f, -3.5f, 1f, monolithLighter),
+                new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 24, speed, vel.flip()), -5f, -3.5f, 1f, monolithLighter)
                 );
             });
 
@@ -698,30 +703,31 @@ public final class MonolithUnitTypes{
             engineSize = 4f;
             engineColor = monolithLighter;
             setEnginesMirror(
-                new PUUnitEngine(17.875f, -16.25f, 3f, -90f),
-                new PUUnitEngine(9f, -11f, 3.5f, -45f, monolithLight)
+            new PUUnitEngine(17.875f, -16.25f, 3f, -90f),
+            new PUUnitEngine(9f, -11f, 3.5f, -45f, monolithLight)
             );
 
             trail(unit -> {
                 VelAttrib velInner = new VelAttrib(0.2f, 0f, (t, v) -> unit.rotation, 0.25f);
                 VelAttrib velOuter = new VelAttrib(0.24f, 0.1f, (t, v) -> unit.rotation, 0.2f);
-                return new MultiTrail(BaseTrail.rot(unit),
-                    new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 32, 2, 5.6f, 8f, speed, 0f, null), monolithLighter),
-                    new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, 6f, 3.2f, speed, velInner), 9f, 11.25f, 0.75f, monolithLighter),
-                    new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, 6f, 3.2f, speed, velInner.flip()), -9f, 11.25f, 0.75f, monolithLighter),
-                    new TrailHold(MonolithTrails.singlePhantasmal(10, velOuter), 17.875f, 6f, 0.6f, monolithLighter),
-                    new TrailHold(MonolithTrails.singlePhantasmal(10, velOuter.flip()), -17.875f, 6f, 0.6f, monolithLighter)
+                return new MultiTrail(
+                BaseTrail.rot(unit),
+                new TrailHold(MonolithTrails.phantasmal(BaseTrail.rot(unit), 32, 2, 5.6f, 8f, speed, 0f, null), monolithLighter),
+                new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, 6f, 3.2f, speed, velInner), 9f, 11.25f, 0.75f, monolithLighter),
+                new TrailHold(MonolithTrails.soul(BaseTrail.rot(unit), 48, 6f, 3.2f, speed, velInner.flip()), -9f, 11.25f, 0.75f, monolithLighter),
+                new TrailHold(MonolithTrails.singlePhantasmal(10, velOuter), 17.875f, 6f, 0.6f, monolithLighter),
+                new TrailHold(MonolithTrails.singlePhantasmal(10, velOuter.flip()), -17.875f, 6f, 0.6f, monolithLighter)
                 );
             });
 
             parts.add(
-                new RegionPart("-middle"){{
-                    outline = false;
-                    layer = Layer.bullet - 0.02f;
-                }}, new RegionPart("-top"){{
-                    outline = false;
-                    layer = Layer.effect + 0.0199f;
-                }}
+            new RegionPart("-middle"){{
+                outline = false;
+                layer = Layer.bullet - 0.02f;
+            }}, new RegionPart("-top"){{
+                outline = false;
+                layer = Layer.effect + 0.0199f;
+            }}
             );
 
             weapons.add(new EnergyRingWeapon(){{
@@ -790,13 +796,13 @@ public final class MonolithUnitTypes{
             }});
 
             parts.add(
-                new RegionPart(name + "-middle"){{
-                    outline = false;
-                    layer = Layer.bullet - 0.02f;
-                }}, new RegionPart(name + "-top"){{
-                    outline = false;
-                    layer = Layer.effect + 0.0199f;
-                }}
+            new RegionPart(name + "-middle"){{
+                outline = false;
+                layer = Layer.bullet - 0.02f;
+            }}, new RegionPart(name + "-top"){{
+                outline = false;
+                layer = Layer.effect + 0.0199f;
+            }}
             );
 
             weapons.add(new EnergyRingWeapon(){{
@@ -820,7 +826,7 @@ public final class MonolithUnitTypes{
                     color = monolithLight;
                     shootY = radius = 8.5f;
                     rotate = false;
-                    angleOffset  = 90f;
+                    angleOffset = 90f;
                     divisions = 2;
                     divisionSeparation = 30f;
                 }}, new Ring(){{

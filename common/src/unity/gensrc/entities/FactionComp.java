@@ -13,7 +13,7 @@ abstract class FactionComp implements Entityc{
     boolean sameFaction(Entityc other){
         Faction fac = faction();
         return
-            (other instanceof Factionc e && e.faction() == fac) ||
-            (other instanceof Building build && FactionRegistry.faction(build.block) == fac);
+        (other instanceof Factionc e && e.faction() == fac) ||
+        (other instanceof Building build && FactionRegistry.faction(build.block) == fac);
     }
 }

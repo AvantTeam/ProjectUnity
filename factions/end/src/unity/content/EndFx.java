@@ -19,7 +19,7 @@ public class EndFx{
         float scl = e.rotation;
         //int l = Math.max((int)(a.dst(b) / 60), 3);
         r.setSeed(e.id * 9999L);
-        
+
         e.lifetime = 40f * scl;
 
         if(scl >= 0.9f){
@@ -83,8 +83,8 @@ public class EndFx{
         Lines.stroke(2.5f);
         for(int i = 0; i < 20; i++){
             float off = r.random(Mathf.PI),
-                    c1 = (Mathf.sin(Time.time * 0.75f + off) + 1f) / 4f + 0.5f,
-                    c2 = (Mathf.cos(Time.time * 0.75f + off) + 1f) / 4f + 0.5f;
+            c1 = (Mathf.sin(Time.time * 0.75f + off) + 1f) / 4f + 0.5f,
+            c2 = (Mathf.cos(Time.time * 0.75f + off) + 1f) / 4f + 0.5f;
             Draw.color(Tmp.c1.set(EndPal.endMid).mul(1f, c1, c2, 1f));
             Vec2 v = Tmp.v1.trns(r.random(360f), r.random(12f, 80f) * finpow + 0.1f);
             Lines.lineAngle(e.x + v.x, e.y + v.y, v.angle(), 10f * e.fout());

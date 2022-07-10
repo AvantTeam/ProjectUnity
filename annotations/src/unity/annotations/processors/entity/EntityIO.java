@@ -54,9 +54,9 @@ public class EntityIO{
         int nextRevision = revisions.isEmpty() ? 0 : revisions.max(r -> r.version).version + 1;
 
         Seq<FieldSpec> fields = typeFields.select(spec ->
-            !spec.hasModifier(TRANSIENT) &&
-            !spec.hasModifier(STATIC) &&
-            !spec.hasModifier(FINAL));
+        !spec.hasModifier(TRANSIENT) &&
+        !spec.hasModifier(STATIC) &&
+        !spec.hasModifier(FINAL));
 
         fields.sortComparing(f -> f.name);
         presentFields.addAll(fields.map(f -> f.name));
@@ -119,7 +119,7 @@ public class EntityIO{
                 io(field.type, "this." + (sf ? field.name + targetSuffix : field.name) + " = ", true);
 
                 if(sl){
-                    ncont("else" );
+                    ncont("else");
                     io(field.type, "", true);
 
                     if(sf){
@@ -165,9 +165,9 @@ public class EntityIO{
         for(VarSymbol field : fields){
             String name = name(field), targetName = name + targetSuffix, lastName = name + lastSuffix;
             st("$L = $L($T.$L($L, $L, alpha))",
-                name, anno(field, SyncField.class).clamped() ? "arc.math.Mathf.clamp" : "",
-                Mathf.class,
-                anno(field, SyncField.class).value() ? "lerp" : "slerp", lastName, targetName
+            name, anno(field, SyncField.class).clamped() ? "arc.math.Mathf.clamp" : "",
+            Mathf.class,
+            anno(field, SyncField.class).value() ? "lerp" : "slerp", lastName, targetName
             );
         }
 
@@ -293,7 +293,7 @@ public class EntityIO{
                 RevisionField field = fields.get(i);
                 FieldSpec spec = specs.get(i);
                 if(!field.type.replace("unity.gen.", "").equals(
-                    spec.type.toString().replace("unity.gen.", "")
+                spec.type.toString().replace("unity.gen.", "")
                 )) return false;
             }
 

@@ -160,8 +160,8 @@ public final class MathUtils{
      */
     public static Vec2 invLerp(Vec2 from, Vec2 to, Vec2 value, Vec2 out){
         return out.set(
-            invLerp(from.x, to.x, value.x),
-            invLerp(from.y, to.y, value.y)
+        invLerp(from.x, to.x, value.x),
+        invLerp(from.y, to.y, value.y)
         );
     }
 
@@ -171,9 +171,9 @@ public final class MathUtils{
      */
     public static Vec3 invLerp(Vec3 from, Vec3 to, Vec3 value, Vec3 out){
         return out.set(
-            invLerp(from.x, to.x, value.x),
-            invLerp(from.y, to.y, value.y),
-            invLerp(from.z, to.z, value.z)
+        invLerp(from.x, to.x, value.x),
+        invLerp(from.y, to.y, value.y),
+        invLerp(from.z, to.z, value.z)
         );
     }
 

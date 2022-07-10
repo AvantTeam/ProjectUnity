@@ -211,11 +211,11 @@ abstract class MonolithSoulComp implements Unitc, Factionc{
     boolean joinInvalid(Healthc other){
         SoulHolder soul = SoulHolder.toSoul(other);
         return
-            soul == null || !other.isAdded() || soul.acceptSoul(1) < 1 ||
-            !within(other, type.range + (other instanceof Unit unit
-                ? (unit.hitSize / 2f) : other instanceof Building build
-                ? (build.hitSize() / 2f) : 0f
-            ));
+        soul == null || !other.isAdded() || soul.acceptSoul(1) < 1 ||
+        !within(other, type.range + (other instanceof Unit unit
+        ? (unit.hitSize / 2f) : other instanceof Building build
+        ? (build.hitSize() / 2f) : 0f
+        ));
     }
 
     boolean formInvalid(Tile tile){

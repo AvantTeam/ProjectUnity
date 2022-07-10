@@ -11,12 +11,12 @@ import mindustry.maps.generators.*;
 /** Convenient {@link Mesh} builder for creating some shapes. */
 public final class PUMeshBuilder{
     private static final Vec2
-        v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2(), v4 = new Vec2(),
-        v5 = new Vec2();
+    v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2(), v4 = new Vec2(),
+    v5 = new Vec2();
 
     private static final Vec3
-        v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3(), v34 = new Vec3(),
-        nor = new Vec3();
+    v31 = new Vec3(), v32 = new Vec3(), v33 = new Vec3(), v34 = new Vec3(),
+    nor = new Vec3();
 
     private static final int vertSize = 3 + 3 + 1; // Position + Normal + Color.
     private static final FloatSeq builder = new FloatSeq(vertSize * 2000);
@@ -92,14 +92,14 @@ public final class PUMeshBuilder{
         begin();
         for(int i = 0; i < thicknessSides; i++){
             float
-                p1 = (float)i / thicknessSides,
-                p2 = (i + 1f) / thicknessSides,
+            p1 = (float)i / thicknessSides,
+            p2 = (i + 1f) / thicknessSides,
 
-                r1 = p1 * 360f,
-                r2 = p2 * 360f,
+            r1 = p1 * 360f,
+            r2 = p2 * 360f,
 
-                c1 = color.get(p1),
-                c2 = color.get(p2);
+            c1 = color.get(p1),
+            c2 = color.get(p2);
 
             // Side vectors, X and Y determining each side's center point.
             v1.trns(r1, radius);
@@ -165,9 +165,9 @@ public final class PUMeshBuilder{
         building = false;
 
         Mesh out = new Mesh(true, builder.size / vertSize, 0,
-            VertexAttribute.position3,
-            VertexAttribute.normal,
-            VertexAttribute.color
+        VertexAttribute.position3,
+        VertexAttribute.normal,
+        VertexAttribute.color
         );
 
         out.setVertices(builder.items, 0, builder.size);
@@ -190,6 +190,7 @@ public final class PUMeshBuilder{
         }
 
         float getHeight(Corner corner, Vec3 position);
+
         Color getColor(Ptile tile, Vec3 position);
 
         default boolean skip(Ptile tile, Vec3 position){

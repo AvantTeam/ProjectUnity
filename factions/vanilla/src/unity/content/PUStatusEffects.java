@@ -9,7 +9,7 @@ import unity.mod.*;
  */
 public final class PUStatusEffects{
     public static StatusEffect
-        disabled;
+    disabled;
 
     private PUStatusEffects(){
         throw new AssertionError();

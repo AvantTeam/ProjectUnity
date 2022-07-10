@@ -30,18 +30,19 @@ public class Downgrader extends AbstractProcessor{
 
             // Downgrade most J8-compatible features.
             for(Feature feature : new Feature[]{
-                EFFECTIVELY_FINAL_VARIABLES_IN_TRY_WITH_RESOURCES,
-                PRIVATE_SAFE_VARARGS,
-                DIAMOND_WITH_ANONYMOUS_CLASS_CREATION,
-                LOCAL_VARIABLE_TYPE_INFERENCE,
-                VAR_SYNTAX_IMPLICIT_LAMBDAS,
-                SWITCH_MULTIPLE_CASE_LABELS,
-                SWITCH_RULE,
-                SWITCH_EXPRESSION,
-                TEXT_BLOCKS,
-                PATTERN_MATCHING_IN_INSTANCEOF,
-                REIFIABLE_TYPES_INSTANCEOF
-            }) set.invokeExact(feature, Source.JDK8);
+            EFFECTIVELY_FINAL_VARIABLES_IN_TRY_WITH_RESOURCES,
+            PRIVATE_SAFE_VARARGS,
+            DIAMOND_WITH_ANONYMOUS_CLASS_CREATION,
+            LOCAL_VARIABLE_TYPE_INFERENCE,
+            VAR_SYNTAX_IMPLICIT_LAMBDAS,
+            SWITCH_MULTIPLE_CASE_LABELS,
+            SWITCH_RULE,
+            SWITCH_EXPRESSION,
+            TEXT_BLOCKS,
+            PATTERN_MATCHING_IN_INSTANCEOF,
+            REIFIABLE_TYPES_INSTANCEOF
+            })
+                set.invokeExact(feature, Source.JDK8);
         }catch(Throwable t){
             throw new RuntimeException(t);
         }

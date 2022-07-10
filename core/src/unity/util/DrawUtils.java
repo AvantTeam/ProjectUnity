@@ -23,17 +23,17 @@ public final class DrawUtils{
     private static final Color col1 = new Color();
     private static final Vec2 vec1 = new Vec2(), vec2 = new Vec2();
     private static final Vec2
-        a = new Vec2(),
-        b = new Vec2(),
-        c = new Vec2(),
-        left = new Vec2(), leftInit = new Vec2(),
-        right = new Vec2(), rightInit = new Vec2();
+    a = new Vec2(),
+    b = new Vec2(),
+    c = new Vec2(),
+    left = new Vec2(), leftInit = new Vec2(),
+    right = new Vec2(), rightInit = new Vec2();
 
     private static final Vec3
-        vert1 = new Vec3(),
-        vert2 = new Vec3(),
-        vert3 = new Vec3(),
-        vert4 = new Vec3();
+    vert1 = new Vec3(),
+    vert2 = new Vec3(),
+    vert3 = new Vec3(),
+    vert4 = new Vec3();
 
     private static boolean building;
     private static final int linestr = 5;
@@ -78,8 +78,8 @@ public final class DrawUtils{
 
         for(int i = 0; i < sides; i++){
             float a = arcRotation - arcCone / 2f + space * i,
-                cos = Mathf.cosDeg(a), sin = Mathf.sinDeg(a),
-                cos2 = Mathf.cosDeg(a + space), sin2 = Mathf.sinDeg(a + space);
+            cos = Mathf.cosDeg(a), sin = Mathf.sinDeg(a),
+            cos2 = Mathf.cosDeg(a + space), sin2 = Mathf.sinDeg(a + space);
             m41.idt().rotate(rotation);
 
             Mat3D.rot(v31.set(r1 * cos, r1 * sin, 0f), m41).scl(Math.max((perspectiveDst + v31.z) / perspectiveDst, 0f));
@@ -210,9 +210,9 @@ public final class DrawUtils{
         if(length < linestr * 2) return;
         for(int i = offset + linestr; i < length - linestr; i += linestr){
             float
-                widthA = items[i - linestr + 3] / 2f, colA = items[i - linestr + 2],
-                widthB = items[i + 3] / 2f, colB = items[i + 2],
-                z = items[i + 4];
+            widthA = items[i - linestr + 3] / 2f, colA = items[i - linestr + 2],
+            widthB = items[i + 3] / 2f, colB = items[i + 2],
+            z = items[i + 4];
 
             a.set(items[i - linestr], items[i - linestr + 1]);
             b.set(items[i], items[i + 1]);
@@ -242,14 +242,14 @@ public final class DrawUtils{
         }
 
         float
-            widthEnd = items[offset + length - linestr + 3] / 2f,
-            colEnd = items[offset + length - linestr + 2],
-            zEnd = items[offset + length - linestr + 4];
+        widthEnd = items[offset + length - linestr + 3] / 2f,
+        colEnd = items[offset + length - linestr + 2],
+        zEnd = items[offset + length - linestr + 4];
 
         if(wrap){
             float
-                colStart = items[offset + 2],
-                zStart = items[offset + 4];
+            colStart = items[offset + 2],
+            zStart = items[offset + 4];
 
             a.set(items[offset], items[offset + 1]);
             MathUtils.pathJoin(b, c, a, left, right, widthEnd);

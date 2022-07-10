@@ -24,11 +24,19 @@ public final class MiscUtils{
 
         type += "-";
         return (AtlasRegion)
-            Core.atlas.find(mod + type + name + "-full",
-            Core.atlas.find(mod + type + name,
-            Core.atlas.find(mod + name + "-full",
-            Core.atlas.find(mod + name,
-            Core.atlas.find(mod + name + "1")))));
+        Core.atlas.find(
+        mod + type + name + "-full",
+        Core.atlas.find(
+        mod + type + name,
+        Core.atlas.find(
+        mod + name + "-full",
+        Core.atlas.find(
+        mod + name,
+        Core.atlas.find(mod + name + "1")
+        )
+        )
+        )
+        );
     }
 
     public static AtlasRegion uiReg(MappableContent content){

@@ -37,8 +37,8 @@ public class EnergyRingWeapon extends Weapon{
 
         EnergyRingMount m = (EnergyRingMount)mount;
         m.aggression = (m.target != null || m.shoot)
-            ? Mathf.lerpDelta(m.aggression, 1f, aggressionSpeed)
-            : Mathf.lerpDelta(m.aggression, 0f, cooldownSpeed);
+        ? Mathf.lerpDelta(m.aggression, 1f, aggressionSpeed)
+        : Mathf.lerpDelta(m.aggression, 0f, cooldownSpeed);
         m.time += Time.delta + m.aggression * Time.delta * aggressionScale;
     }
 
@@ -60,8 +60,8 @@ public class EnergyRingWeapon extends Weapon{
             for(int i = 0; i < ring.divisions; i++){
                 float angleStep = 360f / ring.divisions, sect = angleStep - ring.divisionSeparation;
                 Lines.arc(Tmp.v1.x, Tmp.v1.y,
-                    ring.radius, ring.divisions == 1 ? 1f : (sect / 360f),
-                    rotation - sect / 2f + angleStep * i
+                ring.radius, ring.divisions == 1 ? 1f : (sect / 360f),
+                rotation - sect / 2f + angleStep * i
                 );
             }
 
@@ -108,10 +108,10 @@ public class EnergyRingWeapon extends Weapon{
         @Override
         public String toString(){
             return "Ring{" +
-                "color=" + color + ", thickness=" + thickness + ", radius=" + radius + ", rotate=" + rotate +
-                ", rotateSpeed=" + rotateSpeed + ", angleOffset=" + angleOffset + ", flip=" + flip + ", divisions=" + divisions +
-                ", divisionSeparation=" + divisionSeparation + ", spikes=" + spikes + ", spikeOffset=" + spikeOffset +
-                ", spikeRotOffset=" + spikeRotOffset + ", spikeWidth=" + spikeWidth + ", spikeLength=" + spikeLength +
+            "color=" + color + ", thickness=" + thickness + ", radius=" + radius + ", rotate=" + rotate +
+            ", rotateSpeed=" + rotateSpeed + ", angleOffset=" + angleOffset + ", flip=" + flip + ", divisions=" + divisions +
+            ", divisionSeparation=" + divisionSeparation + ", spikes=" + spikes + ", spikeOffset=" + spikeOffset +
+            ", spikeRotOffset=" + spikeRotOffset + ", spikeWidth=" + spikeWidth + ", spikeLength=" + spikeLength +
             '}';
         }
     }
