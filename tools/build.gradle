@@ -12,7 +12,7 @@ dependencies{
 
 task proc(dependsOn: [classes, configurations.runtimeClasspath]){
     doFirst{
-        delete{ delete spritesDir }
+        delete{delete spritesDir}
         spritesDir.mkdirs()
 
         copy{

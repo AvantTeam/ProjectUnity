@@ -7,9 +7,9 @@ buildscript{
     repositories{
         google()
         mavenCentral()
-        maven{ url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        maven{ url 'https://oss.sonatype.org/content/repositories/releases/' }
-        maven{ url 'https://jitpack.io' }
+        maven{url 'https://oss.sonatype.org/content/repositories/snapshots/'}
+        maven{url 'https://oss.sonatype.org/content/repositories/releases/'}
+        maven{url 'https://jitpack.io'}
     }
 }
 
@@ -24,12 +24,12 @@ import arc.struct.*
 import java.util.regex.*
 
 file("$rootDir/local.properties").with{
-    if (it.exists()) {
+    if(it.exists()){
         def map = new StringMap()
-        it.withReader{ PropertiesUtils.load(map, it) }
+        it.withReader{PropertiesUtils.load(map, it)}
 
         configure(allprojects){
-            for (def e : map) ext."$e.key" = e.value
+            for(def e : map) ext."$e.key" = e.value
         }
     }
 }
@@ -42,20 +42,20 @@ allprojects{
     version = modVersion
 
     ext{
-        mindustry = { String submodule ->
+        mindustry = {String submodule ->
             return "com.github.Anuken.MindustryJitpack$submodule:$mindustryVersion"
         }
 
-        arc = { String submodule ->
+        arc = {String submodule ->
             return "com.github.Anuken.Arc$submodule:$arcVersion"
         }
 
-        force = { Task task, final boolean run ->
-            task.onlyIf{ run }
-            task.outputs.upToDateWhen{ !run }
+        force = {Task task, final boolean run ->
+            task.onlyIf{run}
+            task.outputs.upToDateWhen{!run}
         }
 
-        ready = { Action<TaskExecutionGraph> graph ->
+        ready = {Action<TaskExecutionGraph> graph ->
             gradle.taskGraph.whenReady graph
         }
 
@@ -77,9 +77,9 @@ allprojects{
 
     repositories{
         mavenCentral()
-        maven{ url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        maven{ url 'https://oss.sonatype.org/content/repositories/releases/' }
-        maven{ url 'https://jitpack.io' }
+        maven{url 'https://oss.sonatype.org/content/repositories/snapshots/'}
+        maven{url 'https://oss.sonatype.org/content/repositories/releases/'}
+        maven{url 'https://jitpack.io'}
     }
 
     task sourcesJar(type: Jar, dependsOn: classes){
@@ -112,8 +112,8 @@ allprojects{
         options.incremental = true
         options.encoding = 'UTF-8'
 
-        if (showDeprecate) options.deprecation = true
-        if (listFiles) options.listFiles = true
+        if(showDeprecate) options.deprecation = true
+        if(listFiles) options.listFiles = true
     }
 
     javadoc{
@@ -141,11 +141,11 @@ configure([project(':core'), project(':mod'), project(':tools')] + project(':fac
     }
 }
 
-ready{ TaskExecutionGraph graph ->
-    [':mod', ':plugin'].collect{ file("${project(it).projectDir}/assets/mod.json") }.forEach{ File file ->
+ready{TaskExecutionGraph graph ->
+    [':mod', ':plugin'].collect{file("${project(it).projectDir}/assets/mod.json")}.forEach{File file ->
         def str = file.text
 
         def matcher = Pattern.compile('"version": "(.*)"').matcher(str)
-        if (matcher.find()) file.text = "${str.substring(0, matcher.start(1))}$modVersion${str.substring(matcher.end(1))}"
+        if(matcher.find()) file.text = "${str.substring(0, matcher.start(1))}$modVersion${str.substring(matcher.end(1))}"
     }
 }
