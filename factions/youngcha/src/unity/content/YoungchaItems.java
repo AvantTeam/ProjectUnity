@@ -7,7 +7,7 @@ import unity.mod.*;
 
 /**
  * Defines all {@linkplain Faction#youngcha youngcha} items.
- * @author xelo, younggam
+ * @author younggam, xelo
  */
 public final class YoungchaItems{
     public static Item
