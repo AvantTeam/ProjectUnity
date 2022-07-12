@@ -14,14 +14,18 @@ import static mindustry.graphics.CacheLayer.*;
 /** Defines all {@link CacheLayer}s this mod has to load. */
 public final class PUCacheLayer{
     public static CacheLayer
-    eneraphyte;
+    eneraphyte, pitLayer, waterpitLayer;
 
     private PUCacheLayer(){
         throw new AssertionError();
     }
 
     public static void load(){
-        add(eneraphyte = new ApplicableShaderLayer(PUShaders.eneraphyte));
+        add(
+        eneraphyte = new ApplicableShaderLayer(PUShaders.eneraphyte),
+        pitLayer = new ShaderLayer(PUShaders.pit),
+        waterpitLayer = new ShaderLayer(PUShaders.waterpit)
+        );
     }
 
     /**

@@ -92,6 +92,7 @@ public class ProjectUnity extends ProjectUnityCommon{
 
         EndBlocks.load();
 
+        YoungchaItems.load();
         YoungchaBlocks.load();
     }
 }

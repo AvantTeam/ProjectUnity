@@ -17,7 +17,7 @@ import static mindustry.graphics.Shaders.*;
 /** Lists all {@link Shader}s the mod has to load. */
 public final class PUShaders{
     public static PlanetObjectShader planet;
-    public static PUSurfaceShader eneraphyte;
+    public static PUSurfaceShader eneraphyte, pit, waterpit;
 
     private PUShaders(){
         throw new AssertionError();
@@ -28,6 +28,8 @@ public final class PUShaders{
 
         planet = new PlanetObjectShader();
         eneraphyte = new PUSurfaceShader("eneraphyte", "noise");
+        pit = new PitShader("pit", 9, "noise", "concrete-blank1", "stone-sheet", "truss");
+        waterpit = new PitShader("waterpit", 9, "noise", "concrete-blank1", "stone-sheet");
     }
 
     public static <T extends Shader> T preprocess(String vertPreprocess, String fragPreprocess, Prov<T> create){
@@ -138,5 +140,30 @@ public final class PUShaders{
 
     public static String tex(String name){
         return "shaders/textures/" + name + ".png";
+    }
+
+    /**
+     * Not much differs from {@link PUSurfaceShader}.
+     * As number of textures are limited, uses variants in texture sheet. Similar as atlas.
+     * @author younggam, xelo
+     */
+    public static class PitShader extends PUSurfaceShader{
+        public int variants;
+
+        public PitShader(String frag, int variants, String... textures){
+            super(frag, textures);
+            this.variants = variants;
+        }
+
+        public PitShader(Fi vert, Fi frag, int variants, String... textures){
+            super(vert, frag, textures);
+            this.variants = variants;
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("variants", (float)variants);
+            super.apply();
+        }
     }
 }

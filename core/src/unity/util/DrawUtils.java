@@ -274,4 +274,41 @@ public final class DrawUtils{
         Draw.z(z);
         Fill.quad(vert1.x, vert1.y, vert1.z, vert2.x, vert2.y, vert2.z, vert3.x, vert3.y, vert3.z, vert4.x, vert4.y, vert4.z);
     }
+
+    /**
+     * Gets multiple regions inside a {@link TextureRegion}. The size for each region has to be 32.
+     * Could be replaced by {@link TextureRegion#split(int, int)}?
+     * @param w The amount of regions horizontally.
+     * @param h The amount of regions vertically.
+     * @author xelo
+     */
+    public static TextureRegion[] getRegions(TextureRegion region, int w, int h, int tilesize){
+        int size = w * h;
+        TextureRegion[] regions = new TextureRegion[size];
+
+        float tileW = (region.u2 - region.u) / w;
+        float tileH = (region.v2 - region.v) / h;
+
+        for(int i = 0; i < size; i++){
+            float tileX = ((float)(i % w)) / w;
+            float tileY = ((float)(i / w)) / h;
+            TextureRegion reg = new TextureRegion(region);
+
+            //start coordinate
+            reg.u = Mathf.map(tileX, 0f, 1f, reg.u, reg.u2) + tileW * 0.01f;
+            reg.v = Mathf.map(tileY, 0f, 1f, reg.v, reg.v2) + tileH * 0.01f;
+            //end coordinate
+            reg.u2 = reg.u + tileW * 0.98f;
+            reg.v2 = reg.v + tileH * 0.98f;
+
+            reg.width = reg.height = tilesize;
+
+            regions[i] = reg;
+        }
+        return regions;
+    }
+
+    public static TextureRegion[] getRegions(TextureRegion region, int w, int h){
+        return getRegions(region, w, h, 32);
+    }
 }
