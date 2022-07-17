@@ -3,7 +3,7 @@ package unity.util;
 import arc.func.*;
 
 /**
- * Currently only for ConnectedWall.
+ * Currently only for 12 * 4 and block size 1 sprite sheet.
  * Caches, calculate, and export index related to how many adjacent available blocks
  * @author younggam, xelo
  */
@@ -33,6 +33,11 @@ public class TilingUtils{
                             0, 0, 42, 42, 0, 0, 12, 12, 1, 1, 45, 18, 1, 1, 19, 13
     };
 
+    /**
+     * @param map adjacent objects.
+     * @param canConnect judge object is connectable.
+     * @return bitmap of 8directions available adjacent objects for size 1 block.
+     */
     public static <T> int getMaskIndex(T[][] map, int x, int y, Boolf<T> canConnect){
         int index = 0, ax, ay;
         for(int i = 0; i < tilechkdirs.length; i++){
@@ -47,6 +52,9 @@ public class TilingUtils{
         return index;
     }
 
+    /**
+     * Gets bitmap from {@link TilingUtils#getMaskIndex(Object[][], int, int, Boolf)} and converts to 12 * 4 sprite sheet index.
+     */
     public static <T> int getTilingIndex(T[][] map, int x, int y, Boolf<T> canConnect){
         return tileMap[getMaskIndex(map, x, y, canConnect)];
     }

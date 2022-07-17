@@ -13,7 +13,7 @@ import static mindustry.Vars.world;
  * @author younggam, xelo
  */
 public class ConnectedWall extends StaticWall{
-    TextureRegion[] tiles;
+    TextureRegion[][] tiles;
 
     public ConnectedWall(String name){
         super(name);
@@ -22,7 +22,7 @@ public class ConnectedWall extends StaticWall{
     @Override
     public void load(){
         super.load();
-        tiles = DrawUtils.getRegions(Core.atlas.find(name + "-tiles"), 12, 4, 32);
+        tiles = Core.atlas.find(name + "-tiles").split(32, 32);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ConnectedWall extends StaticWall{
         }
         int index = TilingUtils.getTilingIndex(grid, 1, 1, t -> t != null && t.block() == this);
         if(avail){
-            Draw.rect(tiles[index], tile.worldx(), tile.worldy());
+            Draw.rect(tiles[index % 12][index / 12], tile.worldx(), tile.worldy());
         }else{
             Draw.rect(region, tile.worldx(), tile.worldy());
         }
