@@ -39,6 +39,7 @@ public class WindTurbine extends GenericGraphBlock{
             rotorRegions[i] = atlas.find(name + "-rotor" + (i + 1));
         }
     }
+
     public static class WindTurbineTorqueGraphNode extends TorqueGraphNode{
 
         public WindTurbineTorqueGraphNode(float friction, float inertia, float maxTorque, float maxSpeed, GraphBuild build){
@@ -48,23 +49,26 @@ public class WindTurbine extends GenericGraphBlock{
         @Override
         public void update(){
             //todo weather
-            float weather = Groups.weather.contains(w->w.weather== Weathers.sandstorm || w.weather== Weathers.sporestorm)?2:1;
+            float weather = Groups.weather.contains(w -> w.weather == Weathers.sandstorm || w.weather == Weathers.sporestorm) ? 2 : 1;
             float x = Time.time * 0.001f;
             float mul = 0.2f * Math.max(
-                0f,
-                Mathf.sin(x) + 0.5f * Mathf.sin(2f * x + 50f) + 0.2f * Mathf.sin(7f * x + 90f) + 0.1f * Mathf.sin(23f * x + 10f) + 0.55f
+            0f,
+            Mathf.sin(x) + 0.5f * Mathf.sin(2f * x + 50f) + 0.2f * Mathf.sin(7f * x + 90f) + 0.1f * Mathf.sin(23f * x + 10f) + 0.55f
             ) + 0.3f;
-            baseForce = mul*weather;
+            baseForce = mul * weather;
         }
     }
+
     public class WindTurbineBuildGeneric extends GenericGraphBuild{
         GraphConnector<TorqueGraph> torqueConn;
+
         public GraphConnector<TorqueGraph> getTorqueConn(){
-            if(torqueConn ==null){
+            if(torqueConn == null){
                 torqueConn = getGraphNode(TorqueGraph.class).connector.first();
             }
             return torqueConn;
         }
+
         @Override
         public void draw(){
             float shaftRotog = getTorqueConn().getGraph().rotation;

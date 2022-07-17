@@ -11,10 +11,10 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
+import unity.parts.stats.AdditiveStat.*;
 import unity.parts.stats.*;
 import unity.util.*;
 import unity.world.blocks.payloads.*;
-import unity.parts.stats.AdditiveStat.*;
 
 //like Block, this is a singleton
 public class ModularPartType implements Displayable{

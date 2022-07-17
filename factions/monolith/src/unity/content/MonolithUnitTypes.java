@@ -28,11 +28,12 @@ import unity.mod.*;
 import unity.type.*;
 import unity.util.*;
 
-import static arc.Core.*;
-import static mindustry.Vars.*;
-import static unity.gen.entities.EntityRegistry.*;
+import static arc.Core.atlas;
+import static mindustry.Vars.content;
+import static mindustry.Vars.headless;
+import static unity.gen.entities.EntityRegistry.content;
 import static unity.graphics.MonolithPal.*;
-import static unity.mod.FactionRegistry.*;
+import static unity.mod.FactionRegistry.register;
 
 /**
  * Defines all {@linkplain Faction#monolith monolith} unit types.

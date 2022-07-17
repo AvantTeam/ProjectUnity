@@ -18,7 +18,7 @@ import unity.world.graph.*;
 
 import java.io.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tree;
 
 public class ProjectUnity extends ProjectUnityCommon{
     /** UI **/

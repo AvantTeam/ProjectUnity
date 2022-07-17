@@ -9,6 +9,7 @@ import arc.util.io.*;
 public class TorqueGraph extends Graph<TorqueGraph>{
     public float lastInertia, lastGrossForceApplied, lastNetForceApplied, lastVelocity, lastFrictionCoefficient;
     public float rotation = 0;
+
     @Override
     public TorqueGraph copy(){
         var t = new TorqueGraph();
@@ -17,7 +18,8 @@ public class TorqueGraph extends Graph<TorqueGraph>{
         return t;
     }
 
-    @Override public void onMergeBegin(TorqueGraph graph){
+    @Override
+    public void onMergeBegin(TorqueGraph graph){
         float momentumA = lastVelocity * lastInertia;
         float mementumB = graph.lastVelocity * graph.lastInertia;
         lastVelocity = (momentumA + mementumB) / (lastInertia + graph.lastInertia);
@@ -31,7 +33,7 @@ public class TorqueGraph extends Graph<TorqueGraph>{
 
     @Override
     public boolean canConnect(GraphConnector v1, GraphConnector v2){
-        return v1.getNode().build().team ==  v2.getNode().build().team;
+        return v1.getNode().build().team == v2.getNode().build().team;
     }
 
     @Override
@@ -65,7 +67,7 @@ public class TorqueGraph extends Graph<TorqueGraph>{
 
     @Override
     public void onVertexAdded(GraphConnector<TorqueGraph> vertex){
-        if(vertex.getNode().connectors>1){
+        if(vertex.getNode().connectors > 1){
             multiconnectors.add(vertex);
         }
     }
@@ -78,9 +80,9 @@ public class TorqueGraph extends Graph<TorqueGraph>{
         while(!toVisit.isEmpty()){
             TorqueGraph graph = toVisit.pop();
             cons.get(graph);
-            for(var mc: graph.multiconnectors){
-                for(var other: mc.getNode().connector){
-                    if(other!=mc && !visited.contains(other.getGraph())){
+            for(var mc : graph.multiconnectors){
+                for(var other : mc.getNode().connector){
+                    if(other != mc && !visited.contains(other.getGraph())){
                         visited.add(other.getGraph());
                         toVisit.add(other.getGraph());
                     }
@@ -94,14 +96,14 @@ public class TorqueGraph extends Graph<TorqueGraph>{
         refreshGraphStats();
         float netForce = lastGrossForceApplied;
         netForce -= lastFrictionCoefficient;
-        netForce -= lastFrictionCoefficient*lastVelocity*0.15;
+        netForce -= lastFrictionCoefficient * lastVelocity * 0.15;
         lastNetForceApplied = netForce;
         float acceleration = lastInertia == 0f ? 0f : netForce / lastInertia;
         lastVelocity += acceleration * Time.delta;
         lastVelocity = Math.max(0f, lastVelocity);
         rotation += lastVelocity * Time.delta;
-        if(rotation>360*2520){
-            rotation-=360*2520;
+        if(rotation > 360 * 2520){
+            rotation -= 360 * 2520;
         }
     }
 

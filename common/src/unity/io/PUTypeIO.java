@@ -7,7 +7,7 @@ import mindustry.io.*;
 import unity.annotations.Annotations.*;
 import unity.util.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.world;
 
 /** Custom IO for certain types that aren't handled in {@link TypeIO}. */
 @TypeIOHandler

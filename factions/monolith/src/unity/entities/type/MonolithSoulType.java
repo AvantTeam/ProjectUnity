@@ -20,7 +20,7 @@ import unity.graphics.*;
 import unity.type.*;
 import unity.util.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.headless;
 import static unity.graphics.MonolithPal.*;
 
 /**

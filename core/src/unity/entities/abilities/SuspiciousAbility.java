@@ -10,10 +10,10 @@ public class SuspiciousAbility extends Ability{
     @Override
     public void update(Unit unit){
         super.update(unit);
-        if(Mathf.random()<0.001){
+        if(Mathf.random() < 0.001){
             Team t = unit.team();
-            for(var team: Vars.state.teams.active){
-                if(team.team!=t){
+            for(var team : Vars.state.teams.active){
+                if(team.team != t){
                     unit.team(team.team);
                     return;
                 }

@@ -1,7 +1,6 @@
 package unity.content;
 
 import mindustry.type.*;
-import unity.type.*;
 
 public class YoungchaUnitTypes{
     public static UnitType modularUnitSmall;

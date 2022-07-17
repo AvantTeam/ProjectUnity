@@ -2,8 +2,8 @@ package unity.parts.types;
 
 import mindustry.type.*;
 import unity.parts.*;
-import unity.parts.stats.*;
 import unity.parts.stats.AdditiveStat.*;
+import unity.parts.stats.*;
 import unity.util.*;
 
 public class ModularWeaponMountType extends ModularPartType{

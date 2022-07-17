@@ -10,7 +10,7 @@ import unity.entities.type.*;
 import unity.graphics.*;
 import unity.util.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.headless;
 
 /**
  * Base implementation of {@link PUUnitTypeCommon}.

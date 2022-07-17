@@ -2,8 +2,8 @@ package unity.tools.proc;
 
 import arc.graphics.*;
 import arc.math.*;
-import unity.tools.*;
 import unity.tools.GenAtlas.*;
+import unity.tools.*;
 
 import java.util.concurrent.*;
 

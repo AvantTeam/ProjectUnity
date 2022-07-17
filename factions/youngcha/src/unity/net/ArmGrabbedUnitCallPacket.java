@@ -14,28 +14,28 @@ public class ArmGrabbedUnitCallPacket extends Packet{
     public Building arm;
     Unit unit;
 
-    public ArmGrabbedUnitCallPacket() {
+    public ArmGrabbedUnitCallPacket(){
         this.DATA = NODATA;
     }
 
-    public void write(Writes WRITE) {
+    public void write(Writes WRITE){
         TypeIO.writePayload(WRITE, this.unitPayload);
-        TypeIO.writeUnit(WRITE,this.unitPayload.unit);
+        TypeIO.writeUnit(WRITE, this.unitPayload.unit);
         TypeIO.writeBuilding(WRITE, arm);
     }
 
-    public void read(Reads READ, int LENGTH) {
+    public void read(Reads READ, int LENGTH){
         this.DATA = READ.b(LENGTH);
     }
 
-    public void handled() {
+    public void handled(){
         BAIS.setBytes(this.DATA);
         this.unitPayload = (UnitPayload)TypeIO.readPayload(READ);
         this.unit = TypeIO.readUnit(READ);
         this.arm = TypeIO.readBuilding(READ);
     }
 
-    public void handleClient() {
+    public void handleClient(){
         if(arm instanceof PayloadArmBuild pab){
             unit.remove();
             if(Vars.net.client()){

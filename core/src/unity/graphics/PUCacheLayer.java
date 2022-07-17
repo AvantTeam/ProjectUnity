@@ -8,7 +8,7 @@ import arc.util.*;
 import mindustry.graphics.*;
 import unity.assets.list.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.renderer;
 import static mindustry.graphics.CacheLayer.*;
 
 /** Defines all {@link CacheLayer}s this mod has to load. */

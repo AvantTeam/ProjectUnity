@@ -10,7 +10,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
-import static unity.graphics.MonolithPal.*;
+import static unity.graphics.MonolithPal.monolithLighter;
 
 /**
  * Sprite-less weapon composed of revolving energy rings.

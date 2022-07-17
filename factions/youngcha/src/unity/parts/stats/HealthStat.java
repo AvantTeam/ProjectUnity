@@ -38,6 +38,6 @@ public class HealthStat extends ModularPartStat{
     @Override
     public void display(Table table){
         table.row();
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stattype."+name) + ": [accent]"+hpboost + (percentage?"%":"")).left().top();
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.stattype." + name) + ": [accent]" + hpboost + (percentage ? "%" : "")).left().top();
     }
 }

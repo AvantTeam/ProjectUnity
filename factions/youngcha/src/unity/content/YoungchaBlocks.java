@@ -21,7 +21,7 @@ import unity.world.blocks.units.*;
 import unity.world.graph.*;
 
 import static mindustry.type.ItemStack.with;
-import static unity.mod.FactionRegistry.*;
+import static unity.mod.FactionRegistry.register;
 
 /**
  * Defines all {@linkplain Faction#youngcha youngcha} block types.

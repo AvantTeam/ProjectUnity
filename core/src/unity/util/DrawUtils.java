@@ -8,7 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.graphics.*;
 
-import static arc.Core.*;
+import static arc.Core.atlas;
 import static arc.math.geom.Mat3D.*;
 
 /** Intermediately-shared utility access for rendering operations. */

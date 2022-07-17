@@ -19,9 +19,13 @@ public abstract class GenericCaster extends GenericGraphBlock{
         public float progress;
 
         public abstract boolean isCasting();
+
         public abstract void tryStartCast();
+
         public abstract void offloadCast();
+
         public abstract void resetCast();
+
         public abstract boolean canOffloadCast();
 
         @Override
@@ -33,22 +37,22 @@ public abstract class GenericCaster extends GenericGraphBlock{
             if(!isCasting()){
                 tryStartCast();
             }else{
-                if(progress<castTime){
+                if(progress < castTime){
                     progress += Time.delta;
-                    if(progress>castTime){
-                        float f = progress-castTime;
-                        progress-=f;
-                        progress+=f* Mathf.curve(torque.lastVelocity,0,torqueNode.maxSpeed);
+                    if(progress > castTime){
+                        float f = progress - castTime;
+                        progress -= f;
+                        progress += f * Mathf.curve(torque.lastVelocity, 0, torqueNode.maxSpeed);
                     }
                 }else{
-                    progress+=Time.delta * Mathf.curve(torque.lastVelocity,0,torqueNode.maxSpeed);
-                        if(progress>=castTime+moveTime){
+                    progress += Time.delta * Mathf.curve(torque.lastVelocity, 0, torqueNode.maxSpeed);
+                    if(progress >= castTime + moveTime){
                         if(canOffloadCast()){
                             offloadCast();
                             resetCast();
                             progress = 0;
                         }else{
-                            progress = castTime+moveTime;
+                            progress = castTime + moveTime;
                         }
                     }
                 }

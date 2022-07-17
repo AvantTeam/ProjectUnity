@@ -2,7 +2,7 @@ package unity.graphics;
 
 import arc.graphics.*;
 
-import static mindustry.graphics.Pal.*;
+import static mindustry.graphics.Pal.darkerMetal;
 
 /**
  * Shared access for commonly used palettes. Specific palettes should be defined in the corresponding submodules, optionally

@@ -6,8 +6,8 @@ import mindustry.io.*;
 import mindustry.net.*;
 import unity.gen.entities.*;
 
-import static mindustry.Vars.*;
-import static mindustry.net.Net.*;
+import static mindustry.Vars.net;
+import static mindustry.net.Net.registerPacket;
 
 /** Defines all shared modded network synchronization packet handlers. Do as little refactorings as possible! */
 public final class PUPackets{

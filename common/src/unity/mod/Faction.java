@@ -6,7 +6,7 @@ import arc.graphics.g2d.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.headless;
 
 /** @author GlennFolker */
 public enum Faction{

@@ -17,7 +17,7 @@ import unity.util.*;
 import unity.world.planets.*;
 
 import static unity.graphics.MonolithPal.*;
-import static unity.mod.FactionRegistry.*;
+import static unity.mod.FactionRegistry.register;
 
 /**
  * Defines all {@linkplain Faction#monolith monolith} planets.

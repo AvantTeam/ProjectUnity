@@ -9,8 +9,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 
-import static mindustry.Vars.*;
-
 /**
  * An extension of the trail; capable of texture-mapping, shrink/grow configurations, various color interpolations, custom
  * blends, and trail effects.

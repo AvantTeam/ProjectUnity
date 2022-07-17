@@ -1,6 +1,5 @@
 package unity.graphics.trail;
 
-import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;

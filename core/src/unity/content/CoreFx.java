@@ -3,7 +3,7 @@ package unity.content;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.state;
 
 /**
  * Defines all shared faction-less effect types. Specific effects should be defined in the corresponding submodules, optionally

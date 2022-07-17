@@ -2,18 +2,17 @@ package unity.parts;
 
 public class ModularPart{
     public ModularPartType type;
-    int x,y;
+    int x, y;
     //position of lowest left tile
-    public float ax,ay;
+    public float ax, ay;
     //middle
-    public float cx,cy;
+    public float cx, cy;
     public int[] panelingIndexes;
     //which lighting variation to draw
     int front = 0;
 
     //editor only fields
     boolean valid = false;
-
 
 
     public ModularPart(ModularPartType type, int x, int y){
@@ -30,6 +29,7 @@ public class ModularPart{
     public void setY(int y){
         this.y = y;
     }
+
     public void setPos(int x, int y){
         this.x = x;
         this.y = y;
@@ -51,8 +51,8 @@ public class ModularPart{
         return y;
     }
 
-    public boolean isHere(int x_,int y_){
-        return x==x_ &&y==y_;
+    public boolean isHere(int x_, int y_){
+        return x == x_ && y == y_;
     }
 
     public float getCx(){

@@ -1,6 +1,6 @@
 package unity.content;
 
-import mindustry.world.Block;
+import mindustry.world.*;
 import unity.mod.*;
 import unity.world.blocks.*;
 

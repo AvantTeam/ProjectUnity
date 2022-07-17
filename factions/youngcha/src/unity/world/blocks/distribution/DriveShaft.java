@@ -35,17 +35,18 @@ public class DriveShaft extends GenericGraphBlock{
 
         public void onConnectionChanged(GraphConnector g){
             baseSpriteIndex = 0;
-            for(int i = 0;i<2;i++) {
-                if(nearby((i*2+rotation)%4) instanceof GraphBuild gbuild){
+            for(int i = 0; i < 2; i++){
+                if(nearby((i * 2 + rotation) % 4) instanceof GraphBuild gbuild){
                     if(!g.isConnected(gbuild)){continue;}
-                    if(rotation == 1 || rotation == 2) baseSpriteIndex += i==0 ? 2 : 1;
-                    else baseSpriteIndex += i==0 ? 1 : 2;
+                    if(rotation == 1 || rotation == 2) baseSpriteIndex += i == 0 ? 2 : 1;
+                    else baseSpriteIndex += i == 0 ? 1 : 2;
                 }
-            };
+            }
+            ;
         }
 
         public FixedGraphConnector<TorqueGraph> getTorqueConn(){
-            if(torqueConn ==null){
+            if(torqueConn == null){
                 torqueConn = (FixedGraphConnector)getGraphNode(TorqueGraph.class).connector.first();
             }
             return torqueConn;

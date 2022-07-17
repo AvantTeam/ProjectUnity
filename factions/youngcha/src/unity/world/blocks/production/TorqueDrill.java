@@ -29,10 +29,11 @@ public class TorqueDrill extends Drill implements GraphBlock{
         rotate = true;
         drawArrow = false;
     }
+
     @Override
     public TextureRegion[] icons(){
-            return new TextureRegion[]{atlas.find(name)};
-        }
+        return new TextureRegion[]{atlas.find(name)};
+    }
 
     @Override
     public void load(){
@@ -55,40 +56,84 @@ public class TorqueDrill extends Drill implements GraphBlock{
     }
 
 
-    @Override public void setStats(){ super.setStats(); config.setStats(stats); }
+    @Override
+    public void setStats(){
+        super.setStats();
+        config.setStats(stats);
+    }
+
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
     }
-    @Override public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
-         super.drawPlanRegion(req,list);
-         config.drawConnectionPoints(req,list); }
-    @Override public Block getBuild(){
-            return this;
-        }
-    @Override public GraphBlockConfig getConfig(){
+
+    @Override
+    public void drawPlanRegion(BuildPlan req, Eachable<BuildPlan> list){
+        super.drawPlanRegion(req, list);
+        config.drawConnectionPoints(req, list);
+    }
+
+    @Override
+    public Block getBuild(){
+        return this;
+    }
+
+    @Override
+    public GraphBlockConfig getConfig(){
         return config;
     }
 
-    @Override public boolean outputsItems(){
+    @Override
+    public boolean outputsItems(){
         return true;
     }
 
-    @Override public boolean rotatedOutput(int x, int y){
+    @Override
+    public boolean rotatedOutput(int x, int y){
         return false;
     }
 
 
     public class TorqueDrillBuild extends DrillBuild implements GraphBuild{
-        OrderedMap<Class<? extends Graph>,GraphNode> graphNodes = new OrderedMap<>();
+        OrderedMap<Class<? extends Graph>, GraphNode> graphNodes = new OrderedMap<>();
         int prevTileRotation = -1;
         boolean placed = false;
-        @Override public Building create(Block block, Team team){ var b = super.create(block, team); if(b instanceof GraphBuild gb){gb.initGraph();} return b;}
-        @Override public void created(){ if(!placed){ initGraph(); } }
-        @Override public void displayBars(Table table){ super.displayBars(table); displayGraphBars(table); }
-        @Override public void write(Writes write){ super.write(write);writeGraphs(write); }
-        @Override public void read(Reads read, byte revision){ super.read(read, revision); readGraphs(read); }
-        @Override public void pickedUp(){ disconnectFromGraph(); placed = false; super.pickedUp(); }
+
+        @Override
+        public Building create(Block block, Team team){
+            var b = super.create(block, team);
+            if(b instanceof GraphBuild gb){gb.initGraph();}
+            return b;
+        }
+
+        @Override
+        public void created(){if(!placed){initGraph();}}
+
+        @Override
+        public void displayBars(Table table){
+            super.displayBars(table);
+            displayGraphBars(table);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            writeGraphs(write);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            readGraphs(read);
+        }
+
+        @Override
+        public void pickedUp(){
+            disconnectFromGraph();
+            placed = false;
+            super.pickedUp();
+        }
+
         @Override
         public void placed(){
             super.placed();
@@ -114,7 +159,7 @@ public class TorqueDrill extends Drill implements GraphBlock{
 
         @Override
         public float efficiency(){
-            return super.efficiency() * Mathf.clamp(Mathf.map(getGraph(TorqueGraph.class).lastVelocity,0,torqueNode().maxSpeed,0,maxEfficiency),0,maxEfficiency);
+            return super.efficiency() * Mathf.clamp(Mathf.map(getGraph(TorqueGraph.class).lastVelocity, 0, torqueNode().maxSpeed, 0, maxEfficiency), 0, maxEfficiency);
         }
 
         @Override
@@ -154,25 +199,30 @@ public class TorqueDrill extends Drill implements GraphBlock{
             Draw.rect(overlayRegion, x, y, fixedRot);
 
             //gears
-            Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, -deg/2);
-            Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, deg/2);
+            Draw.rect(gearRegion, x + offset.x * 4f, y + offset.y * 4f, -deg / 2);
+            Draw.rect(gearRegion, x - offset.x * 4f, y - offset.y * 4f, deg / 2);
 
             Draw.rect(topRegions[variant], x, y);
             drawTeamTop();
         }
 
-        @Override public OrderedMap<Class<? extends Graph>, GraphNode> getNodes(){
-                    return graphNodes;
-                }
+        @Override
+        public OrderedMap<Class<? extends Graph>, GraphNode> getNodes(){
+            return graphNodes;
+        }
 
-        @Override public Building getBuild(){
+        @Override
+        public Building getBuild(){
             return this;
         }
-        @Override public int getPrevRotation(){
+
+        @Override
+        public int getPrevRotation(){
             return prevTileRotation;
         }
 
-        @Override public void setPrevRotation(int t){
+        @Override
+        public void setPrevRotation(int t){
             prevTileRotation = t;
         }
     }

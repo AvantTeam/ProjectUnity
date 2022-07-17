@@ -5,7 +5,7 @@ import mindustry.type.*;
 import unity.mod.*;
 import unity.type.*;
 
-import static unity.mod.FactionRegistry.*;
+import static unity.mod.FactionRegistry.register;
 
 /**
  * Defines all {@linkplain Faction#youngcha youngcha} item types.

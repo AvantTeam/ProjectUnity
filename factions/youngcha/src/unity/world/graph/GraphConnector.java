@@ -71,7 +71,7 @@ public abstract class GraphConnector<T extends Graph>{
 
     public void disconnect(){
         graph.removeVertex(this);
-        if(connections.size>0){
+        if(connections.size > 0){
             Log.info("[scarlet] disconnected vertex still has edges!");
         }
     }
@@ -86,18 +86,20 @@ public abstract class GraphConnector<T extends Graph>{
     public void triggerConnectionChanged(){
         this.node.build.onConnectionChanged(this);
     }
+
     public void write(Writes write){}
+
     public void read(Reads read){}
 
     public GraphEdge addEdge(GraphConnector extconn){
         long edgeid = GraphEdge.getId(this, extconn);
         if(graph.edges.containsKey(edgeid)){
-           if(!connections.contains((GraphEdge)graph.edges.get(edgeid))){
-               var edge = (GraphEdge)graph.edges.get(edgeid);
-               connections.add(edge);
-               edge.valid = true; // in case.
-           }
-           return (GraphEdge)graph.edges.get(edgeid);
+            if(!connections.contains((GraphEdge)graph.edges.get(edgeid))){
+                var edge = (GraphEdge)graph.edges.get(edgeid);
+                connections.add(edge);
+                edge.valid = true; // in case.
+            }
+            return (GraphEdge)graph.edges.get(edgeid);
         }
         var edge = new GraphEdge(this, extconn);
         graph.addEdge(edge);
@@ -107,26 +109,28 @@ public abstract class GraphConnector<T extends Graph>{
     }
 
 
-
     ///derivative classes
     //single distance connections?
     public static class DistanceGraphConnector<U extends Graph> extends GraphConnector<U>{
         public int maxConnections = 1;
         public Point2[] connection; // connection?
         int validConnections = 0;
+
         public DistanceGraphConnector(GraphNode node, U graph){
             super(node, graph);
             connection = new Point2[maxConnections];
             disconnectWhenRotate = false;
         }
+
         public DistanceGraphConnector(int connections, GraphNode node, U graph){
             super(node, graph);
             maxConnections = connections;
             connection = new Point2[maxConnections];
             disconnectWhenRotate = false;
         }
+
         public Point2 first(){
-            for(Point2 p2:connection){
+            for(Point2 p2 : connection){
                 if(p2 == null || (p2.x == 0 && p2.y == 0)){
                     continue;
                 }
@@ -134,31 +138,34 @@ public abstract class GraphConnector<T extends Graph>{
             }
             return null;
         }
+
         public void refreshValidConnections(){
             validConnections = 0;
-            for(Point2 p2:connection){
+            for(Point2 p2 : connection){
                 if(p2 == null || (p2.x == 0 && p2.y == 0)){
                     continue;
                 }
                 validConnections++;
             }
         }
+
         public int validConnections(){
             return validConnections;
         }
 
         public void resize(int size){
             maxConnections = size;
-            Point2[] newconnection  = new Point2[maxConnections];
+            Point2[] newconnection = new Point2[maxConnections];
             System.arraycopy(connection, 0, newconnection, 0, Math.min(connection.length, size));
             connection = newconnection;
             refreshValidConnections();
         }
+
         public void connectTo(DistanceGraphConnector other){
             Tile ext = other.node.build().tile;
             Tile cur = node.build().tile;
 
-            var edge = other.tryConnect(new Point2(cur.x-ext.x,cur.y-ext.y), this);
+            var edge = other.tryConnect(new Point2(cur.x - ext.x, cur.y - ext.y), this);
             if(edge != null){
                 if(!connections.contains(edge)){
                     connections.add(edge);
@@ -167,7 +174,8 @@ public abstract class GraphConnector<T extends Graph>{
             }
 
         }
-        public void connectTo(int rx,int ry){
+
+        public void connectTo(int rx, int ry){
             Tile intrl = node.build().tile;
             Building build = Vars.world.build(intrl.x + rx, intrl.y + ry);
             if(build == null){
@@ -178,11 +186,11 @@ public abstract class GraphConnector<T extends Graph>{
                 if(extnode == null){
                     return;
                 }
-                for(GraphConnector extconnector: extnode.connector){
+                for(GraphConnector extconnector : extnode.connector){
                     if(!(extconnector instanceof GraphConnector.DistanceGraphConnector)){
                         continue;
                     }
-                    var edge = extconnector.tryConnect(new Point2(-rx,-ry), this);
+                    var edge = extconnector.tryConnect(new Point2(-rx, -ry), this);
                     if(edge != null){
                         if(!connections.contains(edge)){
                             connections.add(edge);
@@ -202,24 +210,25 @@ public abstract class GraphConnector<T extends Graph>{
         @Override
         public void recalcNeighbours(){
             connections.clear();
-            for(Point2 p2:connection){
+            for(Point2 p2 : connection){
                 if(p2 == null || (p2.x == 0 && p2.y == 0)){
                     continue;
                 }
-                connectTo(p2.x,p2.y);
+                connectTo(p2.x, p2.y);
             }
             refreshValidConnections();
         }
+
         boolean addConnection(DistanceGraphConnector other){
             Tile ext = other.node.build().tile;
             Tile cur = node.build().tile;
-            Point2 relpos = new Point2(ext.x-cur.x,ext.y-cur.y);
+            Point2 relpos = new Point2(ext.x - cur.x, ext.y - cur.y);
             for(Point2 point2 : connection){
                 if(point2 != null && (point2.x == relpos.x && point2.y == relpos.y)){
                     return true; // it exists already!
                 }
             }
-            for(int i = 0;i<connection.length;i++){
+            for(int i = 0; i < connection.length; i++){
                 if(connection[i] == null || (connection[i].x == 0 && connection[i].y == 0)){
                     connection[i] = relpos;
                     refreshValidConnections();
@@ -228,18 +237,19 @@ public abstract class GraphConnector<T extends Graph>{
             }
             return false;
         }
+
         public void disconnectTo(DistanceGraphConnector other){
             GraphEdge toRemove = null;
-            for(GraphEdge edge:connections){
-                if(edge.other(this)==other){
+            for(GraphEdge edge : connections){
+                if(edge.other(this) == other){
                     toRemove = edge;
                     break;
                 }
             }
-            if(toRemove==null){
+            if(toRemove == null){
                 return;
             }
-            Log.info("disconnecting edge."+toRemove);
+            Log.info("disconnecting edge." + toRemove);
             removeConnection(other);
             other.removeConnection(this);
             graph.removeEdge(toRemove);
@@ -249,7 +259,7 @@ public abstract class GraphConnector<T extends Graph>{
         public void disconnect(){
             Log.info("disconnecting.");
             while(!connections.isEmpty()){
-                disconnectTo((DistanceGraphConnector) connections.first().other(this));
+                disconnectTo((DistanceGraphConnector)connections.first().other(this));
             }
             super.disconnect();
         }
@@ -257,13 +267,13 @@ public abstract class GraphConnector<T extends Graph>{
         void removeConnection(DistanceGraphConnector other){
             Tile ext = other.node.build().tile;
             Tile cur = node.build().tile;
-            Point2 relpos = new Point2(ext.x-cur.x,ext.y-cur.y);
-            for(int i = 0;i<connection.length;i++){
+            Point2 relpos = new Point2(ext.x - cur.x, ext.y - cur.y);
+            for(int i = 0; i < connection.length; i++){
                 Point2 point2 = connection[i];
                 if(point2 != null && (point2.x == relpos.x && point2.y == relpos.y)){
                     connection[i] = null;
                     refreshValidConnections();
-                    Log.info("disconnected from:"+point2);
+                    Log.info("disconnected from:" + point2);
                     return;
                 }
             }
@@ -281,13 +291,15 @@ public abstract class GraphConnector<T extends Graph>{
             }
             return null;
         }
+
         public void write(Writes write){
-            for(int i = 0;i<maxConnections;i++){
-                write.i(connection[i]==null?0:connection[i].pack());
+            for(int i = 0; i < maxConnections; i++){
+                write.i(connection[i] == null ? 0 : connection[i].pack());
             }
         }
+
         public void read(Reads read){
-            for(int i = 0;i<maxConnections;i++){
+            for(int i = 0; i < maxConnections; i++){
                 connection[i] = Point2.unpack(read.i());
             }
             refreshValidConnections();
@@ -318,10 +330,10 @@ public abstract class GraphConnector<T extends Graph>{
                 recalcPorts();
             }
             //disconnect?
-            if(connections.size>0){
+            if(connections.size > 0){
                 disconnect();
             }
-            for(GraphEdge edge:connections){
+            for(GraphEdge edge : connections){
                 if(edge.valid){
                     edge.valid = false;
                     Log.info("Deleted valid edge, this may cause issues.");
@@ -450,7 +462,7 @@ public abstract class GraphConnector<T extends Graph>{
                 return null;
             }
             GraphEdge edge = addEdge(extconn);
-            if(edge!=null){
+            if(edge != null){
                 port.edge = edge;
             }
             return edge;

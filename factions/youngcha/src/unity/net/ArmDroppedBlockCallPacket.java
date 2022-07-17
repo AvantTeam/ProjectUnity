@@ -15,28 +15,28 @@ public class ArmDroppedBlockCallPacket extends Packet{
     public Building arm;
     public Tile tile;
 
-    public ArmDroppedBlockCallPacket() {
+    public ArmDroppedBlockCallPacket(){
         this.DATA = NODATA;
     }
 
-    public void write(Writes WRITE) {
+    public void write(Writes WRITE){
         TypeIO.writePayload(WRITE, this.buildPayload);
         TypeIO.writeBuilding(WRITE, arm);
-        TypeIO.writeTile(WRITE,tile);
+        TypeIO.writeTile(WRITE, tile);
     }
 
-    public void read(Reads READ, int LENGTH) {
+    public void read(Reads READ, int LENGTH){
         this.DATA = READ.b(LENGTH);
     }
 
-    public void handled() {
+    public void handled(){
         BAIS.setBytes(this.DATA);
         this.buildPayload = (BuildPayload)TypeIO.readPayload(READ);
         this.arm = TypeIO.readBuilding(READ);
         this.tile = TypeIO.readTile(READ);
     }
 
-    public void handleClient() {
+    public void handleClient(){
         if(arm instanceof PayloadArmBuild pab){
             if(Build.validPlace(buildPayload.block(), buildPayload.build.team, tile.x, tile.y, buildPayload.build.rotation, false)){ // place on the ground
                 buildPayload.place(tile, buildPayload.build.rotation);

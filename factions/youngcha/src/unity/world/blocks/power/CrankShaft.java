@@ -12,11 +12,12 @@ import unity.world.blocks.*;
 public class CrankShaft extends GenericGraphBlock{
     TextureRegion[] base = new TextureRegion[4];
     TextureRegion handle;
+
     public CrankShaft(String name){
         super(name);
         configurable = true;
-        config(Point2.class,(CrankShaftBuild b,Point2 p)->{
-            if(b.lastCrank<=0){
+        config(Point2.class, (CrankShaftBuild b, Point2 p) -> {
+            if(b.lastCrank <= 0){
                 b.push = 1;
                 b.lastCrank = 100;
             }
@@ -27,8 +28,8 @@ public class CrankShaft extends GenericGraphBlock{
     @Override
     public void load(){
         super.load();
-        for(int i = 0;i<4;i++){
-            base[i] = loadTex("bottom"+(i+1));
+        for(int i = 0; i < 4; i++){
+            base[i] = loadTex("bottom" + (i + 1));
         }
         handle = loadTex("handle");
     }
@@ -40,17 +41,17 @@ public class CrankShaft extends GenericGraphBlock{
         @Override
         public void buildConfiguration(Table table){
             super.buildConfiguration(table);
-            var bu  = table.button(Icon.rotate,()->{configure(new Point2());}).get();
-            bu.setDisabled(()->lastCrank>0);
+            var bu = table.button(Icon.rotate, () -> {configure(new Point2());}).get();
+            bu.setDisabled(() -> lastCrank > 0);
         }
 
         @Override
         public void updateTile(){
             super.updateTile();
             lastCrank -= Time.delta;
-            if(push>0){
+            if(push > 0){
                 torqueNode().baseForce = Mathf.sqrt(push);
-                push-=0.02*Time.delta;
+                push -= 0.02 * Time.delta;
             }else{
                 torqueNode().baseForce = 0;
             }
@@ -58,8 +59,8 @@ public class CrankShaft extends GenericGraphBlock{
 
         @Override
         public void draw(){
-            Draw.rect(base[rotation],x,y);
-            Draw.rect(handle,x,y,torqueNode().getGraph().rotation);
+            Draw.rect(base[rotation], x, y);
+            Draw.rect(handle, x, y, torqueNode().getGraph().rotation);
             drawTeamTop();
         }
 

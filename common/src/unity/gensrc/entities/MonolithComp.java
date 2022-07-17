@@ -9,7 +9,7 @@ import unity.entities.type.*;
 import unity.gen.entities.*;
 import unity.mod.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.net;
 
 @SuppressWarnings("unused")
 @EntityComponent

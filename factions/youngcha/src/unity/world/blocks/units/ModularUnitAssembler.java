@@ -15,12 +15,11 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
 import unity.content.*;
-import unity.entities.type.*;
 import unity.parts.*;
+import unity.parts.PanelDoodadType.*;
 import unity.parts.types.*;
 import unity.ui.*;
 import unity.util.*;
-import unity.parts.PanelDoodadType.*;
 
 import static mindustry.Vars.content;
 import static unity.parts.ModularPartType.partSize;
