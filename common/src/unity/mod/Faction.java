@@ -3,14 +3,19 @@ package unity.mod;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import mindustry.graphics.*;
 import unity.graphics.*;
 
 import static mindustry.Vars.*;
 
 /** @author GlennFolker */
 public enum Faction{
+    vanilla("vanilla", Pal.accent),
+
     monolith("monolith", Palettes.monolith),
+
     end("end", Palettes.end),
+
     youngcha("youngcha", Palettes.youngcha);
 
     public static final Faction[] all = values();

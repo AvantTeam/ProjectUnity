@@ -1,13 +1,15 @@
 package unity.util;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.graphics.*;
 
 import static arc.Core.*;
+import static arc.math.geom.Mat3D.*;
 
 /** Intermediately-shared utility access for rendering operations. */
 public final class DrawUtils{
@@ -20,8 +22,9 @@ public final class DrawUtils{
         }};
     }};
 
+    private final static TextureRegion tr1 = new TextureRegion(), tr2 = new TextureRegion();
     private static final Color col1 = new Color();
-    private static final Vec2 vec1 = new Vec2(), vec2 = new Vec2();
+    private static final Vec2 vec1 = new Vec2(), vec2 = new Vec2(), vec3 = new Vec2(), vec4 = new Vec2();
     private static final Vec2
     a = new Vec2(),
     b = new Vec2(),
@@ -29,11 +32,8 @@ public final class DrawUtils{
     left = new Vec2(), leftInit = new Vec2(),
     right = new Vec2(), rightInit = new Vec2();
 
-    private static final Vec3
-    vert1 = new Vec3(),
-    vert2 = new Vec3(),
-    vert3 = new Vec3(),
-    vert4 = new Vec3();
+    private static final Vec3 vert1 = new Vec3(), vert2 = new Vec3(), vert3 = new Vec3(), vert4 = new Vec3();
+    private static final Vec3[] vec3s = new Vec3[]{new Vec3(), new Vec3(), new Vec3(), new Vec3()};
 
     private static boolean building;
     private static final int linestr = 5;
@@ -146,6 +146,14 @@ public final class DrawUtils{
             line(line, start, end, x1, y1, x2, y2);
             s *= falloff;
         }
+    }
+
+    public static void line(Color color, float x, float y, float x2, float y2){
+        Lines.stroke(3f, Pal.gray);
+        Lines.line(x, y, x2, y2);
+        Lines.stroke(1f, color);
+        Lines.line(x, y, x2, y2);
+        Draw.reset();
     }
 
     public static void fillSector(float x, float y, float radius, float rotation, float fraction){
@@ -291,40 +299,156 @@ public final class DrawUtils{
         Fill.quad(vert1.x, vert1.y, vert1.z, vert2.x, vert2.y, vert2.z, vert3.x, vert3.y, vert3.z, vert4.x, vert4.y, vert4.z);
     }
 
-    /**
-     * Gets multiple regions inside a {@link TextureRegion}. The size for each region has to be 32.
-     * Could be replaced by {@link TextureRegion#split(int, int)}?
-     * @param w The amount of regions horizontally.
-     * @param h The amount of regions vertically.
-     * @author xelo
-     */
-    public static TextureRegion[] getRegions(TextureRegion region, int w, int h, int tilesize){
-        int size = w * h;
-        TextureRegion[] regions = new TextureRegion[size];
-
-        float tileW = (region.u2 - region.u) / w;
-        float tileH = (region.v2 - region.v) / h;
-
-        for(int i = 0; i < size; i++){
-            float tileX = ((float)(i % w)) / w;
-            float tileY = ((float)(i / w)) / h;
-            TextureRegion reg = new TextureRegion(region);
-
-            //start coordinate
-            reg.u = Mathf.map(tileX, 0f, 1f, reg.u, reg.u2) + tileW * 0.01f;
-            reg.v = Mathf.map(tileY, 0f, 1f, reg.v, reg.v2) + tileH * 0.01f;
-            //end coordinate
-            reg.u2 = reg.u + tileW * 0.98f;
-            reg.v2 = reg.v + tileH * 0.98f;
-
-            reg.width = reg.height = tilesize;
-
-            regions[i] = reg;
-        }
-        return regions;
+    public static void mulVec(float[] mat, Vec3 vec){
+        float x = vec.x * mat[M00] + vec.y * mat[M01] + vec.z * mat[M02] + mat[M03];
+        float y = vec.x * mat[M10] + vec.y * mat[M11] + vec.z * mat[M12] + mat[M13];
+        float z = vec.x * mat[M20] + vec.y * mat[M21] + vec.z * mat[M22] + mat[M23];
+        vec.x = x;
+        vec.y = y;
+        vec.z = z;
     }
 
-    public static TextureRegion[] getRegions(TextureRegion region, int w, int h){
-        return getRegions(region, w, h, 32);
+    static float getYPos(float d, float r, float h){
+        float c1 = Mathf.pi * r;
+        if(d < c1){
+            return r * (1f - Mathf.sinDeg(180 * d / c1));
+        }else if(d > c1 + h - r){
+            return (h - r) + r * (Mathf.sinDeg(180 * (d - (c1 + h - r)) / c1));
+        }else{
+            return d - c1 + r;
+        }
+    }
+
+    public static void drawTread(TextureRegion region, float x, float y, float w, float h, float r, float rot, float d1, float d2){
+        float c1 = Mathf.pi * r;
+        float cut1 = c1 * 0.5f;
+        float cut2 = c1 * 1.5f + h - r * 2;
+        if(d1 < cut1 && d2 < cut1){return;}//cant be seen
+        if(d1 > cut2 && d2 > cut2){return;}//cant be seen
+
+        float y1 = getYPos(d1, r, h) - h * 0.5f;
+        float y2 = getYPos(d2, r, h) - h * 0.5f;
+        TextureRegion reg = region;
+        if(d1 < cut1){
+            y1 = -h * 0.5f;
+            tr1.set(region);
+            tr1.v = Mathf.map(cut1, d1, d2, tr1.v, tr1.v2);
+            reg = tr1;
+        }
+
+        if(d2 > cut2){
+            y2 = h * 0.5f;
+            tr1.set(region);
+            tr1.v2 = Mathf.map(cut2, d1, d2, tr1.v, tr1.v2);
+            reg = tr1;
+        }
+
+        Draw.rect(reg, x, y + (y1 + y2) * 0.5f, w, y2 - y1, w * 0.5f, -y1, rot);
+
+    }
+
+    public static void drawRotRect(TextureRegion region, float x, float y, float w, float h, float th, float rot, float ang1, float ang2){
+        if(region == null || !Core.settings.getBool("effects")) return;
+        float amod1 = Mathf.mod(ang1, 360f);
+        float amod2 = Mathf.mod(ang2, 360f);
+        if(amod1 >= 180f && amod2 >= 180f) return;
+
+        tr1.set(region);
+        float uy1 = tr1.v;
+        float uy2 = tr1.v2;
+        float uCenter = (uy1 + uy2) / 2f;
+        float uSize = (uy2 - uy1) * h / th * 0.5f;
+        uy1 = uCenter - uSize;
+        uy2 = uCenter + uSize;
+        tr1.v = uy1;
+        tr1.v2 = uy2;
+
+        float s1 = -Mathf.cos(ang1 * Mathf.degreesToRadians);
+        float s2 = -Mathf.cos(ang2 * Mathf.degreesToRadians);
+        if(amod1 > 180f){
+            tr1.v2 = Mathf.map(0f, amod1 - 360f, amod2, uy2, uy1);
+            s1 = -1f;
+        }else if(amod2 > 180f){
+            tr1.v = Mathf.map(180f, amod1, amod2, uy2, uy1);
+            s2 = 1f;
+        }
+        s1 = Mathf.map(s1, -1f, 1f, y - h / 2f, y + h / 2f);
+        s2 = Mathf.map(s2, -1f, 1f, y - h / 2f, y + h / 2f);
+        Draw.rect(tr1, x, (s1 + s2) * 0.5f, w, s2 - s1, w * 0.5f, y - s1, rot);
+    }
+
+    public static void drawRectOrtho(TextureRegion region, float x, float y, float z, float w, float h, float rotY, float rotZ){
+        drawRectOrtho(region, x, y, 0, 0, z, w, h, rotY, rotZ);
+    }
+
+    public static void drawRectOrtho(TextureRegion region, float x, float y, float ox, float oy, float z, float w, float h, float rotY, float rotZ){
+        drawRectOrtho(region, x, y, ox, oy, z, w, h, rotY, rotZ, (w != h) ? rotZ : 0);
+    }
+
+    public static void drawRectOrtho(TextureRegion region, float x, float y, float ox, float oy, float z, float w, float h, float rotY, float rotZ, float sprrotZ){
+        vec3s[3].set(+w * 0.5f, +h * 0.5f, 0);
+        vec3s[0].set(-w * 0.5f, +h * 0.5f, 0);
+        vec3s[1].set(-w * 0.5f, -h * 0.5f, 0);
+        vec3s[2].set(+w * 0.5f, -h * 0.5f, 0);
+
+        vert1.set(ox, oy, z);
+        m41.idt();
+        for(int i = 0; i < 4; i++){
+            vec3s[i].rotate(Vec3.Z, sprrotZ);
+        }
+        vert2.set(Vec3.Y).rotate(Vec3.Z, -rotZ);
+        vert1.rotate(Vec3.Z, -rotZ);
+        m41.rotate(vert2, -rotY);
+        m41.translate(vert1);
+
+        for(int i = 0; i < 4; i++){
+            mulVec(m41.val, vec3s[i]);
+            vec3s[i].add(x, y, 0);
+        }
+
+        Fill.quad(region, vec3s[0].x, vec3s[0].y, vec3s[1].x, vec3s[1].y, vec3s[2].x, vec3s[2].y, vec3s[3].x, vec3s[3].y);
+    }
+
+    public static void drawRectOffsetHorz(TextureRegion region, float x, float y, float w, float h, float rotation, float o){
+        tr1.set(region);
+        tr2.set(region);
+        float cx = x + w * 0.5f;
+        float dx = x - w * 0.5f + w * o;
+        float t1w = w * (1f - o);
+        float t2w = w * o;
+        tr1.u2 = Mathf.lerp(region.u, region.u2, 1 - o);
+        tr2.u = Mathf.lerp(region.u2, region.u, o);
+        Draw.rect(tr1, dx + t1w * 0.5f, y, t1w, h, x - dx, h * 0.5f, rotation);
+        Draw.rect(tr2, dx - t2w * 0.5f, y, t2w, h, x - (dx - t2w), h * 0.5f, rotation);
+    }
+
+    public static void arc(float x, float y, float r, float fromRadian, float toRadian){
+        int seg = (int)Math.max(1, Lines.circleVertices(r) * Math.abs(toRadian - fromRadian) / (2 * Mathf.pi));
+        float c = Mathf.cos(fromRadian);
+        float s = Mathf.sin(fromRadian);
+        float thick = Lines.getStroke() * 0.5f;
+        vec1.set(c * (r + thick) + x, s * (r + thick) + y);
+        vec2.set(c * (r - thick) + x, s * (r - thick) + y);
+        for(int i = 0; i < seg; i++){
+            float t = Mathf.lerp(fromRadian, toRadian, (i + 1f) / seg);
+            c = Mathf.cos(t);
+            s = Mathf.sin(t);
+            vec3.set(c * (r + thick) + x, s * (r + thick) + y);
+            vec4.set(c * (r - thick) + x, s * (r - thick) + y);
+            Fill.quad(Core.atlas.white(), vec1.x, vec1.y, vec3.x, vec3.y, vec4.x, vec4.y, vec2.x, vec2.y);
+            vec1.set(vec3);
+            vec2.set(vec4);
+        }
+    }
+
+    public static void selected(float x, float y, float size, Color color){
+        Draw.color(color);
+
+        for(int i = 0; i < 4; ++i){
+            Point2 p = Geometry.d8edge[i];
+            Draw.rect("block-select", x + p.x * size, y + p.y * size, (float)(i * 90));
+        }
+
+        Draw.reset();
     }
 }

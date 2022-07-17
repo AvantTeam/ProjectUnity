@@ -108,7 +108,7 @@ public final class ReflectUtils{
     }
 
     public static <T> T invoke(Class<?> type, Object inst, String name, Object[] args, @Nullable Class<?>... params){
-        if(params == null){
+        if(params == null && args != null){
             params = new Class[args.length];
             for(int i = 0; i < params.length; i++) params[i] = args[i].getClass();
         }

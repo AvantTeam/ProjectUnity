@@ -25,6 +25,7 @@ import unity.graphics.*;
 import unity.graphics.MultiTrail.*;
 import unity.graphics.trail.*;
 import unity.mod.*;
+import unity.type.*;
 import unity.util.*;
 
 import static arc.Core.*;

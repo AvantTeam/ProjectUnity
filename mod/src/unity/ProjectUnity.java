@@ -10,13 +10,20 @@ import unity.gen.entities.*;
 import unity.graphics.*;
 import unity.io.*;
 import unity.mod.*;
+import unity.net.*;
+import unity.parts.*;
+import unity.ui.*;
 import unity.util.*;
+import unity.world.graph.*;
 
 import java.io.*;
 
 import static mindustry.Vars.*;
 
 public class ProjectUnity extends ProjectUnityCommon{
+    /** UI **/
+    public static YoungchaUI youngchaUI = YoungchaUI.self;
+
     public ProjectUnity(){
         try{
             Class<DevBuildImpl> type = ReflectUtils.findc("unity.DevBuildImpl");
@@ -60,6 +67,16 @@ public class ProjectUnity extends ProjectUnityCommon{
             }
         }));
 
+        Events.on(ClientLoadEvent.class, e -> {
+            ModularPartType.loadStatic();
+            for(var en : ModularPartType.partMap){
+                en.value.load();
+            }
+
+            Graphs.load();
+            YoungchaParts.loadDoodads();
+        });
+
         Events.on(ContentInitEvent.class, e -> Core.app.post(Faction::load));
         Core.app.post(() -> {
             dev.setup();
@@ -73,6 +90,8 @@ public class ProjectUnity extends ProjectUnityCommon{
     public void init(){
         JSBridge.importDefaults(JSBridge.defaultScope);
         dev.init();
+        youngchaUI.init();
+        UnityCalls.registerPackets();
     }
 
     @Override
@@ -81,6 +100,7 @@ public class ProjectUnity extends ProjectUnityCommon{
         Faction.init();
 
         PUStatusEffects.load();
+        PUBullets.load();
 
         MonolithItems.load();
         MonolithStatusEffects.load();
@@ -93,6 +113,7 @@ public class ProjectUnity extends ProjectUnityCommon{
         EndBlocks.load();
 
         YoungchaItems.load();
+        YoungchaUnitTypes.load();
         YoungchaBlocks.load();
     }
 }
