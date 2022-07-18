@@ -68,7 +68,7 @@ public final class YoungchaBlocks{
                 solid = true;
                 variants = 0;
                 canShadow = false;
-                mapColor = Color.black;
+                mapColor = Color.black.cpy();
             }
         });
         waterpit = register(Faction.youngcha, new Floor("waterpit"){
