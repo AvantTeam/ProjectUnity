@@ -153,22 +153,42 @@ public class EndGameTurret extends Turret{
                 Rand r = MathUtils.seedr, r2 = MathUtils.seedr2;
                 r.setSeed(id * 9999L + 2);
                 float charge = (reloadCounter - reload) / chargeTime;
-                float charge2 = charge * 7f;
-                int amount = Mathf.ceil(charge2);
+                float fin3 = Interp.pow3Out.apply(charge);
+
+                float amountf = charge * 7f;
+                int amount = Mathf.ceil(amountf);
                 for(int i = 0; i < amount; i++){
+                    float fin = Math.min(1f, amountf - i);
                     for(int j = 0; j < 3; j++){
-                        float fin = Math.min(1f, charge2 - i);
                         float duration = r.random(50f, 80f);
                         float t = Time.time + r.random(duration);
-                        //int tseed = (int)(t / duration) + r.nextInt();
                         float fin2 = (t / duration) % 1f;
-                        float fin3 = Interp.pow3Out.apply(charge);
 
                         r2.setSeed((int)(t / duration) + r.nextInt());
                         float width = r2.random(11f, 22f);
                         float length = width * r2.random(3f, 3.8f) * Mathf.slope(fin2) * fin * fin3;
 
                         DrawPU.diamond(x, y, width * Mathf.curve(1f - fin2, 0.5f, 1f) * fin * fin3, length, r2.random(360f) + r2.range(15f) * fin2);
+                    }
+                }
+                r.setSeed(id * 9999L + 4);
+
+                amountf = charge * charge * 9f;
+                amount = Mathf.ceil(amountf);
+                for(int i = 0; i < amount; i++){
+                    float fin = Math.min(1f, amountf - i);
+                    for(int j = 0; j < 10; j++){
+                        float duration = r.random(25f, 60f);
+                        float t = Time.time + r.random(duration);
+                        float fin2 = (t / duration) % 1f;
+
+                        r2.setSeed((int)(t / duration) + r.nextInt());
+                        //float l = r2.nextFloat();
+                        //float l2 = (l * l * 135f) * fin2 * fin2 * fin3;
+                        float l2 = r2.random(60f * charge, 125f) * fin2 * fin2 * fin3;
+
+                        Vec2 v = Tmp.v1.trns(r2.random(360f), l2).add(this);
+                        Fill.square(v.x, v.y, r2.random(3.25f, 6f) * (1f + charge / 2f) * Interp.pow3Out.apply(1f - fin2) * fin, 45f);
                     }
                 }
             }
@@ -369,6 +389,35 @@ public class EndGameTurret extends Turret{
             if(reloadCounter >= reload + chargeTime){
                 reloadCounter = 0f;
                 chargeTimeCounter = Mathf.random(1000000f);
+                shootMain();
+            }
+        }
+
+        void shootMain(){
+            EndFx.endgameShoot.at(x, y, mainRange);
+
+            Seq<Teams.TeamData> data = Vars.state.teams.present;
+            float r = mainRange;
+            for(int i = 0; i < data.size; i++){
+                if(data.items[i].team != team){
+                    QuadTree<Unit> utree = data.items[i].unitTree;
+                    QuadTree<Building> btree = data.items[i].buildingTree;
+
+                    if(utree != null){
+                        utree.intersect(x - r, y - r, r * 2, r * 2, u -> {
+                            if(within(u, r + u.hitSize / 2f)){
+                                u.destroy();
+                            }
+                        });
+                    }
+                    if(btree != null){
+                        btree.intersect(x - r, y - r, r * 2, r * 2, b -> {
+                            if(within(b, r + b.hitSize() / 2f)){
+                                b.kill();
+                            }
+                        });
+                    }
+                }
             }
         }
 
@@ -457,11 +506,11 @@ public class EndGameTurret extends Turret{
             tmpTargets.clear();
 
             Seq<Teams.TeamData> data = Vars.state.teams.present;
+            float r = range;
             for(int i = 0; i < data.size; i++){
                 if(data.items[i].team != team){
                     QuadTree<Unit> utree = data.items[i].unitTree;
                     QuadTree<Building> btree = data.items[i].buildingTree;
-                    float r = range;
 
                     if(utree != null){
                         utree.intersect(x - r, y - r, r * 2, r * 2, u -> {

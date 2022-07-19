@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import unity.graphics.*;
+import unity.util.*;
 
 public class EndFx{
     private final static FloatSeq floatSeq = new FloatSeq();
@@ -94,7 +95,26 @@ public class EndFx{
         Draw.color(EndPal.endLight);
         Lines.stroke(4f * e.fout());
         Lines.circle(e.x, e.y, 120f * finpow);
-    });
+    }),
+
+    endgameShoot = new Effect(60f, 900f * 2f, e -> {
+        float rad = (e.rotation - 130f) * Interp.pow3Out.apply(Mathf.curve(e.fin(), 0f, 0.5f)) + 130f;
+        float rad2 = e.rotation * Mathf.curve(e.fin(), 0.25f, 1f);
+        r.setSeed(e.id * 9999L);
+
+        Draw.blend(PUBlending.shadowRealm);
+        //Fill.poly(e.x, e.y, 6, rad);
+        Draw.color(EndPal.endMid);
+        DrawUtils.hollowPoly(e.x, e.y, Lines.circleVertices(rad) / 2, rad2, rad);
+        Draw.blend();
+
+        Draw.color(Color.black);
+        for(int i = 0; i < 60; i++){
+            Vec2 v = Tmp.v1.trns(r.random(360f), rad + (15f * e.finpow() * r.nextFloat()));
+            float ang = v.angle();
+            DrawPU.diamond(e.x + v.x, e.y + v.y, r.random(25f, 40f) * e.fslope(), r.random(80f, 110f) * Mathf.curve(e.fout(), 0f, 0.5f), ang);
+        }
+    }).layer(Layer.flyingUnit);
 
     public static class LaserEffectData{
         public Position a, b;

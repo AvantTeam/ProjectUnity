@@ -163,6 +163,22 @@ public final class DrawUtils{
         }
     }
 
+    public static void hollowPoly(float x, float y, int amount, float rad1, float rad2){
+        for(int i = 0; i < amount; i++){
+            float r1 = (360f / amount) * i;
+            float r2 = (360f / amount) * (i + 1f);
+            float s1 = Mathf.sinDeg(r1), c1 = Mathf.cosDeg(r1);
+            float s2 = Mathf.sinDeg(r2), c2 = Mathf.cosDeg(r2);
+
+            Fill.quad(
+                    x + s1 * rad1, y + c1 * rad1,
+                    x + s1 * rad2, y + c1 * rad2,
+                    x + s2 * rad2, y + c2 * rad2,
+                    x + s2 * rad1, y + c2 * rad1
+            );
+        }
+    }
+
     public static void linePoint(float x, float y, Color col){
         linePoint(x, y, col.toFloatBits(), Draw.z());
     }
