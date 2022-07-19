@@ -17,7 +17,6 @@ import unity.content.*;
 import unity.entities.prop.*;
 import unity.gen.entities.*;
 import unity.graphics.*;
-import unity.type.*;
 import unity.util.*;
 
 import static mindustry.Vars.headless;

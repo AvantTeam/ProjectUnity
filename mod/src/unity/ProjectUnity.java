@@ -12,7 +12,6 @@ import unity.io.*;
 import unity.mod.*;
 import unity.net.*;
 import unity.parts.*;
-import unity.ui.*;
 import unity.util.*;
 import unity.world.graph.*;
 
@@ -21,9 +20,6 @@ import java.io.*;
 import static mindustry.Vars.tree;
 
 public class ProjectUnity extends ProjectUnityCommon{
-    /** UI **/
-    public static YoungchaUI youngchaUI = YoungchaUI.self;
-
     public ProjectUnity(){
         try{
             Class<DevBuildImpl> type = ReflectUtils.findc("unity.DevBuildImpl");
@@ -90,7 +86,7 @@ public class ProjectUnity extends ProjectUnityCommon{
     public void init(){
         JSBridge.importDefaults(JSBridge.defaultScope);
         dev.init();
-        youngchaUI.init();
+        ui.init();
         UnityCalls.registerPackets();
     }
 
@@ -115,5 +111,6 @@ public class ProjectUnity extends ProjectUnityCommon{
         YoungchaItems.load();
         YoungchaUnitTypes.load();
         YoungchaBlocks.load();
+        YoungchaParts.load();
     }
 }

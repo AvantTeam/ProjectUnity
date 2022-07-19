@@ -4,8 +4,6 @@ import arc.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import mindustry.ctype.*;
 
-import static java.lang.Math.exp;
-
 /** Intermediately-shared utility access for miscellaneous operations, such as convenient codes relating to contents. */
 public final class MiscUtils{
     private MiscUtils(){}
@@ -59,13 +57,5 @@ public final class MiscUtils{
         if(name.endsWith("1")) name = name.substring(0, name.length() - 1);
 
         return (AtlasRegion)Core.atlas.find(name + "-ui", full);
-    }
-
-    public static float interp(float x, float x2, float t){
-        return (float)(1 - (1 / (1 + exp((t * 2 - 1) / 0.2)))) * (x2 - x) + x;
-    }
-
-    public static float sqinterp(float x, float x2, float t){
-        return t * t * (x2 - x) + x;
     }
 }

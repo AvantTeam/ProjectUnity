@@ -7,7 +7,7 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
-import unity.content.*;
+import unity.mod.*;
 import unity.parts.*;
 import unity.util.*;
 
@@ -70,6 +70,7 @@ public class WeaponMountStat extends ModularPartStat{
         t.row();
         t.add("[lightgray]" + Stat.reload.localized() + ": " + (u.mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / u.reload * u.shoot.shots, 2) + " " + StatUnit.perSecond.localized());
 
-        StatValues.ammo(ObjectMap.of(YoungchaUnitTypes.modularUnitSmall, u.bullet)).display(t);
+        //It was YoungchaUnitTypes.modularUnitSmall. hacky TODO
+        StatValues.ammo(ObjectMap.of(FactionRegistry.contents(Faction.youngcha, UnitType.class).get(0), u.bullet)).display(t);
     }
 }

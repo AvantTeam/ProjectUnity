@@ -488,7 +488,7 @@ public class PayloadArm extends GenericGraphBlock{
                     }
                     break;
             }
-            progressInterop = MiscUtils.interp(0, 1, Mathf.clamp(progress));
+            progressInterop = MathUtils.interp(0, 1, Mathf.clamp(progress));
             arm.start.set(0, 0);
             arm.end.set(Mathf.cosDeg(getCurrentArmRotation()) * getCurrentArmExtend(), Mathf.sinDeg(getCurrentArmRotation()) * getCurrentArmExtend());
             arm.update();

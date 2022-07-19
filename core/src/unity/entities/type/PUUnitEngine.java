@@ -1,4 +1,4 @@
-package unity.type;
+package unity.entities.type;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;

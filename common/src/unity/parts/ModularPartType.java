@@ -14,7 +14,6 @@ import mindustry.world.meta.*;
 import unity.parts.stats.AdditiveStat.*;
 import unity.parts.stats.*;
 import unity.util.*;
-import unity.world.blocks.payloads.*;
 
 //like Block, this is a singleton
 public class ModularPartType implements Displayable{
@@ -48,7 +47,6 @@ public class ModularPartType implements Displayable{
     public float constructTimeMultiplier = 1; // base time based on item cost
     public ItemStack[] cost = {};
     public int costTotal = 0;
-    public ModuleBlock moduleCost = null;
     //module cost..
 
 
@@ -66,6 +64,7 @@ public class ModularPartType implements Displayable{
 
 
     public ModularPartType(String name){
+        arc.util.Log.info(id);
         this.name = name;
         partMap.put(id, this);
     }

@@ -12,6 +12,9 @@ final class EntityDefs{
     /** Monolith legs + unit. */
     @EntityDef({Unitc.class, Legsc.class, Monolithc.class}) Object monolithLegsUnit;
 
+    /** Youngcha modular + unit. */
+    @EntityDef({Unitc.class, Modularc.class}) Object modularUnit;
+
     private EntityDefs(){
         throw new AssertionError();
     }

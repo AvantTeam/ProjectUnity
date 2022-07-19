@@ -1,4 +1,4 @@
-package unity.entities.bullet;
+package unity.content.type.bullet;
 
 import arc.*;
 import arc.graphics.*;

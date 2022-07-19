@@ -1,4 +1,4 @@
-package unity.type;
+package unity.entities.type;
 
 import arc.*;
 import arc.func.*;
@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import unity.entities.type.*;
 import unity.graphics.*;
 import unity.util.*;
 
@@ -25,9 +24,6 @@ public class PUUnitType extends PUUnitTypeCommon{
     public Func<Unit, Trail> trailType = unit -> new Trail(trailLength);
     /** Whether to kickstart trails when instantiating. Only valid if the trail is an instanceof {@link BaseTrail}. */
     public boolean kickstartTrail = false;
-
-    // Modular Units.
-    public Seq<String> templates = new Seq<>();
 
     public PUUnitType(String name){
         super(name);
@@ -115,5 +111,10 @@ public class PUUnitType extends PUUnitTypeCommon{
         for(Props prop : properties.values()) prop.preLoad();
         super.load();
         for(Props prop : properties.values()) prop.load();
+    }
+
+    @Override
+    public void drawCell(Unit unit){
+        for(Props prop : properties.values()) prop.drawCell(unit);
     }
 }

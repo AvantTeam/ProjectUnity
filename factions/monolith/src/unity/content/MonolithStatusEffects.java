@@ -1,8 +1,8 @@
 package unity.content;
 
 import mindustry.type.*;
+import unity.content.type.*;
 import unity.mod.*;
-import unity.type.*;
 
 import static unity.graphics.MonolithPal.monolithLighter;
 import static unity.mod.FactionRegistry.register;

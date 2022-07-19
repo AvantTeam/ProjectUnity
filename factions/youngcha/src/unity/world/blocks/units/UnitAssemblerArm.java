@@ -83,7 +83,7 @@ public class UnitAssemblerArm extends GenericGraphBlock{
             if(!enabled){
                 buildProgress = 0;
                 if(currentJob != null){
-                    currentJob.takenby = -1;
+                    currentJob.takenBy = -1;
                     currentJob = null;
                 }
                 return;
@@ -116,11 +116,11 @@ public class UnitAssemblerArm extends GenericGraphBlock{
                     }
                     if(currentJob != null && !Vars.net.client() && currentJob.isComplete()){
                         UnityCalls.moduleComplete(attached, this, currentJob);
-                        currentJob.takenby = -1;
+                        currentJob.takenBy = -1;
                         currentJob = null;
                         buildProgress = 0;
                     }else if(!found && currentJob != null){
-                        currentJob.takenby = -1;
+                        currentJob.takenBy = -1;
                         currentJob = null;
                         buildProgress = 0;
                     }

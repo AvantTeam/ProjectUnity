@@ -1,4 +1,4 @@
-package unity.type.weapons;
+package unity.entities.weapons;
 
 import arc.*;
 import arc.func.*;

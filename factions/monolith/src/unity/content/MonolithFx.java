@@ -11,6 +11,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import unity.entities.*;
+import unity.entities.type.*;
 import unity.gen.entities.*;
 import unity.graphics.*;
 import unity.graphics.MultiTrail.*;

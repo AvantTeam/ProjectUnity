@@ -39,13 +39,13 @@ public class ModularWheelType extends ModularPartType{
         transform.drawRect(base, part.cx * partSize, part.cy * partSize);
         if(h == 1){
             for(int i = 0; i < 4; i++){
-                DrawUtils.drawRotRect(moving, pos.x, pos.y, w * partSize, moving.height * Draw.scl, moving.height * Draw.scl, transform.getRotation() - 90, ang + i * 90, ang + i * 90 + 90);
+                YoungchaDrawUtils.drawRotRect(moving, pos.x, pos.y, w * partSize, moving.height * Draw.scl, moving.height * Draw.scl, transform.getRotation() - 90, ang + i * 90, ang + i * 90 + 90);
             }
         }else{
             float treadlength = h * partSize - partSize + partSize * Mathf.pi;
             float offset = (rollDistance * Draw.scl) % (moving.height * Draw.scl);
             for(float i = 0; i < treadlength; i += moving.height * Draw.scl){
-                DrawUtils.drawTread(moving, pos.x, pos.y, w * partSize, (h + 0.5f) * partSize, partSize * 0.5f, transform.getRotation() - 90, i + offset, i + offset + moving.height * Draw.scl);
+                YoungchaDrawUtils.drawTread(moving, pos.x, pos.y, w * partSize, (h + 0.5f) * partSize, partSize * 0.5f, transform.getRotation() - 90, i + offset, i + offset + moving.height * Draw.scl);
             }
         }
         //transform.drawRect(base,part.ax*partSize,part.ay*partSize);

@@ -1,15 +1,12 @@
 package unity.content;
 
-import mindustry.world.*;
-import unity.mod.*;
+import mindustry.world.Block;
 import unity.world.blocks.*;
-
-import static unity.mod.FactionRegistry.register;
 
 public class EndBlocks{
     public static Block endgame;
 
     public static void load(){
-        endgame = register(Faction.end, new EndGameTurret("endgame"));
+        endgame = new EndGameTurret("endgame");
     }
 }

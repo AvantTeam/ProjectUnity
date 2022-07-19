@@ -3,10 +3,10 @@ package unity.parts;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import unity.content.*;
 import unity.parts.PanelDoodadType.*;
 
 public class UnitDoodadGenerator{
+    public static final Seq<PanelDoodadPalette> unitDoodads = new Seq();
     public static void initDoodads(int rngseed, Seq<PanelDoodad> doodads, ModularConstruct construct){
         Rand rand = new Rand();
         rand.setSeed(rngseed);
@@ -122,7 +122,7 @@ public class UnitDoodadGenerator{
 
                     if(filled[i][j] && !placed[i][j]){
                         draw.clear();
-                        for(var pal : YoungchaParts.unitDoodads){
+                        for(var pal : unitDoodads){
                             if(pal.w == 1 && pal.h == 1){
                                 draw.add(pal.get(1 - lightness[i][j]));
                             }else{
@@ -150,7 +150,7 @@ public class UnitDoodadGenerator{
                             continue;
                         }
                         draw.clear();
-                        for(var pal : YoungchaParts.unitDoodads){
+                        for(var pal : unitDoodads){
                             if(pal.w == 1 && pal.h == 1){
                                 draw.add(pal.get(1 - lightness[w - i - 1][j]));
                             }else{

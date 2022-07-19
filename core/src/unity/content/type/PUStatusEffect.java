@@ -1,4 +1,4 @@
-package unity.type;
+package unity.content.type;
 
 import arc.graphics.*;
 import mindustry.type.*;

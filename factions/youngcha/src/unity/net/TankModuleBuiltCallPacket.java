@@ -37,11 +37,11 @@ public class TankModuleBuiltCallPacket extends Packet{
     }
 
     public void handleClient(){
-        if(arm instanceof UnitAssemblerArmBuild unitarm && hangar instanceof ModularUnitAssemblerBuild hangar){
+        if(arm instanceof UnitAssemblerArmBuild unitArm && hangar instanceof ModularUnitAssemblerBuild hangar){
             hangar.finishModule(completedModule);
-            if(unitarm.currentJob != null && unitarm.currentJob.x == completedModule.x && unitarm.currentJob.y == completedModule.y){
-                unitarm.currentJob.takenby = -1;
-                unitarm.currentJob = null;
+            if(unitArm.currentJob != null && unitArm.currentJob.x == completedModule.x && unitArm.currentJob.y == completedModule.y){
+                unitArm.currentJob.takenBy = -1;
+                unitArm.currentJob = null;
             }
         }
     }

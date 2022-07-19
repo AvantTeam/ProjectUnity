@@ -6,6 +6,8 @@ import arc.math.Interp.*;
 import arc.math.geom.*;
 import arc.util.*;
 
+import static java.lang.Math.exp;
+
 /** Shared utility access for mathematical operations. */
 @SuppressWarnings({"SuspiciousNameCombination", "UnusedReturnValue"})
 public final class MathUtils{
@@ -189,6 +191,14 @@ public final class MathUtils{
         float d = Math.abs(a - b) % 360f;
         int sign = (a - b >= 0f && a - b <= 180f) || (a - b <= -180f && a - b >= -360f) ? 1 : -1;
         return (d > 180f ? 360f - d : d) * sign;
+    }
+
+    public static float interp(float x, float x2, float t){
+        return (float)(1 - (1 / (1 + exp((t * 2 - 1) / 0.2)))) * (x2 - x) + x;
+    }
+
+    public static float sqinterp(float x, float x2, float t){
+        return t * t * (x2 - x) + x;
     }
 
     public interface IntExtractor{

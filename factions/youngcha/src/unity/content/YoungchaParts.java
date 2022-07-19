@@ -2,18 +2,19 @@ package unity.content;
 
 import arc.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.weapons.*;
+import unity.content.type.bullet.*;
 import unity.entities.abilities.*;
-import unity.entities.bullet.*;
+import unity.entities.weapons.*;
 import unity.parts.*;
 import unity.parts.types.*;
-import unity.type.weapons.*;
+
+import static unity.parts.UnitDoodadGenerator.unitDoodads;
 
 public class YoungchaParts{
     //unit
@@ -27,7 +28,7 @@ public class YoungchaParts{
     //abilities
     public static ModularPartType pipebomb, pretender;
     //unit
-    public static Seq<PanelDoodadPalette> unitDoodads = new Seq();
+    //public static Seq<PanelDoodadPalette> unitDoodads = new Seq();TODO
 
     public static void load(){
         //region units

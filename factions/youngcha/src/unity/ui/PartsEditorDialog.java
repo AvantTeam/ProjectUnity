@@ -29,7 +29,7 @@ public class PartsEditorDialog extends BaseDialog{
     public PartsEditorElement editorElement;
     public Cons2<ModularConstructBuilder, Table> infoViewer;
 
-    public ObjectMap<String, Seq<ModularPartType>> avalibleParts = new ObjectMap<>();
+    public ObjectMap<String, Seq<ModularPartType>> availableParts = new ObjectMap<>();
     boolean info = false;
 
     //part select
@@ -38,7 +38,7 @@ public class PartsEditorDialog extends BaseDialog{
         table.top();
         table.add(Core.bundle.get("ui.parts.select")).growX().left().color(Pal.gray);
 
-        for(var category : avalibleParts){
+        for(var category : availableParts){
             ///Title!
             table.row();
             table.add(Core.bundle.get("ui.parts.category." + category.key)).growX().left().color(Pal.accent);
@@ -205,15 +205,15 @@ public class PartsEditorDialog extends BaseDialog{
         show();
 
         //todo: temp
-        avalibleParts.clear();
+        availableParts.clear();
         for(var part : ModularPartType.partMap){
             if(!allowed.get(part.value)){
                 continue;
             }
-            if(!avalibleParts.containsKey(part.value.category)){
-                avalibleParts.put(part.value.category, new Seq<>());
+            if(!availableParts.containsKey(part.value.category)){
+                availableParts.put(part.value.category, new Seq<>());
             }
-            avalibleParts.get(part.value.category).add(part.value);
+            availableParts.get(part.value.category).add(part.value);
         }
     }
 

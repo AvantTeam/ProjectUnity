@@ -1,6 +1,7 @@
 package unity.entities.type;
 
 import arc.struct.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 /**
@@ -27,7 +28,7 @@ public abstract class PUUnitTypeCommon extends UnitType{
     }
 
     /** Unit type properties, e.g. copter regions, soul amounts, etc. */
-    public static class Props{
+    public abstract static class Props{
         public void preInit(){}
 
         public void init(){}
@@ -35,5 +36,7 @@ public abstract class PUUnitTypeCommon extends UnitType{
         public void preLoad(){}
 
         public void load(){}
+
+        public void drawCell(Unit unit){}
     }
 }

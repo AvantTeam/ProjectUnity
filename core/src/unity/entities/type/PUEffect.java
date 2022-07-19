@@ -1,4 +1,4 @@
-package unity.entities;
+package unity.entities.type;
 
 import arc.func.*;
 import arc.graphics.*;

@@ -2,8 +2,8 @@ package unity.content;
 
 import arc.graphics.*;
 import mindustry.type.*;
+import unity.content.type.*;
 import unity.mod.*;
-import unity.type.*;
 
 import static unity.mod.FactionRegistry.register;
 

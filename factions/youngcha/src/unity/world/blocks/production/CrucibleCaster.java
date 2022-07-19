@@ -163,7 +163,7 @@ public class CrucibleCaster extends GenericCaster{
                 }else{
                     float moveprog = Mathf.curve(progress, castTime, castTime + moveTime);
 
-                    float ang = MiscUtils.interp(0, 180, moveprog);
+                    float ang = MathUtils.interp(0, 180, moveprog);
 
                     if(ang < 90){
                         DrawUtils.drawRectOrtho(platter, x, y, -2, platter.width * 0.25f, platter.height * 0.25f, ang, rotdeg());

@@ -197,7 +197,7 @@ public class PayloadCaster extends GenericCaster{
                     if(moveprog < keyframe1){
                         //platter lifts up with the casted thing
                         float prog = Mathf.curve(moveprog, 0, keyframe1);
-                        float ang = MiscUtils.interp(0, plateangle, prog);
+                        float ang = MathUtils.interp(0, plateangle, prog);
                         DrawUtils.drawRectOrtho(platter, pivot.x, pivot.y, -5, 0, -2, platter.width * 0.25f, platter.height * 0.25f, ang, rotdeg());
                         DrawUtils.drawRectOrtho(platterside, pivot.x, pivot.y, 0, 0, -12, 4, 16, ang - 90, rotdeg());
 
@@ -215,7 +215,7 @@ public class PayloadCaster extends GenericCaster{
                         float prog = Mathf.curve(moveprog, keyframe1, keyframe2);
                         float edgemovescl = 4 / 5f;
                         Vec3 cubepos = new Vec3(-offset.x * edgemovescl, -offset.y * edgemovescl, -(2 + 4)); //rel to pivot
-                        float ang = MiscUtils.sqinterp(plateangle, 90, prog);
+                        float ang = MathUtils.sqinterp(plateangle, 90, prog);
                         cubepos.rotate(perp, ang);
                         Drawf.shadow(pivot.x + cubepos.x, pivot.y + cubepos.y, cast.size * tilesize * 2f, 1);
                         DrawUtils.drawRectOrtho(cast.region, pivot.x + cubepos.x, pivot.y + cubepos.y, -4, cast.region.width * 0.25f, cast.region.height * 0.25f, ang, rotdeg());
@@ -224,7 +224,7 @@ public class PayloadCaster extends GenericCaster{
                     }else if(moveprog <= keyframe3){
                         //casted thing moves to end, plates goes back
                         float prog = Mathf.curve(moveprog, keyframe2, keyframe3);
-                        float ang = MiscUtils.interp(plateangle, 0, prog);
+                        float ang = MathUtils.interp(plateangle, 0, prog);
                         DrawUtils.drawRectOrtho(platter, pivot.x, pivot.y, -5, 0, -2, platter.width * 0.25f, platter.height * 0.25f, ang, rotdeg());
                         DrawUtils.drawRectOrtho(platterside, pivot.x, pivot.y, 0, 0, -12, 4, 16, ang - 90, rotdeg());
                         float px = x + offset.x * Mathf.lerp(11, 12, prog) / 5f;
