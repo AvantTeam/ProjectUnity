@@ -110,7 +110,7 @@ public class EndFx{
 
         Draw.color(Color.black);
         for(int i = 0; i < 60; i++){
-            Vec2 v = Tmp.v1.trns(r.random(360f), rad + (15f * e.finpow() * r.nextFloat()));
+            Vec2 v = Tmp.v1.trns(r.random(360f), rad);
             float ang = v.angle();
             DrawPU.diamond(e.x + v.x, e.y + v.y, r.random(25f, 40f) * e.fslope(), r.random(80f, 110f) * Mathf.curve(e.fout(), 0f, 0.5f), ang);
         }
