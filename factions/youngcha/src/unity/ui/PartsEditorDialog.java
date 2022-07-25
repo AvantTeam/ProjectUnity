@@ -24,10 +24,10 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class PartsEditorDialog extends BaseDialog{
-    public ModularConstructBuilder builder;
+    public ModularConstructValidator builder;
     Cons<byte[]> consumer;
     public PartsEditorElement editorElement;
-    public Cons2<ModularConstructBuilder, Table> infoViewer;
+    public Cons2<ModularConstructValidator, Table> infoViewer;
 
     public ObjectMap<String, Seq<ModularPartType>> availableParts = new ObjectMap<>();
     boolean info = false;
@@ -53,7 +53,7 @@ public class PartsEditorDialog extends BaseDialog{
                         list.row(); //row size i 5
                     }
                     list.left();
-                    ImageButton partbutton = list.button(new TextureRegionDrawable(part.icon), Styles.selecti, () -> {
+                    ImageButton partsButton = list.button(new TextureRegionDrawable(part.icon), Styles.selecti, () -> {
                         if(editorElement.selected == part){
                             editorElement.deselect();
                         }else{
@@ -61,15 +61,16 @@ public class PartsEditorDialog extends BaseDialog{
                         }
                     }).pad(3).size(46f).name("part-" + part.name)
                     .tooltip(part::displayTooltip).get();
-                    partbutton.resizeImage(iconMed);
+                    partsButton.resizeImage(iconMed);
 
                     // unselect if another one got selected
-                    partbutton.update(() -> {
-                        partbutton.setChecked(editorElement.selected == part);
+                    partsButton.update(() -> {
+                        partsButton.setChecked(editorElement.selected == part);
                         //possibly set gray if disallowed.
-                        partbutton.forEach(elem -> elem.setColor(Color.white));
-                        if(builder.root == null && !part.root){
-                            partbutton.forEach(elem -> elem.setColor(Color.darkGray));
+                        if(builder.root == null && !part.root || builder.root != null && part.root){
+                            partsButton.forEach(elem -> elem.setColor(Color.darkGray));
+                        }else{
+                            partsButton.forEach(elem -> elem.setColor(Color.white));
                         }
                     });
                     i++;
@@ -87,14 +88,14 @@ public class PartsEditorDialog extends BaseDialog{
         ImageButton partsSelectMenuButton = new ImageButton(Icon.box, Styles.clearNoneTogglei);
         partsSelectMenuButton.clicked(() -> {
             partSelectBuilder.get(content);
-            builder.onChange = () -> {};
+            builder.setOnChange(() -> {});
         });
         tabs.add(partsSelectMenuButton).size(64).pad(8);
 
         ImageButton infoMenuButton = new ImageButton(Icon.info, Styles.clearNoneTogglei);
         infoMenuButton.clicked(() -> {
             infoViewer.get(builder, content);
-            builder.onChange = () -> infoViewer.get(builder, content);
+            builder.setOnChange(() -> infoViewer.get(builder, content));
         });
         tabs.add(infoMenuButton).size(64);
 
@@ -126,7 +127,7 @@ public class PartsEditorDialog extends BaseDialog{
 
     public PartsEditorDialog(){
         super("parts");
-        this.builder = new ModularConstructBuilder(3, 3);
+        this.builder = new ModularConstructValidator(3, 3);
         editorElement = new PartsEditorElement(this.builder);
         clearChildren();
         buttons.defaults().size(160f, 64f);
@@ -142,8 +143,7 @@ public class PartsEditorDialog extends BaseDialog{
         }).tooltip("copy").width(64);
         buttons.button(Icon.paste, () -> {
             try{
-                ModularConstructBuilder test = new ModularConstructBuilder(3, 3);
-                test.set(Base64.getDecoder().decode(Core.app.getClipboardText().trim().replaceAll("[\\t\\n\\r]+", "")));
+                ModularConstructValidator test = new ModularConstructValidator(Base64.getDecoder().decode(Core.app.getClipboardText().trim().replaceAll("[\\t\\n\\r]+", "")));
                 builder.clear();
                 builder.paste(test);
                 editorElement.onAction();
@@ -196,7 +196,7 @@ public class PartsEditorDialog extends BaseDialog{
         });
     }
 
-    public void show(byte[] data, Cons<byte[]> modified, Cons2<ModularConstructBuilder, Table> viewer, Boolf<ModularPartType> allowed){
+    public void show(byte[] data, Cons<byte[]> modified, Cons2<ModularConstructValidator, Table> viewer, Boolf<ModularPartType> allowed){
         this.builder.set(data);
         leftSideBuilder.get(selectSide);
         editorElement.setBuilder(this.builder);
@@ -218,11 +218,11 @@ public class PartsEditorDialog extends BaseDialog{
     }
 
 
-    public static Cons2<ModularConstructBuilder, Table> unitInfoViewer = (construct, table) -> {
+    public static Cons2<ModularConstructValidator, Table> unitInfoViewer = (construct, table) -> {
         table.clearChildren();
         var statmap = new ModularUnitStatMap();
         var itemcost = construct.itemRequirements();
-        ModularConstructBuilder.getStats(construct.parts, statmap);
+        ModularConstructValidator.getStats(construct.parts, statmap);
         table.top();
         table.add(Core.bundle.get("ui.parts.info")).growX().left().color(Pal.gray);
 

@@ -20,7 +20,7 @@ public class ModularConstruct implements Serializable{
     });
 
     public ModularPart[][] parts;
-    public Seq<ModularPart> partlist = new Seq<>();
+    public Seq<ModularPart> partList = new Seq<>();
     public Seq<ModularPart> hasCustomDraw = new Seq<>();
     static final int idSize = 1;
     public byte[] data;
@@ -34,14 +34,14 @@ public class ModularConstruct implements Serializable{
             int w = ub(data[0]);
             int h = ub(data[1]);
             parts = new ModularPart[w][h];
-            int partamount = (data.length - 2) / (2 + idSize);
-            int blocksize = (2 + idSize);
-            for(int i = 0; i < partamount; i++){
-                int id = getID(data, 2 + i * blocksize);
-                int x = ub(data[2 + i * blocksize + idSize]);
-                int y = ub(data[2 + i * blocksize + idSize + 1]);
+            int partAmount = (data.length - 2) / (2 + idSize);
+            int blockSize = (2 + idSize);
+            for(int i = 0; i < partAmount; i++){
+                int id = getID(data, 2 + i * blockSize);
+                int x = ub(data[2 + i * blockSize + idSize]);
+                int y = ub(data[2 + i * blockSize + idSize + 1]);
                 var part = ModularPartType.getPartFromId(id).create(x, y);
-                partlist.add(part);
+                partList.add(part);
                 if(part.type.open || part.type.hasCellDecal || part.type.hasExtraDecal){
                     hasCustomDraw.add(part);
                 }
@@ -56,7 +56,7 @@ public class ModularConstruct implements Serializable{
                     }
                 }
             }
-            for(ModularPart mp : partlist){
+            for(ModularPart mp : partList){
                 mp.type.setupPanellingIndex(mp, parts);
             }
             this.data = data;
@@ -89,18 +89,6 @@ public class ModularConstruct implements Serializable{
         for(int i = 0; i < idSize; i++){
             data[s + i] = sb(id & (0xFF << (i * 8))); //ignore warning, its for if there is somehow more then 255 parts
         }
-    }
-
-    public static ModularConstruct read(Reads reads){
-        int length = reads.b();
-        byte[] bytes = new byte[length];
-        return new ModularConstruct(reads.b(bytes));
-    }
-
-    public void write(Writes writes){
-        int len = partlist.size * 3 + 2;
-        writes.b(len);
-        writes.b(data);
     }
 
     public static int ub(byte a){

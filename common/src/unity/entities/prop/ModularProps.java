@@ -78,7 +78,7 @@ public class ModularProps extends Props{
         var construct = unit.construct();
         if(construct != null){
             ModularWheelType.rollDistance = unit.driveDist();
-            unit.doodadlist().each(d -> {
+            unit.doodadList().each(d -> {
                 d.drawOutline(dt);
             });
             construct.hasCustomDraw.each((p) -> {
@@ -87,16 +87,16 @@ public class ModularProps extends Props{
             construct.hasCustomDraw.each((p) -> {
                 p.type.draw(dt, p);
             });
-            unit.doodadlist().each(d -> {
+            unit.doodadList().each(d -> {
                 d.drawTop(dt);
             });
             construct.hasCustomDraw.each((p) -> {
                 p.type.drawTop(dt, p);
             });
         }else{
-            if(unit.constructdata() != null && unit.constructdata().length > 0){
-                unit.construct(new ModularConstruct(unit.constructdata()));
-                UnitDoodadGenerator.initDoodads(unit.construct().parts.length, unit.doodadlist(), unit.construct());
+            if(unit.constructData() != null && unit.constructData().length > 0){
+                unit.construct(new ModularConstruct(unit.constructData()));
+                UnitDoodadGenerator.initDoodads(unit.construct().parts.length, unit.doodadList(), unit.construct());
             }
         }
         Draw.reset();

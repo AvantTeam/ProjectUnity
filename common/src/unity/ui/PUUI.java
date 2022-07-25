@@ -26,7 +26,6 @@ import static mindustry.Vars.iconMed;
 public class PUUI{
     public int one = 1;
 
-
     //blockfrag editing
     ObjectSet<Faction> included = new ObjectSet<>();
     ObjectMap<Faction, Float> lastClicked = new ObjectMap<>();
@@ -156,9 +155,9 @@ public class PUUI{
             }
         }
         //fuckery (updates the blocks)
-        var b = (ImageButton)table.find("category-" + Vars.ui.hudfrag.blockfrag.currentCategory.name());
+        ImageButton b = table.find("category-" + Vars.ui.hudfrag.blockfrag.currentCategory.name());
         if(b == null){
-            b = (ImageButton)table.find("category-" + Category.distribution.name());
+            b = table.find("category-" + Category.distribution.name());
         }
         if(b != null){
             b.fireClick();

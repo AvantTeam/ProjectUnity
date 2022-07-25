@@ -24,7 +24,7 @@ public class PartsEditorElement extends Element{
     Seq<byte[]> prev = new Seq<>();
     int index = -1;
 
-    public ModularConstructBuilder builder;
+    public ModularConstructValidator builder;
     public ModularPartType selected = null;
     public boolean erasing = false;
     public boolean mirror = true;
@@ -39,7 +39,7 @@ public class PartsEditorElement extends Element{
     int dragTriggered = 0;
 
 
-    public PartsEditorElement(ModularConstructBuilder builder){
+    public PartsEditorElement(ModularConstructValidator builder){
         this.builder = builder;
 
         addListener(new InputListener(){
@@ -144,7 +144,7 @@ public class PartsEditorElement extends Element{
         return (x >= 0 && x < builder.w && y >= 0 && y < builder.h);
     }
 
-    public void setBuilder(ModularConstructBuilder builder){
+    public void setBuilder(ModularConstructValidator builder){
         this.builder = builder;
     }
 

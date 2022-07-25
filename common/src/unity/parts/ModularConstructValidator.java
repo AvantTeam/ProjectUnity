@@ -4,25 +4,33 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.type.*;
 
-public class ModularConstructBuilder{
+public class ModularConstructValidator{
     public ModularPart[][] parts;
     public boolean[][] valid;
     public int w, h;
     public ModularPart root = null;
 
-    public Runnable onChange = () -> {};
+    private Runnable onChange = () -> {};
 
-    public ModularConstructBuilder(int w, int h){
+    boolean updatedItemReq = false;
+    public ItemSeq itemRequirements;
+
+    public ModularConstructValidator(int w, int h){
         this.w = w;
         this.h = h;
         parts = new ModularPart[w][h];
         valid = new boolean[w][h];
     }
 
+    public ModularConstructValidator(byte[] data){
+        set(data);
+    }
+
     public void clear(){
         for(int i = 0; i < w; i++){
             for(int j = 0; j < h; j++){
                 parts[i][j] = null;
+                valid[i][j] = false;
             }
         }
         root = null;
@@ -30,37 +38,40 @@ public class ModularConstructBuilder{
         updatedItemReq = false;
     }
 
+    //converts data to ModularPart with ModularConstruct.
     public void set(byte[] data){
+        //Temporary uses ModularConstructs decoder of byte data.
         ModularConstruct design = new ModularConstruct(data);
-        parts = design.parts;
-        if(parts == null){
-            parts = new ModularPart[w][h];
+        //If data is judged to invalid, reset and skip.
+        if(design.parts == null){
             return;
         }
+        parts = design.parts;
         w = parts.length;
         h = parts[0].length;
         valid = new boolean[w][h];
         root = null;
         findRoot();
         onChange.run();
+        //Build whether each parts valid.
         rebuildValid();
         updatedItemReq = false;
     }
 
-    public void paste(ModularConstructBuilder e){
+    public void paste(ModularConstructValidator e){
         int ox = (w - e.w) / 2;
         int oy = (h - e.h) / 2;
         for(int i = 0; i < w; i++){
             for(int j = 0; j < h; j++){
-                if(!e.isIn(i - ox, j - oy)){
+                if(!e.canHave(i - ox, j - oy)){
                     continue;
                 }
                 if(e.parts[i - ox][j - oy] == null){
                     continue;
                 }
-                var epart = e.parts[i - ox][j - oy];
-                if(canFit(epart, ox, oy) && epart.isHere(i - ox, j - oy)){
-                    placePartDirect(epart.type, i, j);
+                var part = e.parts[i - ox][j - oy];
+                if(canHave(part, ox, oy) && part.isHere(i - ox, j - oy)){
+                    placePartDirect(part.type, i, j);
                 }
             }
         }
@@ -68,16 +79,26 @@ public class ModularConstructBuilder{
         rebuildValid();
     }
 
-    public boolean isIn(int x, int y){
-        return !(x < 0 || y < 0 || x >= w || y >= h);
+    private void findRoot(){
+        for(int i = 0; i < parts.length; i++){
+            for(int j = 0; j < parts[0].length; j++){
+                if(parts[i][j] != null && parts[i][j].type.root){
+                    root = parts[i][j];
+                }
+            }
+        }
     }
 
-    public boolean canFit(ModularPart p, int ox, int oy){
-        return isIn(p.x + ox, p.y + oy) && isIn(p.x + p.type.w - 1 + ox, p.y + p.type.h - 1 + oy);
+    public boolean canHave(int x, int y){
+        return x >= 0 && y >= 0 && x < w || y < h;
     }
 
-    public boolean canFit(ModularPartType p, int ox, int oy){
-        return isIn(ox, oy) && isIn(p.w - 1 + ox, p.h - 1 + oy);
+    public boolean canHave(ModularPart p, int ox, int oy){
+        return canHave(p.x + ox, p.y + oy) && canHave(p.x + p.type.w - 1 + ox, p.y + p.type.h - 1 + oy);
+    }
+
+    public boolean canHave(ModularPartType p, int ox, int oy){
+        return canHave(ox, oy) && canHave(p.w - 1 + ox, p.h - 1 + oy);
     }
 
     public Seq<ModularPart> getList(){
@@ -102,34 +123,42 @@ public class ModularConstructBuilder{
             return;
         }
 
-        OrderedSet<Point2> front = new OrderedSet<>();
-        front.add(new Point2(root.x, root.y));
+        //BFS to check it's valid. Valid parts have connections to root.
+        OrderedSet<Point2> points = new OrderedSet<>();
+        Queue<Point2> queue = new Queue<>();
+        var point = new Point2(root.x, root.y);
+        points.add(point);
+        queue.addLast(point);
         valid[root.x][root.y] = true;
-        while(!front.isEmpty()){
-            var pt = front.removeIndex(0);
+        while(!queue.isEmpty()){
+            var pt = queue.removeFirst();
 
             if(pt.x > 0 && parts[pt.x - 1][pt.y] != null && !valid[pt.x - 1][pt.y]){
                 valid[pt.x - 1][pt.y] = true;
-                front.add(new Point2(pt.x - 1, pt.y));
+                point = new Point2(pt.x - 1, pt.y);
+                points.add(point);
+                queue.addLast(point);
             }
             if(pt.y > 0 && parts[pt.x][pt.y - 1] != null && !valid[pt.x][pt.y - 1]){
                 valid[pt.x][pt.y - 1] = true;
-                front.add(new Point2(pt.x, pt.y - 1));
+                point = new Point2(pt.x - 1, pt.y);
+                points.add(point);
+                queue.addLast(point);
             }
-
             if(pt.x < w - 1 && parts[pt.x + 1][pt.y] != null && !valid[pt.x + 1][pt.y]){
                 valid[pt.x + 1][pt.y] = true;
-                front.add(new Point2(pt.x + 1, pt.y));
+                point = new Point2(pt.x - 1, pt.y);
+                points.add(point);
+                queue.addLast(point);
             }
             if(pt.y < h - 1 && parts[pt.x][pt.y + 1] != null && !valid[pt.x][pt.y + 1]){
                 valid[pt.x][pt.y + 1] = true;
-                front.add(new Point2(pt.x, pt.y + 1));
+                point = new Point2(pt.x - 1, pt.y);
+                points.add(point);
+                queue.addLast(point);
             }
         }
     }
-
-    boolean updatedItemReq = false;
-    public ItemSeq itemRequirements;
 
     public ItemSeq itemRequirements(){
         if(!updatedItemReq){
@@ -144,16 +173,16 @@ public class ModularConstructBuilder{
     }
 
     public byte[] export(){
-        var partseq = getList();
-        byte[] output = new byte[2 + partseq.size * (ModularConstruct.idSize + 2)];
+        var partList = getList();
+        byte[] output = new byte[2 + partList.size * (ModularConstruct.idSize + 2)];
         output[0] = ModularConstruct.sb(w);
         output[1] = ModularConstruct.sb(h);
-        int blocksize = (ModularConstruct.idSize + 2);
-        for(int i = 0; i < partseq.size; i++){
-            var part = partseq.get(i);
-            ModularConstruct.writeID(output, 2 + blocksize * i, part.type.id);
-            output[2 + blocksize * i + ModularConstruct.idSize] = ModularConstruct.sb(part.x);
-            output[2 + blocksize * i + ModularConstruct.idSize + 1] = ModularConstruct.sb(part.y);
+        int blockSize = (ModularConstruct.idSize + 2);
+        for(int i = 0; i < partList.size; i++){
+            var part = partList.get(i);
+            ModularConstruct.writeID(output, 2 + blockSize * i, part.type.id);
+            output[2 + blockSize * i + ModularConstruct.idSize] = ModularConstruct.sb(part.x);
+            output[2 + blockSize * i + ModularConstruct.idSize + 1] = ModularConstruct.sb(part.y);
         }
         return output;
     }
@@ -161,48 +190,38 @@ public class ModularConstructBuilder{
     //trims empty tiles.
     public byte[] exportCropped(){
         OrderedSet<ModularPart> partsList = new OrderedSet<>();
-        int maxx = 0, minx = 256;
-        int maxy = 0, miny = 256;
+        int maxX = 0, minX = 256;
+        int maxY = 0, minY = 256;
 
         for(int j = 0; j < h; j++){
             for(int i = 0; i < w; i++){
                 if(valid[i][j] && parts[i][j] != null){
-                    maxx = Math.max(i, maxx);
-                    minx = Math.min(i, minx);
-                    maxy = Math.max(j, maxy);
-                    miny = Math.min(j, miny);
+                    maxX = Math.max(i, maxX);
+                    minX = Math.min(i, minX);
+                    maxY = Math.max(j, maxY);
+                    minY = Math.min(j, minY);
                 }
             }
         }
-        for(int i = minx; i <= maxx; i++){
-            for(int j = miny; j <= maxy; j++){
+        for(int i = minX; i <= maxX; i++){
+            for(int j = minY; j <= maxY; j++){
                 if(valid[i][j] && parts[i][j] != null && !partsList.contains(parts[i][j])){
                     partsList.add(parts[i][j]);
                 }
             }
         }
         byte[] output = new byte[2 + partsList.size * (ModularConstruct.idSize + 2)];
-        output[0] = ModularConstruct.sb(maxx - minx + 1);
-        output[1] = ModularConstruct.sb(maxy - miny + 1);
-        var partseq = partsList.orderedItems();
-        int blocksize = (ModularConstruct.idSize + 2);
-        for(int i = 0; i < partseq.size; i++){
-            var part = partseq.get(i);
-            ModularConstruct.writeID(output, 2 + blocksize * i, part.type.id);
-            output[2 + blocksize * i + ModularConstruct.idSize] = ModularConstruct.sb(part.x - minx);
-            output[2 + blocksize * i + ModularConstruct.idSize + 1] = ModularConstruct.sb(part.y - miny);
+        output[0] = ModularConstruct.sb(maxX - minX + 1);
+        output[1] = ModularConstruct.sb(maxY - minY + 1);
+        var partSeq = partsList.orderedItems();
+        int blockSize = (ModularConstruct.idSize + 2);
+        for(int i = 0; i < partSeq.size; i++){
+            var part = partSeq.get(i);
+            ModularConstruct.writeID(output, 2 + blockSize * i, part.type.id);
+            output[2 + blockSize * i + ModularConstruct.idSize] = ModularConstruct.sb(part.x - minX);
+            output[2 + blockSize * i + ModularConstruct.idSize + 1] = ModularConstruct.sb(part.y - minY);
         }
         return output;
-    }
-
-    private void findRoot(){
-        for(int i = 0; i < parts.length; i++){
-            for(int j = 0; j < parts[0].length; j++){
-                if(parts[i][j] != null && parts[i][j].type.root){
-                    root = parts[i][j];
-                }
-            }
-        }
     }
 
     public static void getStats(ModularPart[][] parts, ModularPartStatMap mstat){
@@ -223,18 +242,18 @@ public class ModularConstructBuilder{
             return;
         }
         ///temp
-        var partseq = partsList.orderedItems();
-        for(int i = 0; i < partseq.size; i++){
-            partseq.get(i).type.appendStats(mstat, partseq.get(i), parts);
+        var partSeq = partsList.orderedItems();
+        for(int i = 0; i < partSeq.size; i++){
+            partSeq.get(i).type.appendStats(mstat, partSeq.get(i), parts);
         }
-        for(int i = 0; i < partseq.size; i++){
-            partseq.get(i).type.appendStatsPost(mstat, partseq.get(i), parts);
+        for(int i = 0; i < partSeq.size; i++){
+            partSeq.get(i).type.appendStatsPost(mstat, partSeq.get(i), parts);
         }
 
     }
 
     public boolean canPlace(ModularPartType selected, int x, int y){
-        if(!canFit(selected, x, y)){
+        if(!canHave(selected, x, y)){
             return false;
         }
         for(int i = x; i < x + selected.w; i++){
@@ -297,5 +316,9 @@ public class ModularConstructBuilder{
         onChange.run();
         rebuildValid();
         updatedItemReq = false;
+    }
+
+    public void setOnChange(Runnable onChange){
+        this.onChange = onChange;
     }
 }
