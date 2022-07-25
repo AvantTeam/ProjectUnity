@@ -1,6 +1,5 @@
 package unity.entities.prop;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -15,44 +14,48 @@ import unity.util.*;
 public class ModularProps extends Props{
     public final UnitType parent;
     public final Seq<String> templates = new Seq<>();
-    public TextureRegion payloadCellRegion;
 
     public ModularProps(UnitType parent, String... templates){
+        super(true);
         this.parent = parent;
         this.templates.add(templates);
     }
 
     @Override
-    public void load(){
-        payloadCellRegion = Core.atlas.find(parent.name + "-cell-payload", parent.cellRegion);
-    }
-
-    @Override
-    public void drawCell(Unit unit){
+    public boolean drawCell(Unit unit){
         if(unit.isAdded()){
             if(unit instanceof Modularc){
                 drawModularCell((Unit & Modularc)unit);
-                return;
+                return false;
             }
-            parent.applyColor(unit);
-
-            Draw.color(parent.cellColor(unit));
-            Draw.rect(parent.cellRegion, unit.x, unit.y, unit.rotation - 90);
-            Draw.reset();
         }else{
             //As payload.
             if(unit instanceof Modularc){
                 drawModularBody((Unit & Modularc)unit);
                 drawModularCell((Unit & Modularc)unit);
                 parent.drawWeapons(unit);
-                return;
+                return false;
             }
-            parent.applyColor(unit);
-
-            Draw.color(parent.cellColor(unit));
-            Draw.rect(payloadCellRegion, unit.x, unit.y, unit.rotation - 90);
-            Draw.reset();
         }
+        return true;
+    }
+
+    @Override
+    public boolean drawBody(Unit unit){
+        if(unit instanceof Modularc){
+            drawModularBody((Unit & Modularc)unit);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean drawSoftShadow(Unit unit, float alpha){
+        if(unit instanceof Modularc){
+            drawModularBodySoftShadow((Unit & Modularc)unit, alpha);
+            return false;
+        }
+        return true;
     }
 
     public <T extends Unit&Modularc> void drawModularCell(T unit){
@@ -97,5 +100,13 @@ public class ModularProps extends Props{
             }
         }
         Draw.reset();
+    }
+
+    public <T extends Unit&Modularc> void drawModularBodySoftShadow(T unit, float alpha){
+        Draw.color(0, 0, 0, 0.4f * alpha);
+        float rad = 1.6f;
+        float size = unit.hitSize;
+        Draw.rect(parent.softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90);
+        Draw.color();
     }
 }

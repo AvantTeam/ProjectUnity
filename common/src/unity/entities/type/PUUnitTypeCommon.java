@@ -29,6 +29,16 @@ public abstract class PUUnitTypeCommon extends UnitType{
 
     /** Unit type properties, e.g. copter regions, soul amounts, etc. */
     public abstract static class Props{
+        public final boolean drawEarly;
+
+        public Props(){
+            this.drawEarly = false;
+        }
+
+        public Props(boolean drawEarly){
+            this.drawEarly = drawEarly;
+        }
+
         public void preInit(){}
 
         public void init(){}
@@ -37,6 +47,13 @@ public abstract class PUUnitTypeCommon extends UnitType{
 
         public void load(){}
 
-        public void drawCell(Unit unit){}
+        public boolean drawCell(Unit unit){return true;}
+
+        public boolean drawBody(Unit unit){return true;}
+
+        //In most cases.
+        public boolean drawSoftShadow(Unit unit, float alpha){return drawSoftShadow(unit.x, unit.y, unit.rotation, alpha);}
+
+        public boolean drawSoftShadow(float x, float y, float rotation, float alpha){return true;}
     }
 }

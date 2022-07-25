@@ -54,8 +54,6 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     float elevation;
     @Import
     public transient Seq<Unit> controlling;
-    //    @Import
-//    public transient Formation formation;
     @Import
     public transient Floor lastDrownFloor;
 
@@ -192,27 +190,27 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
         this.type = type;
         if(controller == null) controller(type.createController(self())); //for now
         //instead of type != YoungchaUnitTypes.modularUnitSmall
-        if(type instanceof PUUnitTypeCommon def && def.hasProp(ModularProps.class)){
-            this.maxHealth = def.health;
-            drag(def.drag);
-            this.armor = def.armor;
-            hitSize(def.hitSize);
-            hovering(def.hovering);
-            if(controller == null) controller(def.createController(self()));
-            if(mounts().length != def.weapons.size) setupWeapons(def);
-            if(abilities().length != def.abilities.size){
+        if(!(type instanceof PUUnitTypeCommon u && u.hasProp(ModularProps.class))){
+            this.maxHealth = type.health;
+            drag(type.drag);
+            this.armor = type.armor;
+            hitSize(type.hitSize);
+            hovering(type.hovering);
+            if(controller == null) controller(type.createController(self()));
+            if(mounts().length != type.weapons.size) setupWeapons(type);
+            if(abilities().length != type.abilities.size){
                 //hacky shrink
-                abilities(def.abilities.map(Ability::copy).shrink());
+                abilities(type.abilities.map(Ability::copy).shrink());
             }
         }
     }
 
     @Replace
     public void setupWeapons(UnitType type){
-        if(type instanceof PUUnitTypeCommon def && def.hasProp(ModularProps.class)){
-            mounts = new WeaponMount[def.weapons.size];
+        if(!(type instanceof PUUnitTypeCommon u && u.hasProp(ModularProps.class))){
+            mounts = new WeaponMount[type.weapons.size];
             for(int i = 0; i < mounts.length; i++){
-                mounts[i] = def.weapons.get(i).mountType.get(def.weapons.get(i));
+                mounts[i] = type.weapons.get(i).mountType.get(type.weapons.get(i));
             }
         }
     }

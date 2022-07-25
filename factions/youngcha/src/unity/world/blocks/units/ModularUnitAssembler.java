@@ -214,8 +214,11 @@ public class ModularUnitAssembler extends PayloadBlock{
             if(Vars.net.client()){
                 return;
             }
-            var t = YoungchaUnitTypes.modularUnitSmall.spawn(team, x, y);
+            var t = YoungchaUnitTypes.modularUnitSmall.create(team);
             ModularConstruct.cache.put(t, blueprint.exportCropped());
+            ((ModularUnit)t).constructdata(ModularConstruct.cache.get(t));
+            t.set(x, y);
+            t.add();
             t.rotation = rotdeg();
             Events.fire(new UnitCreateEvent(t, this));
         }

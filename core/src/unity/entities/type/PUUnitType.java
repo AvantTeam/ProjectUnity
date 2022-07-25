@@ -80,6 +80,7 @@ public class PUUnitType extends PUUnitTypeCommon{
         properties.put(type, prop);
     }
 
+    //Draw order of Prop depends on added order.
     @Override
     public <T extends Props> T prop(Class<T> type){
         return (T)properties.get(type);
@@ -113,8 +114,53 @@ public class PUUnitType extends PUUnitTypeCommon{
         for(Props prop : properties.values()) prop.load();
     }
 
+    //TODO move methods impl that just iterating props to PUUnitTypeCommon
     @Override
     public void drawCell(Unit unit){
-        for(Props prop : properties.values()) prop.drawCell(unit);
+        boolean thisDraw = false;
+        for(Props prop : properties.values()){
+            if(!prop.drawEarly && !thisDraw){
+                super.drawCell(unit);
+                thisDraw = true;
+            }
+            thisDraw |= prop.drawCell(unit);
+        }
+    }
+
+    @Override
+    public void drawBody(Unit unit){
+        boolean thisDraw = false;
+        for(Props prop : properties.values()){
+            if(!prop.drawEarly && !thisDraw){
+                super.drawBody(unit);
+                thisDraw = true;
+            }
+            thisDraw |= prop.drawBody(unit);
+        }
+    }
+
+    @Override
+    public void drawSoftShadow(Unit unit, float alpha){
+        boolean thisDraw = false;
+        for(Props prop : properties.values()){
+            if(!prop.drawEarly && !thisDraw){
+                super.drawSoftShadow(unit, alpha);
+                thisDraw = true;
+            }
+            thisDraw |= prop.drawSoftShadow(unit, alpha);
+        }
+    }
+
+    //hacky separated because there's case that needs unit ref. Since mindustry calls above neither more nor less when needed, it's valid for 'now'.
+    @Override
+    public void drawSoftShadow(float x, float y, float rotation, float alpha){
+        boolean thisDraw = false;
+        for(Props prop : properties.values()){
+            if(!prop.drawEarly && !thisDraw){
+                super.drawSoftShadow(x, y, rotation, alpha);
+                thisDraw = true;
+            }
+            thisDraw |= prop.drawSoftShadow(x, y, rotation, alpha);
+        }
     }
 }
