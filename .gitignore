@@ -15,3 +15,7 @@ mod/assets/sprites/
 .idea/
 .vscode/
 .kateproject
+
+# Aseprite
+.ase
+.aseprite
