@@ -64,7 +64,7 @@ public class ModularProps extends Props{
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
         var construct = unit.construct();
         if(construct != null){
-            ModularWheelType.rollDistance = unit.driveDist();
+            ModularMovementType.rollDistance = unit.driveDist();
             construct.hasCustomDraw.each((p) -> {
                 p.type.drawCell(dt, p);
             });
@@ -77,7 +77,7 @@ public class ModularProps extends Props{
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
         var construct = unit.construct();
         if(construct != null){
-            ModularWheelType.rollDistance = unit.driveDist();
+            ModularMovementType.rollDistance = unit.driveDist();
             unit.doodadList().each(d -> {
                 d.drawOutline(dt);
             });

@@ -7,9 +7,9 @@ import unity.parts.PanelDoodadType.*;
 
 public class UnitDoodadGenerator{
     public static final Seq<PanelDoodadPalette> unitDoodads = new Seq();
-    public static void initDoodads(int rngseed, Seq<PanelDoodad> doodads, ModularConstruct construct){
+    public static void initDoodads(int rngSeed, Seq<PanelDoodad> doodads, ModularConstruct construct){
         Rand rand = new Rand();
-        rand.setSeed(rngseed);
+        rand.setSeed(rngSeed);
         /// :I welp i tried
         if(construct != null){
             if(construct.parts.length == 0){
@@ -20,13 +20,13 @@ public class UnitDoodadGenerator{
 
             int w = construct.parts.length;
             int h = construct.parts[0].length;
-            int miny = 999, maxy = 0;
+            int minY = 999, maxY = 0;
             for(int i = 0; i < w; i++){
                 for(int j = 0; j < h; j++){
                     filled[i][j] = construct.parts[i][j] != null && !construct.parts[i][j].type.open;
                     if(filled[i][j]){
-                        miny = Math.min(j, miny);
-                        maxy = Math.max(j, maxy);
+                        minY = Math.min(j, minY);
+                        maxY = Math.max(j, maxY);
                     }
                 }
             }
@@ -35,7 +35,7 @@ public class UnitDoodadGenerator{
             int tiles = 0;
             for(int i = 0; i < w; i++){
                 for(int j = 0; j < h; j++){
-                    lightness[i][j] = Mathf.clamp((0.5f - (1f - Mathf.map(j, miny, maxy, 0, 1))) * 2 + 1, 0, 1);
+                    lightness[i][j] = Mathf.clamp((0.5f - (1f - Mathf.map(j, minY, maxY, 0, 1))) * 2 + 1, 0, 1);
                     tiles += filled[i][j] ? 1 : 0;
                 }
             }
@@ -43,8 +43,8 @@ public class UnitDoodadGenerator{
                 return;
             }
             Seq<Point2> seeds = new Seq();
-            int[][] seedspace = new int[w][h];
-            int[][] seedspacebuf = new int[w][h];
+            int[][] seedSpace = new int[w][h];
+            int[][] seedSpaceBuf = new int[w][h];
             for(int i = 0; i < Math.max(Mathf.floor(Mathf.sqrt(tiles) / 2), 1); i++){
                 int cnx = rand.random(0, Mathf.floor(w) - 1);
                 int cny = rand.random(0, h - 1);
@@ -53,9 +53,9 @@ public class UnitDoodadGenerator{
                     cny = rand.random(0, h - 1);
                 }
                 seeds.add(new Point2(cnx, cny));
-                seedspace[cnx][cny] = seeds.size;
+                seedSpace[cnx][cny] = seeds.size;
                 if(filled[w - cnx - 1][cny]){
-                    seedspace[w - cnx - 1][cny] = seeds.size;
+                    seedSpace[w - cnx - 1][cny] = seeds.size;
                 }
             }
             boolean hasEmpty = true;
@@ -63,20 +63,20 @@ public class UnitDoodadGenerator{
                 hasEmpty = false;
                 for(int i = 0; i < w; i++){
                     for(int j = 0; j < h; j++){
-                        if(seedspace[i][j] != 0){
-                            int seed = seedspace[i][j];
-                            seedspacebuf[i][j] = seed;
-                            if(i > 0 && seedspace[i - 1][j] == 0 && seedspacebuf[i - 1][j] < seed){
-                                seedspacebuf[i - 1][j] = seed;
+                        if(seedSpace[i][j] != 0){
+                            int seed = seedSpace[i][j];
+                            seedSpaceBuf[i][j] = seed;
+                            if(i > 0 && seedSpace[i - 1][j] == 0 && seedSpaceBuf[i - 1][j] < seed){
+                                seedSpaceBuf[i - 1][j] = seed;
                             }
-                            if(i < w - 1 && seedspace[i + 1][j] == 0 && seedspacebuf[i + 1][j] < seed){
-                                seedspacebuf[i + 1][j] = seed;
+                            if(i < w - 1 && seedSpace[i + 1][j] == 0 && seedSpaceBuf[i + 1][j] < seed){
+                                seedSpaceBuf[i + 1][j] = seed;
                             }
-                            if(j > 0 && seedspace[i][j - 1] == 0 && seedspacebuf[i][j - 1] < seed){
-                                seedspacebuf[i][j - 1] = seed;
+                            if(j > 0 && seedSpace[i][j - 1] == 0 && seedSpaceBuf[i][j - 1] < seed){
+                                seedSpaceBuf[i][j - 1] = seed;
                             }
-                            if(j < h - 1 && seedspace[i][j + 1] == 0 && seedspacebuf[i][j + 1] < seed){
-                                seedspacebuf[i][j + 1] = seed;
+                            if(j < h - 1 && seedSpace[i][j + 1] == 0 && seedSpaceBuf[i][j + 1] < seed){
+                                seedSpaceBuf[i][j + 1] = seed;
                             }
                         }else{
                             hasEmpty = true;
@@ -85,7 +85,7 @@ public class UnitDoodadGenerator{
                 }
                 for(int i = 0; i < w; i++){
                     for(int j = 0; j < h; j++){
-                        seedspace[i][j] = seedspacebuf[i][j];
+                        seedSpace[i][j] = seedSpaceBuf[i][j];
                     }
                 }
             }
@@ -99,7 +99,7 @@ public class UnitDoodadGenerator{
             for(int i = 0; i < w; i++){
                 for(int j = 0; j < h; j++){
 
-                    if(j > 0 && seedspace[i][j] != seedspace[i][j - 1]){
+                    if(j > 0 && seedSpace[i][j] != seedSpace[i][j - 1]){
                         lightness[i][j] -= 0.5;
                     }
                     if(i == Math.round(w / 2f) - 1){
@@ -113,7 +113,7 @@ public class UnitDoodadGenerator{
             boolean[][] placed = new boolean[construct.parts.length][construct.parts[0].length];
             float ox = -w * 0.5f;
             float oy = -h * 0.5f;
-            int middlex = Math.round(w / 2f) - 1;
+            int middleX = Math.round(w / 2f) - 1;
             Seq<PanelDoodadType> draw = new Seq<>();
             PanelDoodadType mirrored = null;
             for(int i = 0; i < Math.round(w / 2f); i++){
@@ -128,10 +128,10 @@ public class UnitDoodadGenerator{
                             }else{
                                 var type = pal.get(1 - lightness[i][j]);
                                 boolean allowed = false;
-                                if((pal.w % 2 == 0 || pal.sides) && i + pal.w - 1 < middlex){
+                                if((pal.w % 2 == 0 || pal.sides) && i + pal.w - 1 < middleX){
                                     allowed = true;
                                 }
-                                if(pal.center && i == middlex - (pal.w / 2)){
+                                if(pal.center && i == middleX - (pal.w / 2)){
                                     allowed = true;
                                 }
                                 if(allowed && type.canFit(construct.parts, i, j)){
@@ -156,7 +156,7 @@ public class UnitDoodadGenerator{
                             }else{
                                 var type = pal.get(1 - lightness[w - i - 1][j]);
                                 boolean allowed = false;
-                                if((pal.w % 2 == 0 || pal.sides) && w - i - 1 > middlex){
+                                if((pal.w % 2 == 0 || pal.sides) && w - i - 1 > middleX){
                                     allowed = true;
                                 }
                                 if(allowed && type.canFit(construct.parts, i, j)){
@@ -172,8 +172,8 @@ public class UnitDoodadGenerator{
         }
     }
 
-    public static void addDoodad(Seq<PanelDoodad> doodadlist, boolean[][] placed, PanelDoodad p, int x, int y){
-        doodadlist.add(p);
+    public static void addDoodad(Seq<PanelDoodad> doodadList, boolean[][] placed, PanelDoodad p, int x, int y){
+        doodadList.add(p);
         for(int i = 0; i < p.type.w; i++){
             for(int j = 0; j < p.type.h; j++){
                 placed[x + i][y + j] = true;

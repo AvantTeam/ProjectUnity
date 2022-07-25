@@ -230,7 +230,6 @@ public class ModularUnitAssembler extends PayloadBlock{
             payload = new UnitPayload(t);
             payVector.setZero();
             Events.fire(new UnitCreateEvent(payload.unit, this));
-
         }
 
         @Override
@@ -345,7 +344,7 @@ public class ModularUnitAssembler extends PayloadBlock{
             DrawTransform dt = new DrawTransform();
             dt.setTranslate(x, y);
             dt.setRotation(rotdeg());
-            ModularWheelType.rollDistance = 0;
+            ModularMovementType.rollDistance = 0;
             if(construct != null && !sandbox && payload == null){
                 //9 slice?
 

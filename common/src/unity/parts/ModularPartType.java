@@ -20,9 +20,6 @@ public class ModularPartType implements Displayable{
     public static IntMap<ModularPartType> partMap = new IntMap<>();
 
     public static final float partSize = 4;
-
-    public static final int TURRET_TYPE = 1;
-    public static final int UNIT_TYPE = 2;
     protected int partType = 0;
 
     private static int idAcc = 0;
@@ -43,8 +40,6 @@ public class ModularPartType implements Displayable{
     public boolean hasExtraDecal = false;
     public boolean hasCellDecal = false;
     public TextureRegion[] cell;
-    //cost
-    public float constructTimeMultiplier = 1; // base time based on item cost
     public ItemStack[] cost = {};
     public int costTotal = 0;
     //module cost..

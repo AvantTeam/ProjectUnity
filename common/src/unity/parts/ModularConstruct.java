@@ -10,14 +10,6 @@ import java.io.*;
 //probably immutable
 public class ModularConstruct implements Serializable{
     public static ObjectMap<Unitc, byte[]> cache = new ObjectMap<>();
-    public static ModularConstruct test = new ModularConstruct(new byte[]{
-    sb(3), sb(3),
-    sb(1), sb(1), sb(1),
-    sb(0), sb(2), sb(1),
-    sb(2), sb(2), sb(0),
-    sb(0), sb(0), sb(1),
-    sb(2), sb(0), sb(0),
-    });
 
     public ModularPart[][] parts;
     public Seq<ModularPart> partList = new Seq<>();

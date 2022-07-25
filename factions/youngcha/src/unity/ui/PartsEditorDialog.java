@@ -24,13 +24,12 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class PartsEditorDialog extends BaseDialog{
-    public ModularConstructValidator builder;
+    public ModularConstructValidator validator;
     Cons<byte[]> consumer;
     public PartsEditorElement editorElement;
     public Cons2<ModularConstructValidator, Table> infoViewer;
 
     public ObjectMap<String, Seq<ModularPartType>> availableParts = new ObjectMap<>();
-    boolean info = false;
 
     //part select
     Cons<Table> partSelectBuilder = table -> {
@@ -67,7 +66,7 @@ public class PartsEditorDialog extends BaseDialog{
                     partsButton.update(() -> {
                         partsButton.setChecked(editorElement.selected == part);
                         //possibly set gray if disallowed.
-                        if(builder.root == null && !part.root || builder.root != null && part.root){
+                        if(validator.root == null && !part.root || validator.root != null && part.root){
                             partsButton.forEach(elem -> elem.setColor(Color.darkGray));
                         }else{
                             partsButton.forEach(elem -> elem.setColor(Color.white));
@@ -88,15 +87,17 @@ public class PartsEditorDialog extends BaseDialog{
         ImageButton partsSelectMenuButton = new ImageButton(Icon.box, Styles.clearNoneTogglei);
         partsSelectMenuButton.clicked(() -> {
             partSelectBuilder.get(content);
-            builder.setOnChange(() -> {});
+            validator.setOnChange(() -> {});
         });
-        tabs.add(partsSelectMenuButton).size(64).pad(8);
 
         ImageButton infoMenuButton = new ImageButton(Icon.info, Styles.clearNoneTogglei);
         infoMenuButton.clicked(() -> {
-            infoViewer.get(builder, content);
-            builder.setOnChange(() -> infoViewer.get(builder, content));
+            infoViewer.get(validator, content);
+            validator.setOnChange(() -> infoViewer.get(validator, content));
         });
+        var tabsButtonGroup = new ButtonGroup();
+        tabsButtonGroup.add(partsSelectMenuButton, infoMenuButton);
+        tabs.add(partsSelectMenuButton).size(64);
         tabs.add(infoMenuButton).size(64);
 
         //middle
@@ -127,25 +128,25 @@ public class PartsEditorDialog extends BaseDialog{
 
     public PartsEditorDialog(){
         super("parts");
-        this.builder = new ModularConstructValidator(3, 3);
-        editorElement = new PartsEditorElement(this.builder);
+        this.validator = new ModularConstructValidator(1, 1);
+        editorElement = new PartsEditorElement(this.validator);
         clearChildren();
         buttons.defaults().size(160f, 64f);
         buttons.button(Icon.flipX, Styles.clearTogglei, () -> {
             editorElement.mirror = !editorElement.mirror;
         }).update(i -> {i.setChecked(editorElement.mirror);}).tooltip("mirror").width(64);
         buttons.button(Icon.file, () -> {
-            builder.clear();
+            validator.clear();
             editorElement.onAction();
         }).tooltip("clear").width(64);
         buttons.button(Icon.copy, () -> {
-            Core.app.setClipboardText(Base64.getEncoder().encodeToString(builder.exportCropped()));
+            Core.app.setClipboardText(Base64.getEncoder().encodeToString(validator.exportCropped()));
         }).tooltip("copy").width(64);
         buttons.button(Icon.paste, () -> {
             try{
                 ModularConstructValidator test = new ModularConstructValidator(Base64.getDecoder().decode(Core.app.getClipboardText().trim().replaceAll("[\\t\\n\\r]+", "")));
-                builder.clear();
-                builder.paste(test);
+                validator.clear();
+                validator.paste(test);
                 editorElement.onAction();
             }catch(Exception e){
                 Vars.ui.showOkText("Uh", "Your code is poopoo", () -> {}); ///?????
@@ -180,7 +181,7 @@ public class PartsEditorDialog extends BaseDialog{
         add(selectSide).align(Align.top).growY();
         add(editorSide);
 
-        hidden(() -> consumer.get(builder.export()));
+        hidden(() -> consumer.get(validator.export()));
 
         //input
         update(() -> {
@@ -197,9 +198,9 @@ public class PartsEditorDialog extends BaseDialog{
     }
 
     public void show(byte[] data, Cons<byte[]> modified, Cons2<ModularConstructValidator, Table> viewer, Boolf<ModularPartType> allowed){
-        this.builder.set(data);
+        this.validator.set(data);
         leftSideBuilder.get(selectSide);
-        editorElement.setBuilder(this.builder);
+        editorElement.setValidator(this.validator);
         this.consumer = modified::get;
         this.infoViewer = viewer;
         show();
@@ -220,9 +221,9 @@ public class PartsEditorDialog extends BaseDialog{
 
     public static Cons2<ModularConstructValidator, Table> unitInfoViewer = (construct, table) -> {
         table.clearChildren();
-        var statmap = new ModularUnitStatMap();
-        var itemcost = construct.itemRequirements();
-        ModularConstructValidator.getStats(construct.parts, statmap);
+        var statMap = new ModularUnitStatMap();
+        var itemCosts = construct.itemRequirements();
+        statMap.getStats(construct.parts);
         table.top();
         table.add(Core.bundle.get("ui.parts.info")).growX().left().color(Pal.gray);
 
@@ -232,14 +233,14 @@ public class PartsEditorDialog extends BaseDialog{
         table.row();
         table.table(req -> {
             req.top().left();
-            for(ItemStack stack : itemcost){
+            for(ItemStack stack : itemCosts){
                 req.add(new ItemDisplay(stack.item, stack.amount, false)).padRight(5);
             }
         }).growX().left().margin(3);
         table.row();
-        table.add("[lightgray]" + Stat.health.localized() + ":[accent] " + statmap.getValue("health")).left().top();
+        table.add("[lightgray]" + Stat.health.localized() + ":[accent] " + statMap.getValue("health")).left().top();
         table.row();
-        float eff = Mathf.clamp(statmap.getValue("power") / statmap.getValue("powerusage"));
+        float eff = Mathf.clamp(statMap.getValue("power") / statMap.getValue("powerusage"));
         String color = "[green]";
         if(eff < 0.7){
             color = "[red]";
@@ -247,30 +248,30 @@ public class PartsEditorDialog extends BaseDialog{
             color = "[yellow]";
         }
 
-        table.add("[lightgray]" + Stat.powerUse.localized() + ": " + color + statmap.getValue("powerusage") + "/" + statmap.getValue("power")).left().top();
+        table.add("[lightgray]" + Stat.powerUse.localized() + ": " + color + statMap.getValue("powerusage") + "/" + statMap.getValue("power")).left().top();
         table.row();
         table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.efficiency") + ": " + color + Strings.fixed(Mathf.clamp(eff) * 100, 1) + "%").left().top();
         table.row();
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.weight") + ":[accent] " + statmap.getValue("mass")).left().top();
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.weight") + ":[accent] " + statMap.getValue("mass")).left().top();
 
-        float mass = statmap.getValue("mass");
-        float wcap = statmap.getValue("wheel", "weight capacity");
-        float speed = eff * Mathf.clamp(wcap / mass) * statmap.getValue("wheel", "nominal speed");
+        float mass = statMap.getValue("mass");
+        float wcap = statMap.getValue("wheel", "weight capacity");
+        float speed = eff * Mathf.clamp(wcap / mass) * statMap.getValue("wheel", "nominal speed");
         table.row();
         table.add("[lightgray]" + Stat.speed.localized() + ":[accent] " + Core.bundle.format("ui.parts.stat.speed", Strings.fixed(speed * 60f / tilesize, 1))).left().top();
         table.row();
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.armour-points") + ":[accent] " + statmap.getValue("armour")).left().top();
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.armour-points") + ":[accent] " + statMap.getValue("armour")).left().top();
         table.row();
-        table.add("[lightgray]" + Stat.armor.localized() + ":[accent] " + Strings.fixed(statmap.getValue("armour", "realValue"), 1)).left().top();
+        table.add("[lightgray]" + Stat.armor.localized() + ":[accent] " + Strings.fixed(statMap.getValue("armour", "realValue"), 1)).left().top();
 
         table.row();
-        int weaponslots = Math.round(statmap.getValue("weaponslots"));
-        int weaponslotsused = Math.round(statmap.getValue("weaponslotuse"));
+        int weaponslots = Math.round(statMap.getValue("weaponslots"));
+        int weaponslotsused = Math.round(statMap.getValue("weaponslotuse"));
         table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.weapon-slots") + ": " + (weaponslotsused > weaponslots ? "[red]" : "[green]") + weaponslotsused + "/" + weaponslots).left().top().tooltip(Core.bundle.get("ui.parts.stat.weapon-slots-tooltip"));
 
         table.row();
-        int abilityslots = Math.round(statmap.getValue("abilityslots"));
-        int abilityslotsused = Math.round(statmap.getValue("abilityslotuse"));
+        int abilityslots = Math.round(statMap.getValue("abilityslots"));
+        int abilityslotsused = Math.round(statMap.getValue("abilityslotuse"));
         table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.ability-slots") + ": " + (abilityslotsused > abilityslots ? "[red]" : "[green]") + abilityslotsused + "/" + abilityslots).left().top().tooltip(Core.bundle.get("ui.parts.stat.ability-slots-tooltip"));
     };
 

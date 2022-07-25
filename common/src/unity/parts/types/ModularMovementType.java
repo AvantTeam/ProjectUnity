@@ -7,10 +7,10 @@ import unity.parts.*;
 import unity.parts.stats.*;
 import unity.util.*;
 
-public class ModularWheelType extends ModularPartType{
+public class ModularMovementType extends ModularPartType{
     TextureRegion base, moving;
 
-    public ModularWheelType(String name){
+    public ModularMovementType(String name){
         super(name);
         open = true;
     }

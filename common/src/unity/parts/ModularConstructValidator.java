@@ -26,6 +26,10 @@ public class ModularConstructValidator{
         set(data);
     }
 
+    public void setOnChange(Runnable onChange){
+        this.onChange = onChange;
+    }
+
     public void clear(){
         for(int i = 0; i < w; i++){
             for(int j = 0; j < h; j++){
@@ -90,7 +94,7 @@ public class ModularConstructValidator{
     }
 
     public boolean canHave(int x, int y){
-        return x >= 0 && y >= 0 && x < w || y < h;
+        return x >= 0 && y >= 0 && x < w && y < h;
     }
 
     public boolean canHave(ModularPart p, int ox, int oy){
@@ -124,10 +128,10 @@ public class ModularConstructValidator{
         }
 
         //BFS to check it's valid. Valid parts have connections to root.
-        OrderedSet<Point2> points = new OrderedSet<>();
+//        OrderedSet<Point2> points = new OrderedSet<>();
         Queue<Point2> queue = new Queue<>();
         var point = new Point2(root.x, root.y);
-        points.add(point);
+//        points.add(point);
         queue.addLast(point);
         valid[root.x][root.y] = true;
         while(!queue.isEmpty()){
@@ -136,25 +140,25 @@ public class ModularConstructValidator{
             if(pt.x > 0 && parts[pt.x - 1][pt.y] != null && !valid[pt.x - 1][pt.y]){
                 valid[pt.x - 1][pt.y] = true;
                 point = new Point2(pt.x - 1, pt.y);
-                points.add(point);
+//                points.add(point);
                 queue.addLast(point);
             }
             if(pt.y > 0 && parts[pt.x][pt.y - 1] != null && !valid[pt.x][pt.y - 1]){
                 valid[pt.x][pt.y - 1] = true;
-                point = new Point2(pt.x - 1, pt.y);
-                points.add(point);
+                point = new Point2(pt.x, pt.y - 1);
+//                points.add(point);
                 queue.addLast(point);
             }
             if(pt.x < w - 1 && parts[pt.x + 1][pt.y] != null && !valid[pt.x + 1][pt.y]){
                 valid[pt.x + 1][pt.y] = true;
-                point = new Point2(pt.x - 1, pt.y);
-                points.add(point);
+                point = new Point2(pt.x + 1, pt.y);
+//                points.add(point);
                 queue.addLast(point);
             }
             if(pt.y < h - 1 && parts[pt.x][pt.y + 1] != null && !valid[pt.x][pt.y + 1]){
                 valid[pt.x][pt.y + 1] = true;
-                point = new Point2(pt.x - 1, pt.y);
-                points.add(point);
+                point = new Point2(pt.x, pt.y + 1);
+//                points.add(point);
                 queue.addLast(point);
             }
         }
@@ -174,6 +178,7 @@ public class ModularConstructValidator{
 
     public byte[] export(){
         var partList = getList();
+        arc.util.Log.infoList(partList.map(p -> p.type.name));
         byte[] output = new byte[2 + partList.size * (ModularConstruct.idSize + 2)];
         output[0] = ModularConstruct.sb(w);
         output[1] = ModularConstruct.sb(h);
@@ -222,34 +227,6 @@ public class ModularConstructValidator{
             output[2 + blockSize * i + ModularConstruct.idSize + 1] = ModularConstruct.sb(part.y - minY);
         }
         return output;
-    }
-
-    public static void getStats(ModularPart[][] parts, ModularPartStatMap mstat){
-        //need to find the root;
-        ModularPart root = null;
-        OrderedSet<ModularPart> partsList = new OrderedSet<>();
-        for(int i = 0; i < parts.length; i++){
-            for(int j = 0; j < parts[0].length; j++){
-                if(parts[i][j] != null && !partsList.contains(parts[i][j])){
-                    partsList.add(parts[i][j]);
-                    if(parts[i][j].type.root){
-                        root = parts[i][j];
-                    }
-                }
-            }
-        }
-        if(root == null){
-            return;
-        }
-        ///temp
-        var partSeq = partsList.orderedItems();
-        for(int i = 0; i < partSeq.size; i++){
-            partSeq.get(i).type.appendStats(mstat, partSeq.get(i), parts);
-        }
-        for(int i = 0; i < partSeq.size; i++){
-            partSeq.get(i).type.appendStatsPost(mstat, partSeq.get(i), parts);
-        }
-
     }
 
     public boolean canPlace(ModularPartType selected, int x, int y){
@@ -316,9 +293,5 @@ public class ModularConstructValidator{
         onChange.run();
         rebuildValid();
         updatedItemReq = false;
-    }
-
-    public void setOnChange(Runnable onChange){
-        this.onChange = onChange;
     }
 }

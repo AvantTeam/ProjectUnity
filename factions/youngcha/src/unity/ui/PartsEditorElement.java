@@ -24,66 +24,65 @@ public class PartsEditorElement extends Element{
     Seq<byte[]> prev = new Seq<>();
     int index = -1;
 
-    public ModularConstructValidator builder;
+    public ModularConstructValidator validator;
     public ModularPartType selected = null;
-    public boolean erasing = false;
     public boolean mirror = true;
     //selection boxes?
 
-    float panx = 0, pany = 0;
-    float prevpx, prevpy;
+    float panX = 0, panY = 0;
+    float prevPanX, prevPanY;
 
-    float mousex, mousey;
-    float anchorx, anchory;
-    float scl = 1, targetscl = 1;
+    float mouseX, mouseY;
+    float anchorX, anchorY;
+    float scl = 1, targetScl = 1;
     int dragTriggered = 0;
 
 
-    public PartsEditorElement(ModularConstructValidator builder){
-        this.builder = builder;
+    public PartsEditorElement(ModularConstructValidator validator){
+        this.validator = validator;
 
         addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 dragTriggered = 0;
-                anchorx = x;
-                anchory = y;
-                prevpx = panx;
-                prevpy = pany;
-                mousex = x;
-                mousey = y;
+                anchorX = x;
+                anchorY = y;
+                prevPanX = panX;
+                prevPanY = panY;
+                mouseX = x;
+                mouseY = y;
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                if(Mathf.dst(anchorx, anchory, x, y) < 5){
-                    onClicked(event, x, y, pointer, button);
+                if(Mathf.dst(anchorX, anchorY, x, y) < 5){
+                    onClicked(x, y, button);
                 }
             }
 
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer){
-                panx = (x - anchorx) + prevpx;
-                pany = (y - anchory) + prevpy;
+                panX = (x - anchorX) + prevPanX;
+                panY = (y - anchorY) + prevPanY;
                 dragTriggered++;
-                mousex = x;
-                mousey = y;
+                mouseX = x;
+                mouseY = y;
             }
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y){
                 scene.setScrollFocus(PartsEditorElement.this); ///AAAAAA
-                mousex = x;
-                mousey = y;
+                mouseX = x;
+                mouseY = y;
                 var g = uiToGrid(x, y);
                 if(!tileValid(g.x, g.y)){
                     Core.graphics.cursor(SystemCursor.hand);
                     return true;
                 }
-                if((selected != null && builder.parts[g.x][g.y] != null) ||
-                (selected == null && builder.parts[g.x][g.y] == null)){
+                if((selected != null && validator.parts[g.x][g.y] != null) ||
+                (selected == null && validator.parts[g.x][g.y] == null)){
                     Core.graphics.cursor(SystemCursor.hand);
                 }else{
                     Core.graphics.cursor(SystemCursor.arrow);
@@ -109,16 +108,11 @@ public class PartsEditorElement extends Element{
     @Override
     public void act(float delta){
         super.act(delta);
-        targetscl += Core.input.axis(Binding.zoom) / 10f * targetscl;
-        targetscl = Mathf.clamp(targetscl, 0.2f, 5);
+        targetScl += Core.input.axis(Binding.zoom) / 10f * targetScl;
+        targetScl = Mathf.clamp(targetScl, 0.2f, 5);
     }
 
-    public void zoom(float am){
-        targetscl *= am;
-        targetscl = Mathf.clamp(targetscl, 0.2f, 5);
-    }
-
-    public void onClicked(InputEvent event, float x, float y, int pointer, KeyCode button){
+    public void onClicked(float x, float y, KeyCode button){
         if(button == KeyCode.mouseRight){
             selected = null;
             return;
@@ -126,14 +120,14 @@ public class PartsEditorElement extends Element{
         var g = uiToGrid(x, y);
         if(tileValid(g.x, g.y)){
             if(selected != null){
-                boolean b = builder.placePart(selected, g.x, g.y);
+                boolean b = validator.placePart(selected, g.x, g.y);
                 if(b && mirror && mirrorX(g.x) != g.x){
-                    builder.placePart(selected, mirrorX(g.x, selected.w), g.y);
+                    validator.placePart(selected, mirrorX(g.x, selected.w), g.y);
                 }
             }else{
-                builder.deletePartAt(g.x, g.y);
+                validator.deletePartAt(g.x, g.y);
                 if(mirror && mirrorX(g.x) != g.x){
-                    builder.deletePartAt(mirrorX(g.x), g.y);
+                    validator.deletePartAt(mirrorX(g.x), g.y);
                 }
             }
             onAction();
@@ -141,42 +135,38 @@ public class PartsEditorElement extends Element{
     }
 
     public boolean tileValid(int x, int y){
-        return (x >= 0 && x < builder.w && y >= 0 && y < builder.h);
+        return (x >= 0 && x < validator.w && y >= 0 && y < validator.h);
     }
 
-    public void setBuilder(ModularConstructValidator builder){
-        this.builder = builder;
-    }
-
-    public void rebuild(){
-        //?
+    public void setValidator(ModularConstructValidator validator){
+        this.validator = validator;
     }
 
     float gx = 0, gy = 0;
 
     @Override
     public void draw(){
-        float cx = panx + width * 0.0f; // cam center relative to gx
-        float cy = pany + height * 0.0f; // cam center relative to gy
-        float pscl = scl;
-        scl += (targetscl - scl) * 0.1;
+        float cx = panX + width * 0.0f; // cam center relative to gx
+        float cy = panY + height * 0.0f; // cam center relative to gy
+        float prevScl = scl;
+        scl += (targetScl - scl) * 0.1;
 
-        float scldiff = scl / pscl;
+        float sclDiff = scl / prevScl;
 
 
-        float dx = cx * (scldiff - 1);
-        panx += dx;
-        float dy = cy * (scldiff - 1);
-        pany += dy;
+        float dx = cx * (sclDiff - 1);
+        panX += dx;
+        float dy = cy * (sclDiff - 1);
+        panY += dy;
 
         gx = gx();
         gy = gy();
-        float midx = x + width * 0.5f;
-        float midy = y + height * 0.5f;
+        float midX = x + width * 0.5f;
+        float midY = y + height * 0.5f;
 
 
         Draw.color(bgCol);
-        Fill.rect(midx, midy, width, height);
+        Fill.rect(midX, midY, width, height);
 
         widgetAreaBounds.set(x, y, width, height);
         scene.calculateScissors(widgetAreaBounds, scissorBounds);
@@ -184,43 +174,43 @@ public class PartsEditorElement extends Element{
             return;
         }
         Draw.color(blueprintCol);
-        rectCorner(0, 0, builder.w * 32, builder.h * 32);
+        rectCorner(0, 0, validator.w * 32, validator.h * 32);
         Draw.color(blueprintColAccent);
         //draw border and center lines
         Lines.stroke(5);
-        rectLine(0, 0, builder.w * 32, builder.h * 32);
-        int mid = builder.w / 2;
-        if(builder.w % 2 == 1){
-            rectLine(mid * 32, 0, 32, builder.h * 32);
+        rectLine(0, 0, validator.w * 32, validator.h * 32);
+        int mid = validator.w / 2;
+        if(validator.w % 2 == 1){
+            rectLine(mid * 32, 0, 32, validator.h * 32);
         }else{
-            line(mid * 32, 0, mid * 32, builder.h * 32);
+            line(mid * 32, 0, mid * 32, validator.h * 32);
         }
-        mid = builder.h / 2;
-        if(builder.h % 2 == 1){
-            rectLine(0, mid * 32, builder.w * 32, 32);
+        mid = validator.h / 2;
+        if(validator.h % 2 == 1){
+            rectLine(0, mid * 32, validator.w * 32, 32);
         }else{
-            line(0, mid * 32, builder.w * 32, mid * 32);
+            line(0, mid * 32, validator.w * 32, mid * 32);
         }
         Draw.reset();
 
         Point2 minPoint = uiToGrid(0, 0);
-        int minx = Mathf.clamp(minPoint.x, 0, builder.w - 1);
-        int miny = Mathf.clamp(minPoint.y, 0, builder.h - 1);
+        int minx = Mathf.clamp(minPoint.x, 0, validator.w - 1);
+        int miny = Mathf.clamp(minPoint.y, 0, validator.h - 1);
 
         Point2 maxPoint = uiToGrid(width, height);
-        int maxx = Mathf.clamp(maxPoint.x, 0, builder.w - 1);
-        int maxy = Mathf.clamp(maxPoint.y, 0, builder.h - 1);
+        int maxX = Mathf.clamp(maxPoint.x, 0, validator.w - 1);
+        int maxY = Mathf.clamp(maxPoint.y, 0, validator.h - 1);
         //draw grid
         Draw.color(blueprintColAccent);
-        for(int i = minx; i <= maxx; i++){
-            for(int j = miny; j <= maxy; j++){
+        for(int i = minx; i <= maxX; i++){
+            for(int j = miny; j <= maxY; j++){
                 if(i > 0 && j > 0){
                     Fill.square(gx + i * 32 * scl, gy + j * 32 * scl, 3, 45);
                 }
             }
         }
         //draw highlight cursor
-        Point2 cursor = uiToGrid(mousex, mousey);
+        Point2 cursor = uiToGrid(mouseX, mouseY);
         if(selected == null){
             rectCorner(cursor.x * 32, cursor.y * 32, 32, 32);
             if(mirror && mirrorX(cursor.x) != cursor.x){
@@ -230,9 +220,9 @@ public class PartsEditorElement extends Element{
 
 
         //draw modules
-        for(int i = minx; i <= maxx; i++){
-            for(int j = miny; j <= maxy; j++){
-                var part = builder.parts[i][j];
+        for(int i = minx; i <= maxX; i++){
+            for(int j = miny; j <= maxY; j++){
+                var part = validator.parts[i][j];
                 if(part == null){
                     continue;
                 }
@@ -241,14 +231,14 @@ public class PartsEditorElement extends Element{
                 }
                 Draw.color(bgCol);
                 rectCorner(part.getX() * 32, part.getY() * 32, part.type.w * 32, part.type.h * 32);
-                Draw.color(builder.valid[i][j] ? Color.white : Color.red);
+                Draw.color(validator.valid[i][j] ? Color.white : Color.red);
                 rectCorner(part.type.icon, part.getX() * 32, part.getY() * 32, part.type.w * 32, part.type.h * 32);
             }
         }
 
         if(selected != null){
             Color highlight = Color.white;
-            if(!builder.canPlace(selected, cursor.x, cursor.y)){
+            if(!validator.canPlace(selected, cursor.x, cursor.y)){
                 highlight = Color.red;
             }
             Draw.color(bgCol, 0.5f);
@@ -269,11 +259,11 @@ public class PartsEditorElement extends Element{
     }
 
     public int mirrorX(int x, int w){
-        return builder.w - x - w;
+        return validator.w - x - w;
     }
 
     public int mirrorX(int x){
-        return builder.w - x - 1;
+        return validator.w - x - 1;
     }
 
     public void rectCorner(float x, float y, float w, float h){
@@ -293,11 +283,11 @@ public class PartsEditorElement extends Element{
     }
 
     public float gx(){
-        return x + (width - builder.w * 32 * scl) * 0.5f + panx;
+        return x + (width - validator.w * 32 * scl) * 0.5f + panX;
     }
 
     public float gy(){
-        return y + (height - builder.h * 32 * scl) * 0.5f + pany;
+        return y + (height - validator.h * 32 * scl) * 0.5f + panY;
     }
 
     public Point2 uiToGrid(float x, float y){
@@ -333,7 +323,7 @@ public class PartsEditorElement extends Element{
     }
 
     public void onAction(){
-        prev.add(builder.export());
+        prev.add(validator.export());
         if(index != prev.size - 2){
             prev.removeRange(index + 2, prev.size - 1);
         }
@@ -346,7 +336,7 @@ public class PartsEditorElement extends Element{
             index = prev.size - 1;
             return;
         }
-        builder.set(prev.get(index));
+        validator.set(prev.get(index));
     }
 
     public void undo(){
@@ -355,7 +345,7 @@ public class PartsEditorElement extends Element{
             index = -1;
             return;
         }
-        builder.set(prev.get(index));
+        validator.set(prev.get(index));
     }
 
 }

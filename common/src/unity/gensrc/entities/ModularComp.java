@@ -93,56 +93,54 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
         }
         constructData = Arrays.copyOf(construct.data, construct.data.length);
 
-        var statmap = new ModularUnitStatMap();
-        ModularConstructValidator.getStats(construct.parts, statmap);
-        applyStatMap(statmap);
-        if(construct != ModularConstruct.test){
-            constructLoaded = true;
-            if(!headless){
-                UnitDoodadGenerator.initDoodads(construct.parts.length, doodadList, construct);
-            }
-            int w = construct.parts.length;
-            int h = construct.parts[0].length;
-            int maxx = 0, minx = 256;
-            int maxy = 0, miny = 256;
+        var statMap = new ModularUnitStatMap();
+        statMap.getStats(construct.parts);
+        applyStatMap(statMap);
+        constructLoaded = true;
+        if(!headless){
+            UnitDoodadGenerator.initDoodads(construct.parts.length, doodadList, construct);
+        }
+        int w = construct.parts.length;
+        int h = construct.parts[0].length;
+        int maxX = 0, minX = 256;
+        int maxY = 0, minY = 256;
 
-            for(int j = 0; j < h; j++){
-                for(int i = 0; i < w; i++){
-                    if(construct.parts[i][j] != null){
-                        maxx = Math.max(i, maxx);
-                        minx = Math.min(i, minx);
-                        maxy = Math.max(j, maxy);
-                        miny = Math.min(j, miny);
-                    }
+        for(int j = 0; j < h; j++){
+            for(int i = 0; i < w; i++){
+                if(construct.parts[i][j] != null){
+                    maxX = Math.max(i, maxX);
+                    minX = Math.min(i, minX);
+                    maxY = Math.max(j, maxY);
+                    minY = Math.min(j, minY);
                 }
             }
-            clipSize = Mathf.dst((maxy - miny), (maxx - minx)) * ModularPartType.partSize * 6;
-            hitSize(((maxy - miny) + (maxx - minx)) * 0.5f * ModularPartType.partSize);
         }
+        clipSize = Mathf.dst((maxY - minY), (maxX - minX)) * ModularPartType.partSize * 6;
+        hitSize(((maxY - minY) + (maxX - minX)) * 0.5f * ModularPartType.partSize);
     }
 
-    public void applyStatMap(ModularUnitStatMap statmap){
+    public void applyStatMap(ModularUnitStatMap statMap){
         if(construct.parts.length == 0){
             return;
         }
-        float power = statmap.getOrCreate("power").getFloat("value");
-        float powerUse = statmap.getOrCreate("powerusage").getFloat("value");
+        float power = statMap.getOrCreate("power").getFloat("value");
+        float powerUse = statMap.getOrCreate("powerusage").getFloat("value");
         float eff = Mathf.clamp(power / powerUse, 0, 1);
 
         float hRatio = Mathf.clamp(this.health / this.maxHealth);
-        this.maxHealth = statmap.getOrCreate("health").getFloat("value");
+        this.maxHealth = statMap.getOrCreate("health").getFloat("value");
         if(savedHp <= 0){
             this.health = hRatio * this.maxHealth;
         }else{
             this.health = savedHp;
             savedHp = -1;
         }
-        var weapons = statmap.stats.getList("weapons");
+        var weapons = statMap.stats.getList("weapons");
         mounts = new WeaponMount[weapons.length()];
         weaponRange = 0;
 
-        int weaponslots = Math.round(statmap.getValue("weaponslots"));
-        int weaponslotsused = Math.round(statmap.getValue("weaponslotuse"));
+        int weaponslots = Math.round(statMap.getValue("weaponslots"));
+        int weaponslotsused = Math.round(statMap.getValue("weaponslotuse"));
 
         for(int i = 0; i < weapons.length(); i++){
             var weapon = getWeaponFromStat(weapons.getMap(i));
@@ -154,15 +152,15 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
                 weapon.load();
             }
             mounts[i] = weapon.mountType.get(weapon);
-            ModularPart mpart = weapons.getMap(i).get("part");
-            weaponRange = Math.max(weaponRange, weapon.bullet.range + Mathf.dst(mpart.cx, mpart.cy) * ModularPartType.partSize);
+            ModularPart part = weapons.getMap(i).get("part");
+            weaponRange = Math.max(weaponRange, weapon.bullet.range + Mathf.dst(part.cx, part.cy) * ModularPartType.partSize);
         }
 
-        int abilityslots = Math.round(statmap.getValue("abilityslots"));
-        int abilityslotsused = Math.round(statmap.getValue("abilityslotuse"));
+        int abilityslots = Math.round(statMap.getValue("abilityslots"));
+        int abilityslotsused = Math.round(statMap.getValue("abilityslotuse"));
 
         if(abilityslotsused <= abilityslots){
-            var abilitiesStats = statmap.stats.getList("abilities");
+            var abilitiesStats = statMap.stats.getList("abilities");
             var newAbilities = new Ability[abilitiesStats.length()];
             for(int i = 0; i < abilitiesStats.length(); i++){
                 var abilityStat = abilitiesStats.getMap(i);
@@ -172,16 +170,16 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
             abilities(newAbilities);
         }
 
-        this.massStat = statmap.getOrCreate("mass").getFloat("value");
+        this.massStat = statMap.getOrCreate("mass").getFloat("value");
 
 
-        float wheelspd = statmap.getOrCreate("wheel").getFloat("nominal speed", 0);
-        float wheelcap = statmap.getOrCreate("wheel").getFloat("weight capacity", 0);
-        speed = eff * Mathf.clamp(wheelcap / this.massStat, 0, 1) * wheelspd;
+        float wheelSpeed = statMap.getOrCreate("wheel").getFloat("nominal speed", 0);
+        float wheelCap = statMap.getOrCreate("wheel").getFloat("weight capacity", 0);
+        speed = eff * Mathf.clamp(wheelCap / this.massStat, 0, 1) * wheelSpeed;
         rotateSpeed = Mathf.clamp(10f * speed / (float)Math.max(construct.parts.length, construct.parts[0].length), 0, 5);
 
-        armor = statmap.getValue("armour", "realValue");
-        itemCap = (int)statmap.getValue("itemcapacity");
+        armor = statMap.getValue("armour", "realValue");
+        itemCap = (int)statMap.getValue("itemcapacity");
     }
 
     @Replace
@@ -247,8 +245,8 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
             Vec2 nvt = new Vec2();
             final Vec2 pos = new Vec2();
             construct.partList.each(part -> {
-                boolean b = part.getY() - 1 < 0 || (construct.parts[part.getX()][part.getY() - 1] != null && construct.parts[part.getX()][part.getY() - 1].type instanceof ModularWheelType);
-                if(!(Mathf.random() > 0.1 || !(part.type instanceof ModularWheelType)) && b){
+                boolean b = part.getY() - 1 < 0 || (construct.parts[part.getX()][part.getY() - 1] != null && construct.parts[part.getX()][part.getY() - 1].type instanceof ModularMovementType);
+                if(!(Mathf.random() > 0.1 || !(part.type instanceof ModularMovementType)) && b){
                     pos.set(part.cx * ModularPartType.partSize, part.ay * ModularPartType.partSize);
                     dt.transform(pos);
                     nvt.set(nv.x + Mathf.range(3), nv.y + Mathf.range(3));

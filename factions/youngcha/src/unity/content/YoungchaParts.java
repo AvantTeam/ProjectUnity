@@ -1,7 +1,5 @@
 package unity.content;
 
-import arc.*;
-import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -91,14 +89,14 @@ public class YoungchaParts{
             mass(15);
             producesPower(20);
         }};
-        smallWheel = new ModularWheelType("wheel-small"){{
+        smallWheel = new ModularMovementType("wheel-small"){{
             requirements(PartCategories.movementUnit, ItemStack.with(YoungchaItems.nickel, 5));
             health(15);
             mass(15);
             wheel(1, 30, 1.5f);
             usesPower(7);
         }};
-        smallTracks = new ModularWheelType("tracks-small"){{
+        smallTracks = new ModularMovementType("tracks-small"){{
             requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 15, YoungchaItems.nickel, 10));
             w = 1;
             h = 3;
@@ -205,7 +203,7 @@ public class YoungchaParts{
             mass(200);
             armor(2000);
         }};
-        mediumWheel = new ModularWheelType("wheel-medium"){{
+        mediumWheel = new ModularMovementType("wheel-medium"){{
             requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 50, Items.titanium, 25));
             w = 2;
             h = 4;
@@ -214,7 +212,7 @@ public class YoungchaParts{
             wheel(6, 180, 1.3f);
             usesPower(50);
         }};
-        largeWheel = new ModularWheelType("wheel-large"){{
+        largeWheel = new ModularMovementType("wheel-large"){{
             requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 400, Items.titanium, 150, Items.thorium, 90, YoungchaItems.cupronickel, 100));
             w = 3;
             h = 8;
@@ -245,7 +243,7 @@ public class YoungchaParts{
                 }};
             }});
         }};
-        largeTracks = new ModularWheelType("tracks-large"){{
+        largeTracks = new ModularMovementType("tracks-large"){{
             requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 50, Items.thorium, 40, YoungchaItems.nickel, 30));
             w = 2;
             h = 9;
@@ -254,7 +252,7 @@ public class YoungchaParts{
             wheel(30, 950, 0.6f);
             usesPower(60);
         }};
-        tankTracks = new ModularWheelType("tank-tracks"){{
+        tankTracks = new ModularMovementType("tank-tracks"){{
             requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 250, Items.titanium, 100, YoungchaItems.nickel, 100, YoungchaItems.cupronickel, 50));
             w = 3;
             h = 16;
@@ -263,7 +261,7 @@ public class YoungchaParts{
             wheel(60, 2000, 0.6f);
             usesPower(200);
         }};
-        tankTracksLarge = new ModularWheelType("tank-tracks-large"){{
+        tankTracksLarge = new ModularMovementType("tank-tracks-large"){{
             requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 700, Items.titanium, 500, YoungchaItems.nickel, 300, YoungchaItems.cupronickel, 200, YoungchaItems.superAlloy, 100));
             w = 5;
             h = 30;
@@ -411,20 +409,5 @@ public class YoungchaParts{
         for(int i = 0; i < unitDoodads.size; i++){
             unitDoodads.get(i).load();
         }
-    }
-
-    static PanelDoodadType getUnitDoodad(String name, String outlinename, int... pos){
-        int w = 1, h = 1, x1 = pos[0], x2 = pos[0], y1 = pos[1], y2 = pos[1];
-        Point2[] pts = new Point2[pos.length / 2];
-        for(int i = 0; i < pts.length; i++){
-            pts[i] = new Point2(pos[i * 2], pos[i * 2 + 1]);
-            x1 = Math.min(x1, pos[i * 2]);
-            x2 = Math.max(x2, pos[i * 2]);
-            y1 = Math.min(y1, pos[i * 2 + 1]);
-            y2 = Math.max(y2, pos[i * 2 + 1]);
-        }
-        w = x2 - x1 + 1;
-        h = y2 - y1 + 1;
-        return new PanelDoodadType(pts, Core.atlas.find("unity-doodad-" + name), Core.atlas.find("unity-doodad-" + outlinename), w, h);
     }
 }
