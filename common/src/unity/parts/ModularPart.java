@@ -1,5 +1,7 @@
 package unity.parts;
 
+import unity.util.*;
+
 public class ModularPart{
     public ModularPartType type;
     int x, y;
@@ -61,5 +63,13 @@ public class ModularPart{
 
     public float getCy(){
         return cy;
+    }
+
+    public void setupPanellingIndex(ModularPart[][] grid){
+        for(int x = 0; x < type.w; x++){
+            for(int y = 0; y < type.h; y++){
+                panelingIndexes[x + y * type.w] = TilingUtils.getTilingIndex(grid, this.x + x, this.y + y, b -> b != null && !b.type.open);
+            }
+        }
     }
 }

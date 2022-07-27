@@ -109,18 +109,6 @@ public class ModularPartType implements Displayable{
         return (type & partType) > 0;
     }
 
-    public void setupPanellingIndex(ModularPart part, ModularPart[][] grid){
-        if(part.type != this){
-            Log.err("part with type " + part.type.name + " is incorrectly using type " + this.name);
-            return;
-        }
-        for(int x = 0; x < w; x++){
-            for(int y = 0; y < h; y++){
-                part.panelingIndexes[x + y * w] = TilingUtils.getTilingIndex(grid, part.x + x, part.y + y, b -> b != null && !b.type.open);
-            }
-        }
-    }
-
     public void drawCell(DrawTransform transform, ModularPart part){
         if(hasCellDecal){
             TextureRegion cellsprite = cell[Math.abs(part.cx) < 0.01 ? 1 : 0];

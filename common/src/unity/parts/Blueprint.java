@@ -3,43 +3,78 @@ package unity.parts;
 import arc.struct.*;
 import mindustry.type.*;
 
-public abstract class Blueprint<T>{
-    public T[][] parts;
-    public OrderedMap<T, Data> partsList;
+//TODO is two Generics inevitable?
+//Assumes fields especially collections are immutable from outer direct access.
+public abstract class Blueprint<T, P>{
+    public P[][] parts;
+    //valid parts only.
+    public OrderedSet<P> partsList;
     public boolean[][] valid;
-    public int w, h;
-    public T root;
+    public final int w, h;
+    public P root;
     protected Runnable onChange = () -> {};
     boolean itemReqChanged;
     public ItemSeq itemRequirements;
 
-    public Data[] data;
+    public OrderedSet<Data> data;
 
-    protected Blueprint(){}
+    public Blueprint(int w, int h){
+        this.w = w;
+        this.h = h;
+        itemRequirements = new ItemSeq();
+    }
 
-    public Blueprint(byte[] data){
-        decode(data);
+    public void setOnChange(Runnable onChange){
+        this.onChange = onChange;
+    }
+
+    public void clear(){
+        root = null;
+        onChange.run();
+        itemReqChanged = true;
     }
 
     public abstract void decode(byte[] data);
 
-    protected abstract void setUpRoot();
+    protected abstract void rebuildValid();
 
-    protected abstract void validate();
+    protected void onChange(){
+        rebuildValid();
+        onChange.run();
+        itemReqChanged = true;
+    }
+
+    public boolean canPlace(int x, int y){
+        return x >= 0 && y >= 0 && x < w && y < h;
+    }
+
+    public abstract boolean canPlace(T type, int x, int y);
+
+    public abstract boolean tryPlace(T type, int x, int y);
+
+    protected abstract void place(T part, int x, int y);
+
+    public abstract void displace(int x, int y);
 
     public abstract ItemSeq itemRequirements();
 
+    //Eliminate invalid parts.
+    protected abstract Blueprint validate();
+
+    public abstract Construct construct();
+
     public abstract byte[] encode();
 
+    //trims empty tiles.
     public abstract byte[] encodeCropped();
 
     //unsigned
-    public static byte ub(byte a){
-        return (byte)(a + 128);
+    public static int ub(byte a){
+        return (int)(a) + 128;
     }
 
     //signed
-    public static byte sb(byte a){
+    public static byte sb(int a){
         return (byte)(a - 128);
     }
 
@@ -49,7 +84,17 @@ public abstract class Blueprint<T>{
         public <D extends Data> D self(){
             return (D)this;
         }
+    }
 
-        public abstract <D extends Data> D copy();
+    public static abstract class Construct<P>{
+        public final P[][] parts;
+        public final Seq<P> partsList;
+
+        public Construct(P[][] parts, Seq<P> partsList){
+            this.parts = parts;
+            this.partsList = partsList;
+        }
+
+        public abstract byte[] toData();
     }
 }

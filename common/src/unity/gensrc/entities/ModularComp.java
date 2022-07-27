@@ -57,10 +57,10 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     @Import
     public transient Floor lastDrownFloor;
 
-    transient ModularConstruct construct;
+    transient Blueprint.Construct<ModularPart> construct;
+    byte[] constructData;
     transient boolean constructLoaded = false;
     public transient Seq<PanelDoodad> doodadList = new Seq<>();
-    public byte[] constructData;
 
     //visuals
     public transient float driveDist = 0;
@@ -80,18 +80,13 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
 
     @Override
     public void add(){
-        if(ModularConstruct.cache.containsKey(this)){
-            construct = new ModularConstruct(ModularConstruct.cache.get(this));
-        }else{
-            if(constructData != null){
-                construct = new ModularConstruct(constructData);
-            }else{
+        if(construct == null){
+            if(constructData == null){
                 String templateStr = ((PUUnitTypeCommon)type).prop(ModularProps.class).templates.random();
-                ModularConstructValidator test = new ModularConstructValidator(Base64.getDecoder().decode(templateStr.trim().replaceAll("[\\t\\n\\r]+", "")));
-                construct = new ModularConstruct(test.exportCropped());
+                constructData = Base64.getDecoder().decode(templateStr.trim().replaceAll("[\\t\\n\\r]+", ""));
             }
-        }
-        constructData = Arrays.copyOf(construct.data, construct.data.length);
+            construct = new ModularUnitBlueprint(constructData).construct();
+        }else constructData = construct.toData();
 
         var statMap = new ModularUnitStatMap();
         statMap.getStats(construct.parts);
@@ -228,10 +223,6 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
 
     @Override
     public void update(){
-        if(construct != null && constructData == null){
-            Log.info("uh constructData died");
-            constructData = Arrays.copyOf(construct.data, construct.data.length);
-        }
         float velLen = this.vel().len();
 
         if(construct != null && velLen > 0.01f && elevation < 0.01){
@@ -244,9 +235,9 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
             Vec2 nv = vel().cpy().nor().scl(dustVel * 40);//
             Vec2 nvt = new Vec2();
             final Vec2 pos = new Vec2();
-            construct.partList.each(part -> {
+            construct.partsList.each(part -> {
                 boolean b = part.getY() - 1 < 0 || (construct.parts[part.getX()][part.getY() - 1] != null && construct.parts[part.getX()][part.getY() - 1].type instanceof ModularMovementType);
-                if(!(Mathf.random() > 0.1 || !(part.type instanceof ModularMovementType)) && b){
+                if(Mathf.random() <= 0.1 && (part.type instanceof ModularMovementType) && b){
                     pos.set(part.cx * ModularPartType.partSize, part.ay * ModularPartType.partSize);
                     dt.transform(pos);
                     nvt.set(nv.x + Mathf.range(3), nv.y + Mathf.range(3));
@@ -259,7 +250,6 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
                             Fill.circle(e.x + e.finpow() * v.x, e.y + e.finpow() * v.y, (7f - e.fin() * 7f) * 0.5f);
                         }).layer(Layer.debris).at(pos.x, pos.y, 0, t.floor().mapColor, nvt);
                     }
-
                 }
             });
 

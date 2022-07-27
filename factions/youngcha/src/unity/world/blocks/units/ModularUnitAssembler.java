@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
@@ -26,7 +25,7 @@ import static mindustry.Vars.content;
 import static unity.parts.ModularPartType.partSize;
 
 public class ModularUnitAssembler extends PayloadBlock{
-    public static PartsEditorDialog partsEditorDialog;
+    public static ModularUnitEditorDialog modularUnitEditorDialog;
     public int unitModuleWidth = 255;
     public int unitModuleHeight = 255;
     public boolean sandbox = false;
@@ -39,9 +38,9 @@ public class ModularUnitAssembler extends PayloadBlock{
         solid = false;
         configurable = true;
         config(byte[].class, (ModularUnitAssemblerBuild build, byte[] data) -> {
-            build.blueprint.set(data);
+            build.blueprint.decode(data);
             build.doodads.clear();
-            build.construct = new ModularConstruct(build.blueprint.exportCropped());
+            build.construct = build.blueprint.construct();
             for(var c : build.currentlyConstructing){
                 c.complete();
             }
@@ -142,27 +141,32 @@ public class ModularUnitAssembler extends PayloadBlock{
     }
 
     public class ModularUnitAssemblerBuild extends PayloadBlockBuild<UnitPayload>{
-        public ModularConstructValidator blueprint;
+        public ModularUnitBlueprint blueprint;
         public Seq<ModuleConstructing> currentlyConstructing = new Seq<>();
         public Seq<PanelDoodad> doodads = new Seq<>();
         IntSet built = new IntSet();
-        public ModularConstruct construct;
+        public ModularUnitConstruct construct;
 
         public ModularUnitAssemblerBuild(){
-            blueprint = new ModularConstructValidator(unitModuleWidth, unitModuleHeight);
+            blueprint = new ModularUnitBlueprint(unitModuleWidth, unitModuleHeight);
+            construct = blueprint.construct();
         }
 
         @Override
         public void buildConfiguration(Table table){
-            if(partsEditorDialog == null) partsEditorDialog = new PartsEditorDialog();
+            if(modularUnitEditorDialog == null) modularUnitEditorDialog = new ModularUnitEditorDialog();
             //ui lambda soup time
             var configureButtonCell = table.button(Tex.whiteui, Styles.cleari, 50,
-            () -> partsEditorDialog.show(
-            blueprint.export(), (data) -> {
-                this.configure(data);
-                Log.info("changed stuff");
+            () -> modularUnitEditorDialog.show(
+            blueprint, () -> {
+                doodads.clear();
+                construct = blueprint.construct();
+                for(var c : currentlyConstructing){
+                    c.complete();
+                }
+                currentlyConstructing.clear();
             },
-            PartsEditorDialog.unitInfoViewer, part -> part.visible && part.w <= unitModuleWidth && part.h <= unitModuleHeight
+            ModularUnitEditorDialog.unitInfoViewer, part -> part.visible && part.w <= unitModuleWidth && part.h <= unitModuleHeight
             )
             );
             configureButtonCell.size(50);
@@ -197,7 +201,7 @@ public class ModularUnitAssembler extends PayloadBlock{
         @Override
         public void displayBars(Table table){
             super.displayBars(table);
-            ModularConstruct[] curCon = {construct};
+            ModularUnitConstruct[] curCon = {construct};
             table.table(t -> {
                 t.update(() -> {
                     if(curCon[0] != construct){
@@ -215,8 +219,7 @@ public class ModularUnitAssembler extends PayloadBlock{
                 return;
             }
             var t = YoungchaUnitTypes.modularUnitSmall.create(team);
-            ModularConstruct.cache.put(t, blueprint.exportCropped());
-            ((ModularUnit)t).constructData(ModularConstruct.cache.get(t));
+            ((ModularUnit)t).construct(construct);
             t.set(x, y);
             t.add();
             t.rotation = rotdeg();
@@ -225,8 +228,7 @@ public class ModularUnitAssembler extends PayloadBlock{
 
         public void createUnit(){
             var t = YoungchaUnitTypes.modularUnitSmall.create(team);
-            ModularConstruct.cache.put(t, blueprint.exportCropped());
-            ((ModularUnit)t).constructData(ModularConstruct.cache.get(t));
+            ((ModularUnit)t).construct(construct);
             payload = new UnitPayload(t);
             payVector.setZero();
             Events.fire(new UnitCreateEvent(payload.unit, this));
@@ -235,14 +237,11 @@ public class ModularUnitAssembler extends PayloadBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            if(blueprint.root != null && !sandbox){
+            if(!construct.isEmpty() && !sandbox){
                 if(doodads.isEmpty() && !Vars.headless){
                     UnitDoodadGenerator.initDoodads(blueprint.parts.length, doodads, construct);
                 }
-                if(construct == null){
-                    construct = new ModularConstruct(blueprint.exportCropped());
-                }
-                if(built.size >= construct.partList.size && payload == null){
+                if(built.size >= construct.partsList.size && payload == null){
                     createUnit();
                     built.clear();
                     currentlyConstructing.clear();
@@ -267,7 +266,7 @@ public class ModularUnitAssembler extends PayloadBlock{
                         return c;
                     }
                 }
-                for(var part : construct.partList){
+                for(var part : construct.partsList){
                     if(!built.contains(Point2.pack(part.getX(), part.getY()))){
                         var con = new ModuleConstructing(part);
                         con.takenBy = b.pos();
@@ -291,7 +290,7 @@ public class ModularUnitAssembler extends PayloadBlock{
                         }
                     }
                 }
-                for(var part : construct.partList){
+                for(var part : construct.partsList){
                     if(!built.contains(Point2.pack(part.getX(), part.getY()))
                     && currentlyConstructing.find(bPart -> bPart.x == part.getX() && bPart.y == part.getY()) == null){
                         boolean hasItem = false;
@@ -353,7 +352,7 @@ public class ModularUnitAssembler extends PayloadBlock{
                 float size = (construct.parts.length + construct.parts[0].length) * 0.5f * partSize;
                 Draw.rect(softShadowRegion, this, size * rad * Draw.xscl, size * rad * Draw.yscl, rotdeg() - 90);
                 Draw.color();
-                for(var part : construct.partList){
+                for(var part : construct.partsList){
                     if(built.contains(Point2.pack(part.getX(), part.getY()))){
                         part.type.draw(dt, part);
                     }else{
@@ -379,7 +378,7 @@ public class ModularUnitAssembler extends PayloadBlock{
 
         @Override
         public byte[] config(){
-            return blueprint.export();
+            return blueprint.encode();
         }
 
         @Override
@@ -391,7 +390,7 @@ public class ModularUnitAssembler extends PayloadBlock{
         @Override
         public void write(Writes write){
             super.write(write);
-            var data = blueprint.export();
+            var data = blueprint.encode();
             write.i(data.length);
             write.b(data);
             write.i(built.size);
@@ -407,7 +406,8 @@ public class ModularUnitAssembler extends PayloadBlock{
             super.read(read, revision);
             byte[] data = new byte[read.i()];
             read.b(data);
-            blueprint.set(data);
+            blueprint.decode(data);
+            construct = blueprint.construct();
             int builtLen = read.i();
             for(int i = 0; i < builtLen; i++){
                 built.add(read.i());

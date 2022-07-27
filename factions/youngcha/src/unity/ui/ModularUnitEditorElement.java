@@ -16,7 +16,7 @@ import unity.parts.*;
 import static arc.Core.scene;
 import static unity.graphics.YoungchaPal.*;
 
-public class PartsEditorElement extends Element{
+public class ModularUnitEditorElement extends Element{
     //clipping
     private final Rect scissorBounds = new Rect();
     private final Rect widgetAreaBounds = new Rect();
@@ -24,7 +24,7 @@ public class PartsEditorElement extends Element{
     Seq<byte[]> prev = new Seq<>();
     int index = -1;
 
-    public ModularConstructValidator validator;
+    public ModularUnitBlueprint blueprint;
     public ModularPartType selected = null;
     public boolean mirror = true;
     //selection boxes?
@@ -38,9 +38,7 @@ public class PartsEditorElement extends Element{
     int dragTriggered = 0;
 
 
-    public PartsEditorElement(ModularConstructValidator validator){
-        this.validator = validator;
-
+    public ModularUnitEditorElement(){
         addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
@@ -73,7 +71,7 @@ public class PartsEditorElement extends Element{
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y){
-                scene.setScrollFocus(PartsEditorElement.this); ///AAAAAA
+                scene.setScrollFocus(ModularUnitEditorElement.this); ///AAAAAA
                 mouseX = x;
                 mouseY = y;
                 var g = uiToGrid(x, y);
@@ -81,8 +79,8 @@ public class PartsEditorElement extends Element{
                     Core.graphics.cursor(SystemCursor.hand);
                     return true;
                 }
-                if((selected != null && validator.parts[g.x][g.y] != null) ||
-                (selected == null && validator.parts[g.x][g.y] == null)){
+                if((selected != null && blueprint.parts[g.x][g.y] != null) ||
+                (selected == null && blueprint.parts[g.x][g.y] == null)){
                     Core.graphics.cursor(SystemCursor.hand);
                 }else{
                     Core.graphics.cursor(SystemCursor.arrow);
@@ -99,7 +97,7 @@ public class PartsEditorElement extends Element{
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Element fromActor){
-                scene.setScrollFocus(PartsEditorElement.this);
+                scene.setScrollFocus(ModularUnitEditorElement.this);
             }
 
         });
@@ -120,14 +118,14 @@ public class PartsEditorElement extends Element{
         var g = uiToGrid(x, y);
         if(tileValid(g.x, g.y)){
             if(selected != null){
-                boolean b = validator.placePart(selected, g.x, g.y);
+                boolean b = blueprint.tryPlace(selected, g.x, g.y);
                 if(b && mirror && mirrorX(g.x) != g.x){
-                    validator.placePart(selected, mirrorX(g.x, selected.w), g.y);
+                    blueprint.tryPlace(selected, mirrorX(g.x, selected.w), g.y);
                 }
             }else{
-                validator.deletePartAt(g.x, g.y);
+                blueprint.displace(g.x, g.y);
                 if(mirror && mirrorX(g.x) != g.x){
-                    validator.deletePartAt(mirrorX(g.x), g.y);
+                    blueprint.displace(mirrorX(g.x), g.y);
                 }
             }
             onAction();
@@ -135,11 +133,11 @@ public class PartsEditorElement extends Element{
     }
 
     public boolean tileValid(int x, int y){
-        return (x >= 0 && x < validator.w && y >= 0 && y < validator.h);
+        return (x >= 0 && x < blueprint.w && y >= 0 && y < blueprint.h);
     }
 
-    public void setValidator(ModularConstructValidator validator){
-        this.validator = validator;
+    public void setBlueprint(ModularUnitBlueprint blueprint){
+        this.blueprint = blueprint;
     }
 
     float gx = 0, gy = 0;
@@ -174,32 +172,32 @@ public class PartsEditorElement extends Element{
             return;
         }
         Draw.color(blueprintCol);
-        rectCorner(0, 0, validator.w * 32, validator.h * 32);
+        rectCorner(0, 0, blueprint.w * 32, blueprint.h * 32);
         Draw.color(blueprintColAccent);
         //draw border and center lines
         Lines.stroke(5);
-        rectLine(0, 0, validator.w * 32, validator.h * 32);
-        int mid = validator.w / 2;
-        if(validator.w % 2 == 1){
-            rectLine(mid * 32, 0, 32, validator.h * 32);
+        rectLine(0, 0, blueprint.w * 32, blueprint.h * 32);
+        int mid = blueprint.w / 2;
+        if(blueprint.w % 2 == 1){
+            rectLine(mid * 32, 0, 32, blueprint.h * 32);
         }else{
-            line(mid * 32, 0, mid * 32, validator.h * 32);
+            line(mid * 32, 0, mid * 32, blueprint.h * 32);
         }
-        mid = validator.h / 2;
-        if(validator.h % 2 == 1){
-            rectLine(0, mid * 32, validator.w * 32, 32);
+        mid = blueprint.h / 2;
+        if(blueprint.h % 2 == 1){
+            rectLine(0, mid * 32, blueprint.w * 32, 32);
         }else{
-            line(0, mid * 32, validator.w * 32, mid * 32);
+            line(0, mid * 32, blueprint.w * 32, mid * 32);
         }
         Draw.reset();
 
         Point2 minPoint = uiToGrid(0, 0);
-        int minx = Mathf.clamp(minPoint.x, 0, validator.w - 1);
-        int miny = Mathf.clamp(minPoint.y, 0, validator.h - 1);
+        int minx = Mathf.clamp(minPoint.x, 0, blueprint.w - 1);
+        int miny = Mathf.clamp(minPoint.y, 0, blueprint.h - 1);
 
         Point2 maxPoint = uiToGrid(width, height);
-        int maxX = Mathf.clamp(maxPoint.x, 0, validator.w - 1);
-        int maxY = Mathf.clamp(maxPoint.y, 0, validator.h - 1);
+        int maxX = Mathf.clamp(maxPoint.x, 0, blueprint.w - 1);
+        int maxY = Mathf.clamp(maxPoint.y, 0, blueprint.h - 1);
         //draw grid
         Draw.color(blueprintColAccent);
         for(int i = minx; i <= maxX; i++){
@@ -222,7 +220,7 @@ public class PartsEditorElement extends Element{
         //draw modules
         for(int i = minx; i <= maxX; i++){
             for(int j = miny; j <= maxY; j++){
-                var part = validator.parts[i][j];
+                var part = blueprint.parts[i][j];
                 if(part == null){
                     continue;
                 }
@@ -231,14 +229,17 @@ public class PartsEditorElement extends Element{
                 }
                 Draw.color(bgCol);
                 rectCorner(part.getX() * 32, part.getY() * 32, part.type.w * 32, part.type.h * 32);
-                Draw.color(validator.valid[i][j] ? Color.white : Color.red);
+                Draw.color(blueprint.valid[i][j] ? Color.white : Color.red);
                 rectCorner(part.type.icon, part.getX() * 32, part.getY() * 32, part.type.w * 32, part.type.h * 32);
             }
         }
 
         if(selected != null){
             Color highlight = Color.white;
-            if(!validator.canPlace(selected, cursor.x, cursor.y)){
+            //trying to move center of part.
+            cursor.x -= (selected.w - 1) / 2;
+            cursor.y -= (selected.h - 1) / 2;
+            if(!blueprint.canPlace(selected, cursor.x, cursor.y)){
                 highlight = Color.red;
             }
             Draw.color(bgCol, 0.5f);
@@ -259,11 +260,11 @@ public class PartsEditorElement extends Element{
     }
 
     public int mirrorX(int x, int w){
-        return validator.w - x - w;
+        return blueprint.w - x - w;
     }
 
     public int mirrorX(int x){
-        return validator.w - x - 1;
+        return blueprint.w - x - 1;
     }
 
     public void rectCorner(float x, float y, float w, float h){
@@ -283,11 +284,11 @@ public class PartsEditorElement extends Element{
     }
 
     public float gx(){
-        return x + (width - validator.w * 32 * scl) * 0.5f + panX;
+        return x + (width - blueprint.w * 32 * scl) * 0.5f + panX;
     }
 
     public float gy(){
-        return y + (height - validator.h * 32 * scl) * 0.5f + panY;
+        return y + (height - blueprint.h * 32 * scl) * 0.5f + panY;
     }
 
     public Point2 uiToGrid(float x, float y){
@@ -323,7 +324,7 @@ public class PartsEditorElement extends Element{
     }
 
     public void onAction(){
-        prev.add(validator.export());
+        prev.add(blueprint.encode());
         if(index != prev.size - 2){
             prev.removeRange(index + 2, prev.size - 1);
         }
@@ -336,7 +337,7 @@ public class PartsEditorElement extends Element{
             index = prev.size - 1;
             return;
         }
-        validator.set(prev.get(index));
+        blueprint.decode(prev.get(index));
     }
 
     public void undo(){
@@ -345,7 +346,7 @@ public class PartsEditorElement extends Element{
             index = -1;
             return;
         }
-        validator.set(prev.get(index));
+        blueprint.decode(prev.get(index));
     }
 
 }

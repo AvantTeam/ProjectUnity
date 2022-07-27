@@ -23,16 +23,17 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class PartsEditorDialog extends BaseDialog{
-    public ModularConstructValidator validator;
-    Cons<byte[]> consumer;
-    public PartsEditorElement editorElement;
-    public Cons2<ModularConstructValidator, Table> infoViewer;
+public class ModularUnitEditorDialog extends BaseDialog{
+    public ModularUnitBlueprint blueprint;
+    Runnable onHidden;
+    public ModularUnitEditorElement editorElement;
+    public Cons2<ModularUnitBlueprint, Table> infoViewer;
 
     public ObjectMap<String, Seq<ModularPartType>> availableParts = new ObjectMap<>();
+    Table selectSide;
 
     //part select
-    Cons<Table> partSelectBuilder = table -> {
+    void buildPartSelect(Table table){
         table.clearChildren();
         table.top();
         table.add(Core.bundle.get("ui.parts.select")).growX().left().color(Pal.gray);
@@ -66,7 +67,7 @@ public class PartsEditorDialog extends BaseDialog{
                     partsButton.update(() -> {
                         partsButton.setChecked(editorElement.selected == part);
                         //possibly set gray if disallowed.
-                        if(validator.root == null && !part.root || validator.root != null && part.root){
+                        if(blueprint.root == null && !part.root || blueprint.root != null && part.root){
                             partsButton.forEach(elem -> elem.setColor(Color.darkGray));
                         }else{
                             partsButton.forEach(elem -> elem.setColor(Color.white));
@@ -76,9 +77,10 @@ public class PartsEditorDialog extends BaseDialog{
                 }
             }).growX().left().padBottom(10);
         }
-    };
+    }
+
     //part select & info container
-    Cons<Table> leftSideBuilder = table -> {
+    void buildLeftSide(Table table){
         table.clearChildren();
         //Middle content
         Table content = new Table();
@@ -86,23 +88,22 @@ public class PartsEditorDialog extends BaseDialog{
         Table tabs = new Table();
         ImageButton partsSelectMenuButton = new ImageButton(Icon.box, Styles.clearNoneTogglei);
         partsSelectMenuButton.clicked(() -> {
-            partSelectBuilder.get(content);
-            validator.setOnChange(() -> {});
+            buildPartSelect(content);
+            blueprint.setOnChange(() -> {});
         });
 
         ImageButton infoMenuButton = new ImageButton(Icon.info, Styles.clearNoneTogglei);
         infoMenuButton.clicked(() -> {
-            infoViewer.get(validator, content);
-            validator.setOnChange(() -> infoViewer.get(validator, content));
+            infoViewer.get(blueprint, content);
+            blueprint.setOnChange(() -> infoViewer.get(blueprint, content));
         });
-        var tabsButtonGroup = new ButtonGroup();
+        var tabsButtonGroup = new ButtonGroup<ImageButton>();
         tabsButtonGroup.add(partsSelectMenuButton, infoMenuButton);
         tabs.add(partsSelectMenuButton).size(64);
         tabs.add(infoMenuButton).size(64);
 
         //middle
         ScrollPane scrollPane = new ScrollPane(content, Styles.defaultPane);
-        partSelectBuilder.get(content);
 
         //bottom info
         Table stats = new Table();
@@ -123,30 +124,27 @@ public class PartsEditorDialog extends BaseDialog{
         table.row();
         table.add(stats);
 
-    };
-    Table selectSide;
+        partsSelectMenuButton.fireClick();
+    }
 
-    public PartsEditorDialog(){
+    public ModularUnitEditorDialog(){
         super("parts");
-        this.validator = new ModularConstructValidator(1, 1);
-        editorElement = new PartsEditorElement(this.validator);
+        editorElement = new ModularUnitEditorElement();
         clearChildren();
         buttons.defaults().size(160f, 64f);
-        buttons.button(Icon.flipX, Styles.clearTogglei, () -> {
-            editorElement.mirror = !editorElement.mirror;
-        }).update(i -> {i.setChecked(editorElement.mirror);}).tooltip("mirror").width(64);
+        buttons.button(Icon.flipX, Styles.clearTogglei, () -> editorElement.mirror = !editorElement.mirror)
+        .update(i -> i.setChecked(editorElement.mirror)).tooltip("mirror").width(64);
+
         buttons.button(Icon.file, () -> {
-            validator.clear();
+            blueprint.clear();
             editorElement.onAction();
         }).tooltip("clear").width(64);
-        buttons.button(Icon.copy, () -> {
-            Core.app.setClipboardText(Base64.getEncoder().encodeToString(validator.exportCropped()));
-        }).tooltip("copy").width(64);
+        buttons.button(Icon.copy, () -> Core.app.setClipboardText(Base64.getEncoder().encodeToString(blueprint.encodeCropped())))
+        .tooltip("copy").width(64);
+
         buttons.button(Icon.paste, () -> {
             try{
-                ModularConstructValidator test = new ModularConstructValidator(Base64.getDecoder().decode(Core.app.getClipboardText().trim().replaceAll("[\\t\\n\\r]+", "")));
-                validator.clear();
-                validator.paste(test);
+                blueprint.decode(Base64.getDecoder().decode(Core.app.getClipboardText().trim().replaceAll("[\\t\\n\\r]+", "")));
                 editorElement.onAction();
             }catch(Exception e){
                 Vars.ui.showOkText("Uh", "Your code is poopoo", () -> {}); ///?????
@@ -155,12 +153,8 @@ public class PartsEditorDialog extends BaseDialog{
         if(Core.graphics.getWidth() < 750){
             buttons.row();
             buttons.table(row2 -> {
-                buttons.button("@undo", Icon.undo, () -> {
-                    editorElement.undo();
-                }).name("undo").width(64);
-                buttons.button("@redo", Icon.redo, () -> {
-                    editorElement.redo();
-                }).name("redo").width(64);
+                buttons.button("@undo", Icon.undo, () -> editorElement.undo()).name("undo").width(64);
+                buttons.button("@redo", Icon.redo, () -> editorElement.redo()).name("redo").width(64);
                 buttons.button("@back", Icon.left, this::hide).name("back");
             }).left();
         }else{
@@ -181,7 +175,7 @@ public class PartsEditorDialog extends BaseDialog{
         add(selectSide).align(Align.top).growY();
         add(editorSide);
 
-        hidden(() -> consumer.get(validator.export()));
+        hidden(() -> onHidden.run());
 
         //input
         update(() -> {
@@ -197,33 +191,32 @@ public class PartsEditorDialog extends BaseDialog{
         });
     }
 
-    public void show(byte[] data, Cons<byte[]> modified, Cons2<ModularConstructValidator, Table> viewer, Boolf<ModularPartType> allowed){
-        this.validator.set(data);
-        leftSideBuilder.get(selectSide);
-        editorElement.setValidator(this.validator);
-        this.consumer = modified::get;
-        this.infoViewer = viewer;
-        show();
-
+    public void show(ModularUnitBlueprint blueprint, Runnable modified, Cons2<ModularUnitBlueprint, Table> viewer, Boolf<ModularPartType> allowed){
         //todo: temp
         availableParts.clear();
         for(var part : ModularPartType.partMap){
-            if(!allowed.get(part.value)){
-                continue;
-            }
+            if(!allowed.get(part.value)) continue;
+
             if(!availableParts.containsKey(part.value.category)){
                 availableParts.put(part.value.category, new Seq<>());
             }
             availableParts.get(part.value.category).add(part.value);
         }
+
+        show();
+        this.blueprint = blueprint;
+        buildLeftSide(selectSide);
+        editorElement.setBlueprint(blueprint);
+        this.onHidden = modified::run;
+        this.infoViewer = viewer;
     }
 
 
-    public static Cons2<ModularConstructValidator, Table> unitInfoViewer = (construct, table) -> {
+    public static Cons2<ModularUnitBlueprint, Table> unitInfoViewer = (blueprint, table) -> {
         table.clearChildren();
         var statMap = new ModularUnitStatMap();
-        var itemCosts = construct.itemRequirements();
-        statMap.getStats(construct.parts);
+        var itemCosts = blueprint.itemRequirements();
+        statMap.getStats(blueprint.parts);
         table.top();
         table.add(Core.bundle.get("ui.parts.info")).growX().left().color(Pal.gray);
 
@@ -281,7 +274,7 @@ public class PartsEditorDialog extends BaseDialog{
         Core.app.post(() -> forEach(child -> {
             if(done[0]) return;
 
-            if(child instanceof ScrollPane || child instanceof PartsEditorElement){
+            if(child instanceof ScrollPane || child instanceof ModularUnitEditorElement){
                 Core.scene.setScrollFocus(child);
                 done[0] = true;
             }

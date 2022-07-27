@@ -3,11 +3,14 @@ package unity.parts;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import unity.parts.Blueprint.*;
 import unity.parts.PanelDoodadType.*;
 
 public class UnitDoodadGenerator{
     public static final Seq<PanelDoodadPalette> unitDoodads = new Seq();
-    public static void initDoodads(int rngSeed, Seq<PanelDoodad> doodads, ModularConstruct construct){
+
+    //Initialize draw config of ModularUnit.
+    public static void initDoodads(int rngSeed, Seq<PanelDoodad> doodads, Construct<ModularPart> construct){
         Rand rand = new Rand();
         rand.setSeed(rngSeed);
         /// :I welp i tried
@@ -31,34 +34,36 @@ public class UnitDoodadGenerator{
                 }
             }
 
+            //Shading of each part tile. It gets brighter near to front and the center.
             float[][] lightness = new float[w][h];
             int tiles = 0;
             for(int i = 0; i < w; i++){
                 for(int j = 0; j < h; j++){
-                    lightness[i][j] = Mathf.clamp((0.5f - (1f - Mathf.map(j, minY, maxY, 0, 1))) * 2 + 1, 0, 1);
+                    lightness[i][j] = Mathf.clamp(Mathf.map(j, minY, maxY, 0, 2), 0, 1);
                     tiles += filled[i][j] ? 1 : 0;
                 }
             }
             if(tiles == 0){
                 return;
             }
+
             Seq<Point2> seeds = new Seq();
             int[][] seedSpace = new int[w][h];
-            int[][] seedSpaceBuf = new int[w][h];
             for(int i = 0; i < Math.max(Mathf.floor(Mathf.sqrt(tiles) / 2), 1); i++){
-                int cnx = rand.random(0, Mathf.floor(w) - 1);
-                int cny = rand.random(0, h - 1);
-                while(!filled[cnx][cny]){
+                int cnx, cny;
+                do{
                     cnx = rand.random(0, Mathf.floor(w) - 1);
                     cny = rand.random(0, h - 1);
-                }
+                }while(!filled[cnx][cny]);
                 seeds.add(new Point2(cnx, cny));
                 seedSpace[cnx][cny] = seeds.size;
                 if(filled[w - cnx - 1][cny]){
                     seedSpace[w - cnx - 1][cny] = seeds.size;
                 }
             }
+
             boolean hasEmpty = true;
+            int[][] seedSpaceBuf = new int[w][h];
             while(hasEmpty){
                 hasEmpty = false;
                 for(int i = 0; i < w; i++){
@@ -91,7 +96,7 @@ public class UnitDoodadGenerator{
             }
             for(int i = 0; i < Math.round(w / 2f) - 1; i++){
                 for(int j = 0; j < h; j++){
-                    float val = Mathf.map((i * 34.343f + j * 844.638f) % 1f, -0.1f, 0.1f);
+                    float val = Mathf.map(Mathf.floor(i * 34.343f + j * 844.638f), -0.1f, 0.1f);
                     lightness[i][j] += val;
                     lightness[w - i - 1][j] += val;
                 }
@@ -108,14 +113,15 @@ public class UnitDoodadGenerator{
                     lightness[i][j] = Mathf.clamp(lightness[i][j], 0, 1);
                 }
             }
+            //shading end.
 
-            ///finally apply doodads
+            ///finally apply ModularUnit drawing palette.
             boolean[][] placed = new boolean[construct.parts.length][construct.parts[0].length];
             float ox = -w * 0.5f;
             float oy = -h * 0.5f;
             int middleX = Math.round(w / 2f) - 1;
             Seq<PanelDoodadType> draw = new Seq<>();
-            PanelDoodadType mirrored = null;
+            PanelDoodadType mirrored;
             for(int i = 0; i < Math.round(w / 2f); i++){
                 for(int j = 0; j < h; j++){
                     mirrored = null;

@@ -10,7 +10,7 @@ public class PanelDoodadPalette{
     public boolean sides;
     public int w, h;
     public Seq<PanelDoodadType> doodads = new Seq<>();
-    int amount = 0;
+    int amount;
     String name;
 
     public PanelDoodadPalette(boolean center, boolean sides, int w, int h, String name, int amount){

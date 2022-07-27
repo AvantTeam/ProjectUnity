@@ -62,7 +62,7 @@ public class ModularProps extends Props{
         parent.applyColor(unit);
         Draw.color(parent.cellColor(unit));
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
-        var construct = unit.construct();
+        var construct = (ModularUnitConstruct)unit.construct();
         if(construct != null){
             ModularMovementType.rollDistance = unit.driveDist();
             construct.hasCustomDraw.each((p) -> {
@@ -75,7 +75,7 @@ public class ModularProps extends Props{
     public <T extends Unit&Modularc> void drawModularBody(T unit){
         parent.applyColor(unit);
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
-        var construct = unit.construct();
+        var construct = (ModularUnitConstruct)unit.construct();
         if(construct != null){
             ModularMovementType.rollDistance = unit.driveDist();
             unit.doodadList().each(d -> {
@@ -93,11 +93,6 @@ public class ModularProps extends Props{
             construct.hasCustomDraw.each((p) -> {
                 p.type.drawTop(dt, p);
             });
-        }else{
-            if(unit.constructData() != null && unit.constructData().length > 0){
-                unit.construct(new ModularConstruct(unit.constructData()));
-                UnitDoodadGenerator.initDoodads(unit.construct().parts.length, unit.doodadList(), unit.construct());
-            }
         }
         Draw.reset();
     }
