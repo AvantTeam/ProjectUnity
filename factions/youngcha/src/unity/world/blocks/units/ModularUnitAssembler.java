@@ -16,7 +16,6 @@ import mindustry.world.blocks.payloads.*;
 import unity.content.*;
 import unity.gen.entities.*;
 import unity.parts.*;
-import unity.parts.PanelDoodadType.*;
 import unity.parts.types.*;
 import unity.ui.*;
 import unity.util.*;
@@ -39,7 +38,6 @@ public class ModularUnitAssembler extends PayloadBlock{
         configurable = true;
         config(byte[].class, (ModularUnitAssemblerBuild build, byte[] data) -> {
             build.blueprint.decode(data);
-            build.doodads.clear();
             build.construct = build.blueprint.construct();
             for(var c : build.currentlyConstructing){
                 c.complete();
@@ -143,7 +141,6 @@ public class ModularUnitAssembler extends PayloadBlock{
     public class ModularUnitAssemblerBuild extends PayloadBlockBuild<UnitPayload>{
         public ModularUnitBlueprint blueprint;
         public Seq<ModuleConstructing> currentlyConstructing = new Seq<>();
-        public Seq<PanelDoodad> doodads = new Seq<>();
         IntSet built = new IntSet();
         public ModularUnitConstruct construct;
 
@@ -159,7 +156,6 @@ public class ModularUnitAssembler extends PayloadBlock{
             var configureButtonCell = table.button(Tex.whiteui, Styles.cleari, 50,
             () -> modularUnitEditorDialog.show(
             blueprint, () -> {
-                doodads.clear();
                 construct = blueprint.construct();
                 for(var c : currentlyConstructing){
                     c.complete();
@@ -238,9 +234,6 @@ public class ModularUnitAssembler extends PayloadBlock{
         public void updateTile(){
             super.updateTile();
             if(!construct.isEmpty() && !sandbox){
-                if(doodads.isEmpty() && !Vars.headless){
-                    UnitDoodadGenerator.initDoodads(blueprint.parts.length, doodads, construct);
-                }
                 if(built.size >= construct.partsList.size && payload == null){
                     createUnit();
                     built.clear();

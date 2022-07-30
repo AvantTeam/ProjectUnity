@@ -1,5 +1,6 @@
 package unity.entities.prop;
 
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -7,6 +8,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import unity.entities.type.PUUnitTypeCommon.*;
 import unity.gen.entities.*;
+import unity.parts.Blueprint.*;
 import unity.parts.*;
 import unity.parts.types.*;
 import unity.util.*;
@@ -14,10 +16,12 @@ import unity.util.*;
 public class ModularProps extends Props{
     public final UnitType parent;
     public final Seq<String> templates = new Seq<>();
+    public final Func<byte[], Construct<ModularPart>> decoder;
 
-    public ModularProps(UnitType parent, String... templates){
+    public ModularProps(UnitType parent, Func<byte[], Construct<ModularPart>> decoder, String... templates){
         super(true);
         this.parent = parent;
+        this.decoder = decoder;
         this.templates.add(templates);
     }
 
@@ -62,7 +66,7 @@ public class ModularProps extends Props{
         parent.applyColor(unit);
         Draw.color(parent.cellColor(unit));
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
-        var construct = (ModularUnitConstruct)unit.construct();
+        var construct = unit.construct();
         if(construct != null){
             ModularMovementType.rollDistance = unit.driveDist();
             construct.hasCustomDraw.each((p) -> {
@@ -75,19 +79,17 @@ public class ModularProps extends Props{
     public <T extends Unit&Modularc> void drawModularBody(T unit){
         parent.applyColor(unit);
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
-        var construct = (ModularUnitConstruct)unit.construct();
+        var construct = unit.construct();
         if(construct != null){
             ModularMovementType.rollDistance = unit.driveDist();
-            unit.doodadList().each(d -> {
+            construct.doodads.each(d -> {
                 d.drawOutline(dt);
             });
             construct.hasCustomDraw.each((p) -> {
                 p.type.drawOutline(dt, p);
-            });
-            construct.hasCustomDraw.each((p) -> {
                 p.type.draw(dt, p);
             });
-            unit.doodadList().each(d -> {
+            construct.doodads.each(d -> {
                 d.drawTop(dt);
             });
             construct.hasCustomDraw.each((p) -> {

@@ -34,11 +34,13 @@ public class ModularPartType implements Displayable{
     /** if true will not have paneling **/
     public boolean open = false;
     public static TextureRegion[][] panelling;
+    public static final Seq<PanelDoodadPalette> unitDoodads = new Seq();
     /** texture will/may have three variants for the front middle and back **/
     public TextureRegion[] top;
     public TextureRegion[] outline;
     public boolean hasExtraDecal = false;
     public boolean hasCellDecal = false;
+    public boolean hasCustomDraw = false;
     public TextureRegion[] cell;
     public ItemStack[] cost = {};
     public int costTotal = 0;
@@ -66,9 +68,18 @@ public class ModularPartType implements Displayable{
 
     public static void loadStatic(){
         panelling = Core.atlas.find("unity-panel").split(16, 16);
+        unitDoodads.add(new PanelDoodadPalette(true, true, 1, 1, "1x1", 12));
+        unitDoodads.add(new PanelDoodadPalette(false, true, 2, 2, "2x2", 5));
+        unitDoodads.add(new PanelDoodadPalette(false, true, 3, 3, "3x3", 4));
+        unitDoodads.add(new PanelDoodadPalette(true, true, 3, 2, "3x2", 3));
+
+        for(int i = 0; i < unitDoodads.size; i++){
+            unitDoodads.get(i).load();
+        }
     }
 
     public void load(){
+        hasCustomDraw = open || hasCellDecal || hasExtraDecal;
         ///
         String prefix = "unity-part-" + name;
         icon = Core.atlas.find(prefix + "-icon");
@@ -111,8 +122,8 @@ public class ModularPartType implements Displayable{
 
     public void drawCell(DrawTransform transform, ModularPart part){
         if(hasCellDecal){
-            TextureRegion cellsprite = cell[Math.abs(part.cx) < 0.01 ? 1 : 0];
-            transform.drawRectScl(cellsprite, part.cx * partSize, part.cy * partSize, part.cx < 0 ? 1 : -1, 1);
+            TextureRegion cellSprite = cell[Math.abs(part.cx) < 0.01 ? 1 : 0];
+            transform.drawRectScl(cellSprite, part.cx * partSize, part.cy * partSize, part.cx < 0 ? 1 : -1, 1);
         }
     }
 
@@ -142,15 +153,15 @@ public class ModularPartType implements Displayable{
 
 
     //stats.
-    public void appendStats(ModularPartStatMap statmap, ModularPart part, ModularPart[][] grid){
+    public void appendStats(ModularPartStatMap statMap, ModularPart part, ModularPart[][] grid){
         for(var stat : stats){
-            stat.merge(statmap, part);
+            stat.merge(statMap, part);
         }
     }
 
-    public void appendStatsPost(ModularPartStatMap statmap, ModularPart part, ModularPart[][] grid){
+    public void appendStatsPost(ModularPartStatMap statMap, ModularPart part, ModularPart[][] grid){
         for(var stat : stats){
-            stat.mergePost(statmap, part);
+            stat.mergePost(statMap, part);
         }
     }
 

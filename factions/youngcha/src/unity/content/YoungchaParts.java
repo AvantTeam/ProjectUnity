@@ -12,8 +12,6 @@ import unity.entities.weapons.*;
 import unity.parts.*;
 import unity.parts.types.*;
 
-import static unity.parts.UnitDoodadGenerator.unitDoodads;
-
 public class YoungchaParts{
     //unit
     //misc
@@ -398,16 +396,5 @@ public class YoungchaParts{
 
 
         //endregion
-    }
-
-    public static void loadDoodads(){
-        unitDoodads.add(new PanelDoodadPalette(true, true, 1, 1, "1x1", 12));
-        unitDoodads.add(new PanelDoodadPalette(false, true, 2, 2, "2x2", 5));
-        unitDoodads.add(new PanelDoodadPalette(false, true, 3, 3, "3x3", 4));
-        unitDoodads.add(new PanelDoodadPalette(true, true, 3, 2, "3x2", 3));
-
-        for(int i = 0; i < unitDoodads.size; i++){
-            unitDoodads.get(i).load();
-        }
     }
 }

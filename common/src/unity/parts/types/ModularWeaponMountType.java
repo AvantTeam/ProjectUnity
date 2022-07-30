@@ -17,8 +17,8 @@ public class ModularWeaponMountType extends ModularPartType{
     }
 
     @Override
-    public void appendStats(ModularPartStatMap statmap, ModularPart part, ModularPart[][] grid){
-        super.appendStats(statmap, part, grid);
+    public void appendStats(ModularPartStatMap statMap, ModularPart part, ModularPart[][] grid){
+        super.appendStats(statMap, part, grid);
     }
 
     @Override

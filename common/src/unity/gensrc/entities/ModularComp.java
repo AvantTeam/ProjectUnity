@@ -60,7 +60,6 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     transient Blueprint.Construct<ModularPart> construct;
     byte[] constructData;
     transient boolean constructLoaded = false;
-    public transient Seq<PanelDoodad> doodadList = new Seq<>();
 
     //visuals
     public transient float driveDist = 0;
@@ -81,20 +80,18 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     @Override
     public void add(){
         if(construct == null){
+            var prop = ((PUUnitTypeCommon)type).prop(ModularProps.class);
             if(constructData == null){
-                String templateStr = ((PUUnitTypeCommon)type).prop(ModularProps.class).templates.random();
+                String templateStr = prop.templates.random();
                 constructData = Base64.getDecoder().decode(templateStr.trim().replaceAll("[\\t\\n\\r]+", ""));
             }
-            construct = new ModularUnitBlueprint(constructData).construct();
+            construct = prop.decoder.get(constructData);
         }else constructData = construct.toData();
 
         var statMap = new ModularUnitStatMap();
         statMap.getStats(construct.parts);
         applyStatMap(statMap);
         constructLoaded = true;
-        if(!headless){
-            UnitDoodadGenerator.initDoodads(construct.parts.length, doodadList, construct);
-        }
         int w = construct.parts.length;
         int h = construct.parts[0].length;
         int maxX = 0, minX = 256;
