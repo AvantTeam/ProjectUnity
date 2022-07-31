@@ -32,7 +32,7 @@ public class ModularUnitConstruct extends Blueprint.Construct<ModularUnitPart>{
         data[1] = sb((byte)(parts[0].length));
         for(int i = 0; i < partsList.size; i++){
             var part = partsList.get(i);
-            new PartData(part.type.id, part.x, part.y).pack(data, 2 + step * i);
+            new PartData(part.type.id(), part.x, part.y).pack(data, 2 + step * i);
         }
         return data;
     }

@@ -2,6 +2,7 @@ package unity.gensrc.entities;
 
 import arc.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -75,7 +76,7 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     }
 
     void setup(){
-        var statMap = new ModularUnitStatMap();
+        var statMap = new ValueMap();
         statMap.getStats(construct.partsList);
         applyStatMap(statMap);
         constructLoaded = true;
@@ -85,67 +86,67 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
         hitSize((h + w) * 0.5f * PartType.partSize);
     }
 
-    public void applyStatMap(PartStatMap statMap){
+    public void applyStatMap(ValueMap statMap){
         if(construct.parts.length == 0){
             return;
         }
-        float power = statMap.getOrCreate("power").getFloat("value");
-        float powerUse = statMap.getOrCreate("powerusage").getFloat("value");
+        float power = statMap.getFloat("power");
+        float powerUse = statMap.getFloat("powerUsage");
         float eff = Mathf.clamp(power / powerUse, 0, 1);
 
         float hRatio = Mathf.clamp(this.health / this.maxHealth);
-        this.maxHealth = statMap.getOrCreate("health").getFloat("value");
+        this.maxHealth = statMap.getFloat("health");
         if(savedHp <= 0){
             this.health = hRatio * this.maxHealth;
         }else{
             this.health = savedHp;
             savedHp = -1;
         }
-        var weapons = statMap.stats.getList("weapons");
-        mounts = new WeaponMount[weapons.length()];
+        var weapons = statMap.<Seq<ValueMap>>getObject("weapons",Seq::new);
+        mounts = new WeaponMount[weapons.size];
         weaponRange = 0;
 
-        int weaponslots = Math.round(statMap.getValue("weaponslots"));
-        int weaponslotsused = Math.round(statMap.getValue("weaponslotuse"));
+        int weaponSlots = Math.round(statMap.getFloat("weaponSlots"));
+        int weaponSlotsUsed = Math.round(statMap.getFloat("weaponSlotUse"));
 
-        for(int i = 0; i < weapons.length(); i++){
-            var weapon = getWeaponFromStat(weapons.getMap(i));
+        for(int i = 0; i < weapons.size; i++){
+            var weapon = getWeaponFromStat(weapons.get(i));
             weapon.reload *= 1f / eff;
-            if(weaponslotsused > weaponslots){
-                weapon.reload *= 4f * (weaponslotsused - weaponslots);
+            if(weaponSlotsUsed > weaponSlots){
+                weapon.reload *= 4f * (weaponSlotsUsed - weaponSlots);
             }
             if(!headless){
                 weapon.load();
             }
             mounts[i] = weapon.mountType.get(weapon);
-            Part part = weapons.getMap(i).get("part");
-            weaponRange = Math.max(weaponRange, weapon.bullet.range + Mathf.dst(part.cx(), part.cy()) * PartType.partSize);
+            Vec2 pos = weapons.get(i).getObject("pos");
+            weaponRange = Math.max(weaponRange, weapon.bullet.range + Mathf.dst(pos.x, pos.y) * PartType.partSize);
         }
 
-        int abilityslots = Math.round(statMap.getValue("abilityslots"));
-        int abilityslotsused = Math.round(statMap.getValue("abilityslotuse"));
+        int abilitySlots = Math.round(statMap.getFloat("abilitySlots"));
+        int abilitySlotsUsed = Math.round(statMap.getFloat("abilitySlotUse"));
 
-        if(abilityslotsused <= abilityslots){
-            var abilitiesStats = statMap.stats.getList("abilities");
-            var newAbilities = new Ability[abilitiesStats.length()];
-            for(int i = 0; i < abilitiesStats.length(); i++){
-                var abilityStat = abilitiesStats.getMap(i);
-                Ability ability = abilityStat.get("ability");
+        if(abilitySlotsUsed <= abilitySlots){
+            var abilitiesStats = statMap.<Seq<ValueMap>>getObject("abilities",Seq::new);
+            var newAbilities = new Ability[abilitiesStats.size];
+            for(int i = 0; i < abilitiesStats.size; i++){
+                var abilityStat = abilitiesStats.get(i);
+                Ability ability = abilityStat.getObject("ability");
                 newAbilities[i] = ability.copy();
             }
             abilities(newAbilities);
         }
 
-        this.massStat = statMap.getOrCreate("mass").getFloat("value");
+        this.massStat = statMap.getFloat("mass");
 
 
-        float wheelSpeed = statMap.getOrCreate("wheel").getFloat("nominal statSpeed", 0);
-        float wheelCap = statMap.getOrCreate("wheel").getFloat("weight capacity", 0);
+        float wheelSpeed = statMap.getFloat("wheel", "nominal statSpeed");
+        float wheelCap = statMap.getFloat("wheel", "weightCapacity");
         statSpeed = eff * Mathf.clamp(wheelCap / this.massStat, 0, 1) * wheelSpeed;
         rotateSpeed = Mathf.clamp(10f * statSpeed / (float)Math.max(construct.parts.length, construct.parts[0].length), 0, 5);
 
-        armor = statMap.getValue("armour", "realValue");
-        itemCap = (int)statMap.getValue("itemcapacity");
+        armor = statMap.getFloat("realArmor");
+        itemCap = (int)statMap.getFloat("itemCapacity");
     }
 
     @Replace
@@ -183,7 +184,7 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     }
 
     public Weapon getWeaponFromStat(ValueMap weaponStat){
-        Weapon weapon = weaponStat.get("weapon");
+        Weapon weapon = weaponStat.getObject("weapon");
         initWeapon(weapon);
         return weapon;
     }

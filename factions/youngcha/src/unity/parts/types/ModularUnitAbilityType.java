@@ -10,8 +10,8 @@ public class ModularUnitAbilityType extends ModularUnitPartType{
         super(name);
     }
 
-    public void ability(int abilityslots, Ability ability){
-        stats.add(new AbilitySlotUseStat(abilityslots));
+    public void ability(int abilitySlots, Ability ability){
+        stats.add(new AbilitySlotUseStat(abilitySlots));
         stats.add(new AbilityStat(ability));
     }
 }

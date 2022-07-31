@@ -9,8 +9,6 @@ import unity.util.*;
 
 public abstract class PartType implements Displayable{
     public static final float partSize = 4;
-    private static int idAcc = 0;
-    public final int id = idAcc++;
     public ItemStack[] cost = {};
     public int w = 1;
     public int h = 1;
@@ -26,13 +24,13 @@ public abstract class PartType implements Displayable{
     public PartType(String name){this.name = name;}
 
     //stats.
-    public void appendStats(PartStatMap statMap, Part part){
+    public void appendStats(ValueMap statMap, Part part){
         for(var stat : stats){
             stat.merge(statMap, part);
         }
     }
 
-    public void appendStatsPost(PartStatMap statMap, Part part){
+    public void appendStatsPost(ValueMap statMap, Part part){
         for(var stat : stats){
             stat.mergePost(statMap, part);
         }
@@ -45,6 +43,8 @@ public abstract class PartType implements Displayable{
     public abstract void draw(DrawTransform transform, Part part, Modularc parent);
 
     public abstract void drawOutline(DrawTransform transform, Part part);
+
+    public abstract int id();
 
     public static abstract class Part{
         public PartType type;

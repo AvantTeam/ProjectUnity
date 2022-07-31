@@ -1,49 +1,48 @@
 package unity.parts.stats;
 
 import arc.graphics.g2d.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.meta.*;
 import mindustry.world.meta.StatValue;
+import mindustry.world.meta.*;
 import unity.mod.*;
 import unity.parts.*;
 import unity.parts.PartType.*;
 import unity.util.*;
 
 public class WeaponMountStat extends PartStat{
-    Weapon baseweapon;
+    Weapon baseWeapon;
 
     public WeaponMountStat(Weapon w){
         super("weapon");
-        baseweapon = w.copy();
+        baseWeapon = w.copy();
     }
 
     @Override
-    public void merge(PartStatMap id, Part part){
-        if(id.has("weapons")){
-            var weaponsarr = id.stats.getList("weapons");
-            ValueMap weapon = new ValueMap();
-            weapon.put("part", part);
-            Weapon copy = baseweapon.copy();
-            copy.x = part.cx() * PartType.partSize;
-            copy.y = part.cy() * PartType.partSize;
-            weapon.put("weapon", copy);
-            weaponsarr.add(weapon);
-        }
+    public void merge(ValueMap id, Part part){
+        var weaponSeq = id.<Seq<ValueMap>>getObject("weapons",Seq::new);
+        ValueMap weapon = new ValueMap();
+        weapon.put("pos", new Vec2(part.cx(), part.cy()));
+        Weapon copy = baseWeapon.copy();
+        copy.x = part.cx() * PartType.partSize;
+        copy.y = part.cy() * PartType.partSize;
+        weapon.put("weapon", copy);
+        weaponSeq.add(weapon);
     }
 
     @Override
-    public void mergePost(PartStatMap id, Part part){
+    public void mergePost(ValueMap id, Part part){
 
     }
 
     @Override
     public void display(Table e){
         e.row();
-        e.table(t -> weapons(baseweapon).display(t));
+        e.table(t -> weapons(baseWeapon).display(t));
     }
 
     public static StatValue weapons(Weapon weapon){

@@ -22,31 +22,25 @@ public class WheelStat extends PartStat{
     }
 
     @Override
-    public void merge(PartStatMap id, Part part){
-        if(id.has("wheel")){
-            ValueMap wheelStat = id.getOrCreate("wheel");
-            wheelStat.add("total strength", wheelStrength);
-            wheelStat.add("total speedpower", wheelStrength * maxSpeed);
-            wheelStat.add("weight capacity", nominalWeight);
-        }
+    public void merge(ValueMap id, Part part){
+        ValueMap wheelStat = id.getValueMap("wheel");
+        wheelStat.add("totalStrength", wheelStrength);
+        wheelStat.add("totalSpeedPower", wheelStrength * maxSpeed);
+        wheelStat.add("weightCapacity", nominalWeight);
     }
 
     @Override
-    public void mergePost(PartStatMap id, Part part){
-        if(id.has("wheel")){
-            ValueMap wheelStat = id.getOrCreate("wheel");
-            if(wheelStat.has("nominal statSpeed")){
-                return;
-            }
-            wheelStat.put("nominal statSpeed", wheelStat.getFloat("total speedpower") / wheelStat.getFloat("total strength"));
-        }
+    public void mergePost(ValueMap id, Part part){
+        ValueMap wheelStat = id.getValueMap("wheel");
+        if(wheelStat.has("nominal statSpeed")) return;
+        wheelStat.put("nominal statSpeed", wheelStat.getFloat("totalSpeedPower") / wheelStat.getFloat("totalStrength"));
     }
 
     @Override
     public void display(Table table){
         table.row();
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stattype.weightcap") + ": [accent]" + nominalWeight).left().top();
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.statType.weightcap") + ": [accent]" + nominalWeight).left().top();
         table.row();
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stattype.maxspeed") + ": [accent]" + Core.bundle.format("ui.parts.stat.speed", Strings.fixed(maxSpeed * 60f / tilesize, 1))).left().top();
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.statType.maxspeed") + ": [accent]" + Core.bundle.format("ui.parts.stat.speed", Strings.fixed(maxSpeed * 60f / tilesize, 1))).left().top();
     }
 }

@@ -4,41 +4,36 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import unity.parts.*;
 import unity.parts.PartType.*;
+import unity.util.*;
 
 public class HealthStat extends PartStat{
-    public float hpboost = 0;
+    public float hpBoost;
     public boolean percentage = false;
 
     public HealthStat(float flat){
         super("health");
-        hpboost = flat;
+        hpBoost = flat;
     }
 
     public HealthStat(float flat, boolean boost){
         super("health");
         percentage = boost;
-        hpboost = flat;
+        hpBoost = flat;
     }
 
     @Override
-    public void merge(PartStatMap id, Part part){
-        if(!percentage && id.has(name)){
-            var jo = id.getOrCreate(name);
-            jo.put("value", jo.getFloat("value") + hpboost);
-        }
+    public void merge(ValueMap id, Part part){
+        if(!percentage) id.add(name, hpBoost);
     }
 
     @Override
-    public void mergePost(PartStatMap id, Part part){
-        if(percentage && id.has(name)){
-            var jo = id.getOrCreate(name);
-            jo.put("value", jo.getFloat("value") * hpboost);
-        }
+    public void mergePost(ValueMap id, Part part){
+        if(percentage) id.mul(name, hpBoost);
     }
 
     @Override
     public void display(Table table){
         table.row();
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stattype." + name) + ": [accent]" + hpboost + (percentage ? "%" : "")).left().top();
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.statType." + name) + ": [accent]" + hpBoost + (percentage ? "%" : "")).left().top();
     }
 }

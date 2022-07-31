@@ -134,7 +134,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
             for(int j = y; j < y + type.h; j++) parts[i][j] = part;
         }
 
-        data.add(new PartData(type.id, x, y));
+        data.add(new PartData(type.id(), x, y));
         part.ax = x - w * 0.5f + 0.5f;
         part.ay = y - h * 0.5f + 0.5f;
         part.cx = x - w * 0.5f + type.w * 0.5f;
@@ -145,7 +145,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
     public void displace(int x, int y){
         var part = parts[x][y];
         if(part != null){
-            data.remove(new PartData(part.type.id, part.x, part.y));
+            data.remove(new PartData(part.type.id(), part.x, part.y));
             if(part == root) root = null;
             for(int i = part.x; i < part.x + part.type.w; i++){
                 for(int j = part.y; j < part.y + part.type.h; j++) parts[i][j] = null;
@@ -212,7 +212,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
         var parts = partsList.orderedItems();
         for(int i = 0; i < parts.size; i++){
             var part = parts.get(i);
-            PartData data = new PartData(part.type.id, part.x - minX, part.y - minY);
+            PartData data = new PartData(part.type.id(), part.x - minX, part.y - minY);
             data.pack(output, 2 + i * step);
         }
         return output;

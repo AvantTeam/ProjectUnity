@@ -1,5 +1,6 @@
 package unity.parts.stats;
 
+import arc.struct.*;
 import mindustry.entities.abilities.*;
 import unity.parts.*;
 import unity.parts.PartType.*;
@@ -14,19 +15,16 @@ public class AbilityStat extends PartStat{
     }
 
     @Override
-    public void merge(PartStatMap id, Part part){
-        if(id.has("abilities")){
-            var weaponsarr = id.stats.getList("abilities");
-            ValueMap abilityMap = new ValueMap();
-            abilityMap.put("part", part);
-            Ability copy = ability.copy();
-            abilityMap.put("ability", copy);
-            weaponsarr.add(abilityMap);
-        }
+    public void merge(ValueMap id, Part part){
+        var abilitySeq = id.<Seq<ValueMap>>getObject("abilities", Seq::new);
+        ValueMap abilityMap = new ValueMap();
+        Ability copy = ability.copy();
+        abilityMap.put("ability", copy);
+        abilitySeq.add(abilityMap);
     }
 
     @Override
-    public void mergePost(PartStatMap id, Part part){
+    public void mergePost(ValueMap id, Part part){
 
     }
 }

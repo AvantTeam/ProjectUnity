@@ -19,10 +19,12 @@ import unity.util.*;
 //like Block, this is a singleton
 public class ModularUnitPartType extends PartType{
     public static IntMap<ModularUnitPartType> partMap = new IntMap<>();
+    private static int idAcc = 0;
+    private final int id = idAcc++;
     public String category;
 
     public static TextureRegion[][] panelling;
-    public static final Seq<PanelDoodadPalette> unitDoodads = new Seq();
+    public static final Seq<PanelDoodadPalette> unitDoodads = new Seq<>();
     /** texture will/may have three variants for the front middle and back **/
     public TextureRegion[] top;
     public TextureRegion[] outline;
@@ -36,16 +38,19 @@ public class ModularUnitPartType extends PartType{
     public boolean root = false;
     public boolean visible = true;
 
+    public ModularUnitPartType(String name){
+        super(name);
+        arc.util.Log.info(id());
+        partMap.put(id(), this);
+    }
 
     public ModularUnitPart create(int x, int y){
         return new ModularUnitPart(this, x, y);
     }
 
-
-    public ModularUnitPartType(String name){
-        super(name);
-        arc.util.Log.info(id);
-        partMap.put(id, this);
+    @Override
+    public int id(){
+        return id;
     }
 
     public static void loadStatic(){
@@ -216,11 +221,7 @@ public class ModularUnitPartType extends PartType{
         }).top().left().minWidth(300).padBottom(5);
 
         tip.row();
-        tip.table(statTable -> {
-            stats.each(stat -> {
-                stat.display(statTable);
-            });
-        }).left();
+        tip.table(statTable -> stats.each(stat -> stat.display(statTable))).left();
 
         tip.row();
         tip.table(req -> {

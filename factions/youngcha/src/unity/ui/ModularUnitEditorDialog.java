@@ -18,6 +18,7 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.meta.*;
 import unity.parts.*;
+import unity.util.*;
 
 import java.util.*;
 
@@ -214,7 +215,7 @@ public class ModularUnitEditorDialog extends BaseDialog{
 
     public static Cons2<ModularUnitBlueprint, Table> unitInfoViewer = (blueprint, table) -> {
         table.clearChildren();
-        var statMap = new ModularUnitStatMap();
+        var statMap = new ValueMap();
         var itemCosts = blueprint.itemRequirements();
         statMap.getStats(blueprint.partsList.orderedItems());
         table.top();
@@ -231,9 +232,9 @@ public class ModularUnitEditorDialog extends BaseDialog{
             }
         }).growX().left().margin(3);
         table.row();
-        table.add("[lightgray]" + Stat.health.localized() + ":[accent] " + statMap.getValue("health")).left().top();
+        table.add("[lightgray]" + Stat.health.localized() + ":[accent] " + statMap.getFloat("health")).left().top();
         table.row();
-        float eff = Mathf.clamp(statMap.getValue("power") / statMap.getValue("powerusage"));
+        float eff = Mathf.clamp(statMap.getFloat("power") / statMap.getFloat("powerUsage"));
         String color = "[green]";
         if(eff < 0.7){
             color = "[red]";
@@ -241,31 +242,31 @@ public class ModularUnitEditorDialog extends BaseDialog{
             color = "[yellow]";
         }
 
-        table.add("[lightgray]" + Stat.powerUse.localized() + ": " + color + statMap.getValue("powerusage") + "/" + statMap.getValue("power")).left().top();
+        table.add("[lightgray]" + Stat.powerUse.localized() + ": " + color + statMap.getFloat("powerUsage") + "/" + statMap.getFloat("power")).left().top();
         table.row();
         table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.efficiency") + ": " + color + Strings.fixed(Mathf.clamp(eff) * 100, 1) + "%").left().top();
         table.row();
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.weight") + ":[accent] " + statMap.getValue("mass")).left().top();
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.weight") + ":[accent] " + statMap.getFloat("mass")).left().top();
 
-        float mass = statMap.getValue("mass");
-        float wcap = statMap.getValue("wheel", "weight capacity");
-        float speed = eff * Mathf.clamp(wcap / mass) * statMap.getValue("wheel", "nominal statSpeed");
+        float mass = statMap.getFloat("mass");
+        float wCap = statMap.getFloat("wheel", "weightCapacity");
+        float speed = eff * Mathf.clamp(wCap / mass) * statMap.getFloat("wheel", "nominal statSpeed");
         table.row();
         table.add("[lightgray]" + Stat.speed.localized() + ":[accent] " + Core.bundle.format("ui.parts.stat.speed", Strings.fixed(speed * 60f / tilesize, 1))).left().top();
         table.row();
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.armour-points") + ":[accent] " + statMap.getValue("armour")).left().top();
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.armor-points") + ":[accent] " + statMap.getFloat("armor")).left().top();
         table.row();
-        table.add("[lightgray]" + Stat.armor.localized() + ":[accent] " + Strings.fixed(statMap.getValue("armour", "realValue"), 1)).left().top();
+        table.add("[lightgray]" + Stat.armor.localized() + ":[accent] " + Strings.fixed(statMap.getFloat("realArmor"), 1)).left().top();
 
         table.row();
-        int weaponslots = Math.round(statMap.getValue("weaponslots"));
-        int weaponslotsused = Math.round(statMap.getValue("weaponslotuse"));
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.weapon-slots") + ": " + (weaponslotsused > weaponslots ? "[red]" : "[green]") + weaponslotsused + "/" + weaponslots).left().top().tooltip(Core.bundle.get("ui.parts.stat.weapon-slots-tooltip"));
+        int weaponSlots = Math.round(statMap.getFloat("weaponSlots"));
+        int weaponSlotsUsed = Math.round(statMap.getFloat("weaponSlotUse"));
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.weapon-slots") + ": " + (weaponSlotsUsed > weaponSlots ? "[red]" : "[green]") + weaponSlotsUsed + "/" + weaponSlots).left().top().tooltip(Core.bundle.get("ui.parts.stat.weapon-slots-tooltip"));
 
         table.row();
-        int abilityslots = Math.round(statMap.getValue("abilityslots"));
-        int abilityslotsused = Math.round(statMap.getValue("abilityslotuse"));
-        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.ability-slots") + ": " + (abilityslotsused > abilityslots ? "[red]" : "[green]") + abilityslotsused + "/" + abilityslots).left().top().tooltip(Core.bundle.get("ui.parts.stat.ability-slots-tooltip"));
+        int abilitySlots = Math.round(statMap.getFloat("abilitySlots"));
+        int abilitySlotsUsed = Math.round(statMap.getFloat("abilitySlotUse"));
+        table.add("[lightgray]" + Core.bundle.get("ui.parts.stat.ability-slots") + ": " + (abilitySlotsUsed > abilitySlots ? "[red]" : "[green]") + abilitySlotsUsed + "/" + abilitySlots).left().top().tooltip(Core.bundle.get("ui.parts.stat.ability-slots-tooltip"));
     };
 
     public void updateScrollFocus(){

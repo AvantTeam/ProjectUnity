@@ -76,7 +76,7 @@ public class ModularUnitAssembler extends PayloadBlock{
         public void write(Writes write){
             write.s(x);
             write.s(y);
-            write.s(type.id);
+            write.s(type.id());
             write.s(remaining.length); //amount of items
 
             for(ItemStack itemStack : remaining){
