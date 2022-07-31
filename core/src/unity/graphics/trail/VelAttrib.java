@@ -7,7 +7,7 @@ import unity.graphics.*;
 import unity.graphics.BaseTrail.*;
 
 /**
- * Velocity trail attribute. Adds an arbitrary vector multiplied by trail speed to the trail position.
+ * Velocity trail attribute. Adds an arbitrary vector multiplied by trail statSpeed to the trail position.
  * @author GlennFolker
  */
 //TODO doesn't exactly handle Time.delta properly

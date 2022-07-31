@@ -4,13 +4,14 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import unity.parts.*;
+import unity.parts.PartType.*;
 import unity.util.*;
 
 import static mindustry.Vars.tilesize;
 
-public class WheelStat extends ModularPartStat{
+public class WheelStat extends PartStat{
     float wheelStrength;
-    float nominalWeight; //max weight supported until speed penalties
+    float nominalWeight; //max weight supported until statSpeed penalties
     float maxSpeed;
 
     public WheelStat(float wheelStrength, float nominalWeight, float maxSpeed){
@@ -21,7 +22,7 @@ public class WheelStat extends ModularPartStat{
     }
 
     @Override
-    public void merge(ModularPartStatMap id, ModularPart part){
+    public void merge(PartStatMap id, Part part){
         if(id.has("wheel")){
             ValueMap wheelStat = id.getOrCreate("wheel");
             wheelStat.add("total strength", wheelStrength);
@@ -31,13 +32,13 @@ public class WheelStat extends ModularPartStat{
     }
 
     @Override
-    public void mergePost(ModularPartStatMap id, ModularPart part){
+    public void mergePost(PartStatMap id, Part part){
         if(id.has("wheel")){
             ValueMap wheelStat = id.getOrCreate("wheel");
-            if(wheelStat.has("nominal speed")){
+            if(wheelStat.has("nominal statSpeed")){
                 return;
             }
-            wheelStat.put("nominal speed", wheelStat.getFloat("total speedpower") / wheelStat.getFloat("total strength"));
+            wheelStat.put("nominal statSpeed", wheelStat.getFloat("total speedpower") / wheelStat.getFloat("total strength"));
         }
     }
 

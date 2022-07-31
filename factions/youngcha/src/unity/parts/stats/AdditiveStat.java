@@ -3,8 +3,9 @@ package unity.parts.stats;
 import arc.*;
 import arc.scene.ui.layout.*;
 import unity.parts.*;
+import unity.parts.PartType.*;
 
-public class AdditiveStat extends ModularPartStat{
+public class AdditiveStat extends PartStat{
     float value = 0;
 
     public AdditiveStat(String name, float value){
@@ -13,7 +14,7 @@ public class AdditiveStat extends ModularPartStat{
     }
 
     @Override
-    public void merge(ModularPartStatMap id, ModularPart part){
+    public void merge(PartStatMap id, Part part){
         if(id.has(name)){
             var jo = id.getOrCreate(name);
             jo.put("value", jo.getFloat("value") + value);
@@ -31,7 +32,7 @@ public class AdditiveStat extends ModularPartStat{
     }
 
     @Override
-    public void mergePost(ModularPartStatMap id, ModularPart part){
+    public void mergePost(PartStatMap id, Part part){
 
     }
 

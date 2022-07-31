@@ -2,9 +2,10 @@ package unity.parts.stats;
 
 import mindustry.entities.abilities.*;
 import unity.parts.*;
+import unity.parts.PartType.*;
 import unity.util.*;
 
-public class AbilityStat extends ModularPartStat{
+public class AbilityStat extends PartStat{
     public Ability ability;
 
     public AbilityStat(Ability ability){
@@ -13,7 +14,7 @@ public class AbilityStat extends ModularPartStat{
     }
 
     @Override
-    public void merge(ModularPartStatMap id, ModularPart part){
+    public void merge(PartStatMap id, Part part){
         if(id.has("abilities")){
             var weaponsarr = id.stats.getList("abilities");
             ValueMap abilityMap = new ValueMap();
@@ -25,7 +26,7 @@ public class AbilityStat extends ModularPartStat{
     }
 
     @Override
-    public void mergePost(ModularPartStatMap id, ModularPart part){
+    public void mergePost(PartStatMap id, Part part){
 
     }
 }

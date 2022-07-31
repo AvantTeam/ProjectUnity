@@ -1,21 +1,15 @@
 package unity.gensrc.entities;
 
 import arc.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
-import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import unity.annotations.Annotations.*;
 import unity.entities.prop.*;
@@ -23,13 +17,9 @@ import unity.entities.type.*;
 import unity.gen.entities.*;
 import unity.mod.*;
 import unity.parts.*;
-import unity.parts.PanelDoodadType.*;
-import unity.parts.types.*;
+import unity.parts.PartType.*;
 import unity.util.*;
 
-import java.util.*;
-
-import static arc.graphics.g2d.Draw.color;
 import static mindustry.Vars.*;
 
 
@@ -57,7 +47,7 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     @Import
     public transient Floor lastDrownFloor;
 
-    transient Blueprint.Construct<ModularPart> construct;
+    transient Blueprint.Construct<? extends Part> construct;
     byte[] constructData;
     transient boolean constructLoaded = false;
 
@@ -66,7 +56,7 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     public transient float clipSize = 0;
     //stat
     public transient float enginePower = 0;
-    public transient float speed = 0;
+    public transient float statSpeed = 0;
     public transient float rotateSpeed = 0;
     public transient float massStat = 0;
     public transient float weaponRange = 0;
@@ -77,41 +67,25 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
         return Faction.youngcha;
     }
 
-    @Override
-    public void add(){
-        if(construct == null){
-            var prop = ((PUUnitTypeCommon)type).prop(ModularProps.class);
-            if(constructData == null){
-                String templateStr = prop.templates.random();
-                constructData = Base64.getDecoder().decode(templateStr.trim().replaceAll("[\\t\\n\\r]+", ""));
-            }
-            construct = prop.decoder.get(constructData);
-        }else constructData = construct.toData();
+    public void setConstruct(Blueprint.Construct<? extends Part> construct){
+        this.construct = construct;
+        constructData = construct.toData();
 
+        setup();
+    }
+
+    void setup(){
         var statMap = new ModularUnitStatMap();
-        statMap.getStats(construct.parts);
+        statMap.getStats(construct.partsList);
         applyStatMap(statMap);
         constructLoaded = true;
         int w = construct.parts.length;
         int h = construct.parts[0].length;
-        int maxX = 0, minX = 256;
-        int maxY = 0, minY = 256;
-
-        for(int j = 0; j < h; j++){
-            for(int i = 0; i < w; i++){
-                if(construct.parts[i][j] != null){
-                    maxX = Math.max(i, maxX);
-                    minX = Math.min(i, minX);
-                    maxY = Math.max(j, maxY);
-                    minY = Math.min(j, minY);
-                }
-            }
-        }
-        clipSize = Mathf.dst((maxY - minY), (maxX - minX)) * ModularPartType.partSize * 6;
-        hitSize(((maxY - minY) + (maxX - minX)) * 0.5f * ModularPartType.partSize);
+        clipSize = Mathf.dst(h, w) * PartType.partSize * 6;
+        hitSize((h + w) * 0.5f * PartType.partSize);
     }
 
-    public void applyStatMap(ModularUnitStatMap statMap){
+    public void applyStatMap(PartStatMap statMap){
         if(construct.parts.length == 0){
             return;
         }
@@ -144,8 +118,8 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
                 weapon.load();
             }
             mounts[i] = weapon.mountType.get(weapon);
-            ModularPart part = weapons.getMap(i).get("part");
-            weaponRange = Math.max(weaponRange, weapon.bullet.range + Mathf.dst(part.cx, part.cy) * ModularPartType.partSize);
+            Part part = weapons.getMap(i).get("part");
+            weaponRange = Math.max(weaponRange, weapon.bullet.range + Mathf.dst(part.cx(), part.cy()) * PartType.partSize);
         }
 
         int abilityslots = Math.round(statMap.getValue("abilityslots"));
@@ -165,10 +139,10 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
         this.massStat = statMap.getOrCreate("mass").getFloat("value");
 
 
-        float wheelSpeed = statMap.getOrCreate("wheel").getFloat("nominal speed", 0);
+        float wheelSpeed = statMap.getOrCreate("wheel").getFloat("nominal statSpeed", 0);
         float wheelCap = statMap.getOrCreate("wheel").getFloat("weight capacity", 0);
-        speed = eff * Mathf.clamp(wheelCap / this.massStat, 0, 1) * wheelSpeed;
-        rotateSpeed = Mathf.clamp(10f * speed / (float)Math.max(construct.parts.length, construct.parts[0].length), 0, 5);
+        statSpeed = eff * Mathf.clamp(wheelCap / this.massStat, 0, 1) * wheelSpeed;
+        rotateSpeed = Mathf.clamp(10f * statSpeed / (float)Math.max(construct.parts.length, construct.parts[0].length), 0, 5);
 
         armor = statMap.getValue("armour", "realValue");
         itemCap = (int)statMap.getValue("itemcapacity");
@@ -179,7 +153,7 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
         this.type = type;
         if(controller == null) controller(type.createController(self())); //for now
         //instead of type != YoungchaUnitTypes.modularUnitSmall
-        if(!(type instanceof PUUnitTypeCommon u && u.hasProp(ModularProps.class))){
+        if(!(type instanceof PUUnitTypeCommon u && u.hasProp(ModularUnitProps.class))){
             this.maxHealth = type.health;
             drag(type.drag);
             this.armor = type.armor;
@@ -196,7 +170,7 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
 
     @Replace
     public void setupWeapons(UnitType type){
-        if(!(type instanceof PUUnitTypeCommon u && u.hasProp(ModularProps.class))){
+        if(!(type instanceof PUUnitTypeCommon u && u.hasProp(ModularUnitProps.class))){
             mounts = new WeaponMount[type.weapons.size];
             for(int i = 0; i < mounts.length; i++){
                 mounts[i] = type.weapons.get(i).mountType.get(type.weapons.get(i));
@@ -220,38 +194,8 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
 
     @Override
     public void update(){
-        float velLen = this.vel().len();
-
-        if(construct != null && velLen > 0.01f && elevation < 0.01){
-            driveDist += velLen;
-            DrawTransform dt = new DrawTransform(new Vec2(this.x(), this.y()), rotation);
-            float dustVel = 0;
-            if(moving){
-                dustVel = velLen - speed;
-            }
-            Vec2 nv = vel().cpy().nor().scl(dustVel * 40);//
-            Vec2 nvt = new Vec2();
-            final Vec2 pos = new Vec2();
-            construct.partsList.each(part -> {
-                boolean b = part.getY() - 1 < 0 || (construct.parts[part.getX()][part.getY() - 1] != null && construct.parts[part.getX()][part.getY() - 1].type instanceof ModularMovementType);
-                if(Mathf.random() <= 0.1 && (part.type instanceof ModularMovementType) && b){
-                    pos.set(part.cx * ModularPartType.partSize, part.ay * ModularPartType.partSize);
-                    dt.transform(pos);
-                    nvt.set(nv.x + Mathf.range(3), nv.y + Mathf.range(3));
-                    Tile t = Vars.world.tileWorld(pos.x, pos.y);
-                    if(t != null){
-                        //TODO what the heck
-                        new Effect(70, e -> {
-                            color(e.color);
-                            Vec2 v = (Vec2)e.data;
-                            Fill.circle(e.x + e.finpow() * v.x, e.y + e.finpow() * v.y, (7f - e.fin() * 7f) * 0.5f);
-                        }).layer(Layer.debris).at(pos.x, pos.y, 0, t.floor().mapColor, nvt);
-                    }
-                }
-            });
-
-        }
-        moving = false;
+        float velLen = vel().len();
+        if(construct != null && velLen > 0.01f && elevation < 0.01) driveDist += velLen;
     }
 
     @Replace
@@ -286,23 +230,12 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
     public float speed(){
         float strafePenalty = isGrounded() || !isPlayer() ? 1.0F : Mathf.lerp(1.0F, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180.0F);
         float boost = Mathf.lerp(1.0F, type.canBoost ? type.boostMultiplier : 1.0F, elevation);
-        return speed * strafePenalty * boost * floorSpeedMultiplier();
+        return statSpeed * strafePenalty * boost * floorSpeedMultiplier();
     }
 
     @Replace
     public float mass(){
         return massStat == 0 ? type.hitSize * type.hitSize : massStat;
-    }
-
-    transient boolean moving = false;
-
-    @Replace
-    public void rotateMove(Vec2 vec){
-        moveAt(Tmp.v2.trns(rotation, vec.len()));
-        moving = vec.len2() > 0.1;
-        if(!vec.isZero()){
-            rotation = Angles.moveToward(rotation, vec.angle(), rotateSpeed * Math.max(Time.delta, 1));
-        }
     }
 
     @Replace
@@ -314,7 +247,9 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
 
     @Override
     public void read(Reads read){
+        construct = ((PUUnitTypeCommon)type).prop(ModularUnitProps.class).decoder.get(constructData);
         savedHp = health;
+        setup();
     }
 
     @Replace

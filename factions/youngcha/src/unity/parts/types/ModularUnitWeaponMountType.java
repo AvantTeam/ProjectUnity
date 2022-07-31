@@ -6,8 +6,8 @@ import unity.parts.stats.AdditiveStat.*;
 import unity.parts.stats.*;
 import unity.util.*;
 
-public class ModularWeaponMountType extends ModularPartType{
-    public ModularWeaponMountType(String name){
+public class ModularUnitWeaponMountType extends ModularUnitPartType{
+    public ModularUnitWeaponMountType(String name){
         super(name);
     }
 
@@ -17,12 +17,7 @@ public class ModularWeaponMountType extends ModularPartType{
     }
 
     @Override
-    public void appendStats(ModularPartStatMap statMap, ModularPart part, ModularPart[][] grid){
-        super.appendStats(statMap, part, grid);
-    }
-
-    @Override
-    public void drawTop(DrawTransform transform, ModularPart part){
+    public void drawTop(DrawTransform transform, Part part){
         super.drawTop(transform, part);
     }
 }

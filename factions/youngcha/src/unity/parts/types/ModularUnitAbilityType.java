@@ -5,7 +5,7 @@ import unity.parts.*;
 import unity.parts.stats.*;
 import unity.parts.stats.AdditiveStat.*;
 
-public class ModularUnitAbilityType extends ModularPartType{
+public class ModularUnitAbilityType extends ModularUnitPartType{
     public ModularUnitAbilityType(String name){
         super(name);
     }

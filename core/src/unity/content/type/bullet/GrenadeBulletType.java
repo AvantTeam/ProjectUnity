@@ -68,7 +68,7 @@ public class GrenadeBulletType extends BulletType{
             t *= 0.8;
             acc += this.lifetime * 0.2f * t;
         }
-        //return Math.max(this.speed * (a*this.lifetime/(a+this.lifetime)), this.maxRange);
+        //return Math.max(this.statSpeed * (a*this.lifetime/(a+this.lifetime)), this.maxRange);
         return Math.max(acc, this.maxRange);
     }
 

@@ -16,12 +16,11 @@ import mindustry.world.blocks.payloads.*;
 import unity.content.*;
 import unity.gen.entities.*;
 import unity.parts.*;
-import unity.parts.types.*;
 import unity.ui.*;
 import unity.util.*;
 
 import static mindustry.Vars.content;
-import static unity.parts.ModularPartType.partSize;
+import static unity.parts.ModularUnitPartType.partSize;
 
 public class ModularUnitAssembler extends PayloadBlock{
     public static ModularUnitEditorDialog modularUnitEditorDialog;
@@ -60,18 +59,18 @@ public class ModularUnitAssembler extends PayloadBlock{
     public static class ModuleConstructing{
         public short x, y;
         public ItemStack[] remaining;
-        public ModularPartType type;
+        public ModularUnitPartType type;
         public int takenBy = -1;
 
         //moduleblock?
-        ModuleConstructing(ModularPart mp){
-            this.x = (short)mp.getX();
-            this.y = (short)mp.getY();
+        ModuleConstructing(ModularUnitPart mp){
+            this.x = (short)mp.x();
+            this.y = (short)mp.y();
             remaining = new ItemStack[mp.type.cost.length];
             for(int i = 0; i < remaining.length; i++){
                 remaining[i] = new ItemStack(mp.type.cost[i].item, mp.type.cost[i].amount);
             }
-            type = mp.type;
+            type = (ModularUnitPartType)mp.type;
         }
 
         public void write(Writes write){
@@ -90,7 +89,7 @@ public class ModularUnitAssembler extends PayloadBlock{
         public ModuleConstructing(Reads read, byte revision){
             x = read.s();
             y = read.s();
-            type = ModularPartType.getPartFromId(read.s());
+            type = ModularUnitPartType.getPartFromId(read.s());
             remaining = new ItemStack[read.s()];
             for(int i = 0; i < remaining.length; i++){
                 remaining[i] = new ItemStack(content.item(read.s()), read.i());
@@ -215,7 +214,7 @@ public class ModularUnitAssembler extends PayloadBlock{
                 return;
             }
             var t = YoungchaUnitTypes.modularUnitSmall.create(team);
-            ((ModularUnit)t).construct(construct);
+            ((Modularc)t).setConstruct(construct);
             t.set(x, y);
             t.add();
             t.rotation = rotdeg();
@@ -224,7 +223,7 @@ public class ModularUnitAssembler extends PayloadBlock{
 
         public void createUnit(){
             var t = YoungchaUnitTypes.modularUnitSmall.create(team);
-            ((ModularUnit)t).construct(construct);
+            ((Modularc)t).setConstruct(construct);
             payload = new UnitPayload(t);
             payVector.setZero();
             Events.fire(new UnitCreateEvent(payload.unit, this));
@@ -260,7 +259,7 @@ public class ModularUnitAssembler extends PayloadBlock{
                     }
                 }
                 for(var part : construct.partsList){
-                    if(!built.contains(Point2.pack(part.getX(), part.getY()))){
+                    if(!built.contains(Point2.pack(part.x(), part.y()))){
                         var con = new ModuleConstructing(part);
                         con.takenBy = b.pos();
                         currentlyConstructing.add(con);
@@ -284,8 +283,8 @@ public class ModularUnitAssembler extends PayloadBlock{
                     }
                 }
                 for(var part : construct.partsList){
-                    if(!built.contains(Point2.pack(part.getX(), part.getY()))
-                    && currentlyConstructing.find(bPart -> bPart.x == part.getX() && bPart.y == part.getY()) == null){
+                    if(!built.contains(Point2.pack(part.x(), part.y()))
+                    && currentlyConstructing.find(bPart -> bPart.x == part.x() && bPart.y == part.y()) == null){
                         boolean hasItem = false;
                         for(var stack : part.type.cost){
                             if(stack.item.equals(e)){
@@ -336,7 +335,6 @@ public class ModularUnitAssembler extends PayloadBlock{
             DrawTransform dt = new DrawTransform();
             dt.setTranslate(x, y);
             dt.setRotation(rotdeg());
-            ModularMovementType.rollDistance = 0;
             if(construct != null && !sandbox && payload == null){
                 //9 slice?
 
@@ -346,11 +344,11 @@ public class ModularUnitAssembler extends PayloadBlock{
                 Draw.rect(softShadowRegion, this, size * rad * Draw.xscl, size * rad * Draw.yscl, rotdeg() - 90);
                 Draw.color();
                 for(var part : construct.partsList){
-                    if(built.contains(Point2.pack(part.getX(), part.getY()))){
-                        part.type.draw(dt, part);
+                    if(built.contains(Point2.pack(part.x(), part.y()))){
+                        part.type.draw(dt, part, null);
                     }else{
-                        float dx = x + (part.ax - 0.5f) * partSize;
-                        float dy = y + (part.ay - 0.5f) * partSize;
+                        float dx = x + (part.ax() - 0.5f) * partSize;
+                        float dy = y + (part.ay() - 0.5f) * partSize;
                         chassis.draw(dx, dy, x - dx, y - dy, part.type.w * partSize, part.type.h * partSize, 1, 1, rotdeg() - 90);
                     }
                 }

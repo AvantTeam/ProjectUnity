@@ -2,6 +2,7 @@ package unity.parts;
 
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
+import unity.parts.PartType.*;
 import unity.util.*;
 
 public class PanelDoodadType{
@@ -23,7 +24,7 @@ public class PanelDoodadType{
     }
 
     //from the corner
-    public boolean canFit(ModularPart[][] grid, int x, int y){
+    public boolean canFit(Part[][] grid, int x, int y){
         if(x + w >= grid.length || y + h >= grid[0].length){
             return false;
         }

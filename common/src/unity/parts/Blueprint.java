@@ -3,10 +3,11 @@ package unity.parts;
 import arc.struct.*;
 import mindustry.type.*;
 import unity.parts.PanelDoodadType.*;
+import unity.parts.PartType.*;
 
 //TODO is two Generics inevitable?
 //Assumes fields especially collections are immutable from outer direct access.
-public abstract class Blueprint<T, P>{
+public abstract class Blueprint<T extends PartType, P extends Part>{
     public P[][] parts;
     //valid parts only.
     public OrderedSet<P> partsList;
@@ -87,10 +88,10 @@ public abstract class Blueprint<T, P>{
         }
     }
 
-    public static abstract class Construct<P>{
+    public static abstract class Construct<P extends Part>{
         public final P[][] parts;
         public final Seq<P> partsList;
-        public final Seq<ModularPart> hasCustomDraw = new Seq<>();
+        public final Seq<P> hasCustomDraw = new Seq<>();
         public final Seq<PanelDoodad> doodads = new Seq<>();
 
         public Construct(P[][] parts, Seq<P> partsList){

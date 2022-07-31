@@ -64,13 +64,12 @@ public class ProjectUnity extends ProjectUnityCommon{
         }));
 
         Events.on(ClientLoadEvent.class, e -> {
-            ModularPartType.loadStatic();
-            for(var en : ModularPartType.partMap){
+            ModularUnitPartType.loadStatic();
+            for(var en : ModularUnitPartType.partMap){
                 en.value.load();
             }
 
             Graphs.load();
-            YoungchaParts.loadDoodads();
         });
 
         Events.on(ContentInitEvent.class, e -> Core.app.post(Faction::load));

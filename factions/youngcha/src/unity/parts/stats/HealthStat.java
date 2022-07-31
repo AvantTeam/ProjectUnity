@@ -3,8 +3,9 @@ package unity.parts.stats;
 import arc.*;
 import arc.scene.ui.layout.*;
 import unity.parts.*;
+import unity.parts.PartType.*;
 
-public class HealthStat extends ModularPartStat{
+public class HealthStat extends PartStat{
     public float hpboost = 0;
     public boolean percentage = false;
 
@@ -20,7 +21,7 @@ public class HealthStat extends ModularPartStat{
     }
 
     @Override
-    public void merge(ModularPartStatMap id, ModularPart part){
+    public void merge(PartStatMap id, Part part){
         if(!percentage && id.has(name)){
             var jo = id.getOrCreate(name);
             jo.put("value", jo.getFloat("value") + hpboost);
@@ -28,7 +29,7 @@ public class HealthStat extends ModularPartStat{
     }
 
     @Override
-    public void mergePost(ModularPartStatMap id, ModularPart part){
+    public void mergePost(PartStatMap id, Part part){
         if(percentage && id.has(name)){
             var jo = id.getOrCreate(name);
             jo.put("value", jo.getFloat("value") * hpboost);

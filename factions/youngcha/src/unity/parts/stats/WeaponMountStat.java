@@ -7,11 +7,13 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.StatValue;
 import unity.mod.*;
 import unity.parts.*;
+import unity.parts.PartType.*;
 import unity.util.*;
 
-public class WeaponMountStat extends ModularPartStat{
+public class WeaponMountStat extends PartStat{
     Weapon baseweapon;
 
     public WeaponMountStat(Weapon w){
@@ -20,21 +22,21 @@ public class WeaponMountStat extends ModularPartStat{
     }
 
     @Override
-    public void merge(ModularPartStatMap id, ModularPart part){
+    public void merge(PartStatMap id, Part part){
         if(id.has("weapons")){
             var weaponsarr = id.stats.getList("weapons");
             ValueMap weapon = new ValueMap();
             weapon.put("part", part);
             Weapon copy = baseweapon.copy();
-            copy.x = part.getCx() * ModularPartType.partSize;
-            copy.y = part.getCy() * ModularPartType.partSize;
+            copy.x = part.cx() * PartType.partSize;
+            copy.y = part.cy() * PartType.partSize;
             weapon.put("weapon", copy);
             weaponsarr.add(weapon);
         }
     }
 
     @Override
-    public void mergePost(ModularPartStatMap id, ModularPart part){
+    public void mergePost(PartStatMap id, Part part){
 
     }
 

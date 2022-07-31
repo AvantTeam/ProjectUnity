@@ -75,7 +75,7 @@ public class CrucibleRecipes{
         needs(Items.surgeAlloy, 2, true),
         needs(Items.pyratite, 2, false)
         ));
-        ///delibratly very slow,, perhaps some casual time manipulation can speed it up?
+        ///delibratly very slow,, perhaps some casual time manipulation can statSpeed it up?
 //        recipes.add(new CrucibleRecipe(items.get(UnityItems.dirium), 0.0002f, HeatGraphNode.celsiusZero + 2000,
 //        needs(UnityItems.uranium, 1, true),
 //        needs(UnityItems.steel, 1, true),

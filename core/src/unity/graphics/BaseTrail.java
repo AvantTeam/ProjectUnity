@@ -24,7 +24,7 @@ public class BaseTrail extends Trail{
 
     /** Whether to force drawing the trail's cap or not. */
     public boolean forceCap;
-    /** Minimum trail speed to update the points. */
+    /** Minimum trail statSpeed to update the points. */
     public float minDst = -1f;
 
     protected final FloatSeq points;

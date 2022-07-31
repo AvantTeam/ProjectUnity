@@ -29,7 +29,7 @@ public class ModularUnitEditorDialog extends BaseDialog{
     public ModularUnitEditorElement editorElement;
     public Cons2<ModularUnitBlueprint, Table> infoViewer;
 
-    public ObjectMap<String, Seq<ModularPartType>> availableParts = new ObjectMap<>();
+    public ObjectMap<String, Seq<ModularUnitPartType>> availableParts = new ObjectMap<>();
     Table selectSide;
 
     //part select
@@ -191,10 +191,10 @@ public class ModularUnitEditorDialog extends BaseDialog{
         });
     }
 
-    public void show(ModularUnitBlueprint blueprint, Runnable modified, Cons2<ModularUnitBlueprint, Table> viewer, Boolf<ModularPartType> allowed){
+    public void show(ModularUnitBlueprint blueprint, Runnable modified, Cons2<ModularUnitBlueprint, Table> viewer, Boolf<ModularUnitPartType> allowed){
         //todo: temp
         availableParts.clear();
-        for(var part : ModularPartType.partMap){
+        for(var part : ModularUnitPartType.partMap){
             if(!allowed.get(part.value)) continue;
 
             if(!availableParts.containsKey(part.value.category)){
@@ -207,7 +207,7 @@ public class ModularUnitEditorDialog extends BaseDialog{
         this.blueprint = blueprint;
         buildLeftSide(selectSide);
         editorElement.setBlueprint(blueprint);
-        this.onHidden = modified::run;
+        this.onHidden = modified;
         this.infoViewer = viewer;
     }
 
@@ -216,7 +216,7 @@ public class ModularUnitEditorDialog extends BaseDialog{
         table.clearChildren();
         var statMap = new ModularUnitStatMap();
         var itemCosts = blueprint.itemRequirements();
-        statMap.getStats(blueprint.parts);
+        statMap.getStats(blueprint.partsList.orderedItems());
         table.top();
         table.add(Core.bundle.get("ui.parts.info")).growX().left().color(Pal.gray);
 
@@ -249,7 +249,7 @@ public class ModularUnitEditorDialog extends BaseDialog{
 
         float mass = statMap.getValue("mass");
         float wcap = statMap.getValue("wheel", "weight capacity");
-        float speed = eff * Mathf.clamp(wcap / mass) * statMap.getValue("wheel", "nominal speed");
+        float speed = eff * Mathf.clamp(wcap / mass) * statMap.getValue("wheel", "nominal statSpeed");
         table.row();
         table.add("[lightgray]" + Stat.speed.localized() + ":[accent] " + Core.bundle.format("ui.parts.stat.speed", Strings.fixed(speed * 60f / tilesize, 1))).left().top();
         table.row();

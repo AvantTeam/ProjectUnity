@@ -14,7 +14,8 @@ public class YoungchaFx{
     public static final Effect dust = new Effect(70, e -> {
         color(e.color);
         Vec2 v = (Vec2)e.data;
-        Fill.circle(e.x + e.finpow() * v.x, e.y + e.finpow() * v.y, (7f - e.fin() * 7f) * 0.5f);
+        var radius = Math.min(v.len(), 7f);
+        Fill.circle(e.x + e.finpow() * v.x, e.y + e.finpow() * v.y, e.fout() * radius);
     }).layer(Layer.debris),
 
     smokePoof = new Effect(30, e -> {

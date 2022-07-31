@@ -25,7 +25,7 @@ public class ModularUnitEditorElement extends Element{
     int index = -1;
 
     public ModularUnitBlueprint blueprint;
-    public ModularPartType selected = null;
+    public ModularUnitPartType selected = null;
     public boolean mirror = true;
     //selection boxes?
 
@@ -116,6 +116,10 @@ public class ModularUnitEditorElement extends Element{
             return;
         }
         var g = uiToGrid(x, y);
+        if(selected != null){
+            g.x -= (selected.w - 1) / 2;
+            g.y -= (selected.h - 1) / 2;
+        }
         if(tileValid(g.x, g.y)){
             if(selected != null){
                 boolean b = blueprint.tryPlace(selected, g.x, g.y);
@@ -224,13 +228,13 @@ public class ModularUnitEditorElement extends Element{
                 if(part == null){
                     continue;
                 }
-                if(!(Math.max(part.getX(), minx) == i && Math.max(part.getY(), miny) == j)){
+                if(!(Math.max(part.x(), minx) == i && Math.max(part.y(), miny) == j)){
                     continue;
                 }
                 Draw.color(bgCol);
-                rectCorner(part.getX() * 32, part.getY() * 32, part.type.w * 32, part.type.h * 32);
+                rectCorner(part.x() * 32, part.y() * 32, part.type.w * 32, part.type.h * 32);
                 Draw.color(blueprint.valid[i][j] ? Color.white : Color.red);
-                rectCorner(part.type.icon, part.getX() * 32, part.getY() * 32, part.type.w * 32, part.type.h * 32);
+                rectCorner(part.type.icon, part.x() * 32, part.y() * 32, part.type.w * 32, part.type.h * 32);
             }
         }
 
@@ -315,7 +319,7 @@ public class ModularUnitEditorElement extends Element{
         return 32;
     }
 
-    public void select(ModularPartType type){
+    public void select(ModularUnitPartType type){
         selected = type;
     }
 

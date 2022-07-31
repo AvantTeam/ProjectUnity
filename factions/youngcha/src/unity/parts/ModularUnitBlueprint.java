@@ -7,10 +7,10 @@ import mindustry.type.*;
 
 import java.util.*;
 
-public class ModularUnitBlueprint extends Blueprint<ModularPartType, ModularPart>{
+public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, ModularUnitPart>{
     public ModularUnitBlueprint(int w, int h){
         super(w, h);
-        parts = new ModularPart[w][h];
+        parts = new ModularUnitPart[w][h];
         partsList = new OrderedSet<>();
         valid = new boolean[w][h];
         data = new OrderedSet<>();
@@ -23,7 +23,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularPartType, ModularPart
 
     @Override
     public void clear(){
-        parts = new ModularPart[w][h];
+        parts = new ModularUnitPart[w][h];
         partsList = new OrderedSet<>();
         valid = new boolean[w][h];
         data = new OrderedSet<>();
@@ -40,7 +40,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularPartType, ModularPart
 
         for(int i = 0; i < partAmount; i++){
             var partData = new PartData(data, 2 + i * step);
-            var partType = ModularPartType.getPartFromId(partData.id);
+            var partType = ModularUnitPartType.getPartFromId(partData.id);
             if(canPlace(partType, partData.x + ox, partData.y + oy)) place(partType, partData.x + ox, partData.y + oy);
         }
 
@@ -104,7 +104,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularPartType, ModularPart
     }
 
     @Override
-    public boolean canPlace(ModularPartType type, int x, int y){
+    public boolean canPlace(ModularUnitPartType type, int x, int y){
         //Checks whether part is in bound by testing left bottom corner and right top corner
         if(!canPlace(x, y) || !canPlace(type.w - 1 + x, type.h - 1 + y)) return false;
         //Check all required space is empty.
@@ -118,7 +118,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularPartType, ModularPart
     }
 
     @Override
-    public boolean tryPlace(ModularPartType type, int x, int y){
+    public boolean tryPlace(ModularUnitPartType type, int x, int y){
         if(!canPlace(type, x, y)) return false;
         place(type, x, y);
 
@@ -127,8 +127,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularPartType, ModularPart
     }
 
     @Override
-    protected void place(ModularPartType type, int x, int y){
-        arc.util.Log.infoList("place", x, y);
+    protected void place(ModularUnitPartType type, int x, int y){
         var part = type.create(x, y);
         if(type.root) root = part;
         for(int i = x; i < x + type.w; i++){
@@ -140,7 +139,6 @@ public class ModularUnitBlueprint extends Blueprint<ModularPartType, ModularPart
         part.ay = y - h * 0.5f + 0.5f;
         part.cx = x - w * 0.5f + type.w * 0.5f;
         part.cy = y - h * 0.5f + type.h * 0.5f;
-        part.setupPanellingIndex(parts);
     }
 
     @Override

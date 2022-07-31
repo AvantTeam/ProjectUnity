@@ -3,6 +3,7 @@ package unity.parts.stats;
 import arc.math.*;
 import arc.util.*;
 import unity.parts.*;
+import unity.parts.PartType.*;
 import unity.util.*;
 
 public class ArmourStat extends AdditiveStat{
@@ -11,7 +12,7 @@ public class ArmourStat extends AdditiveStat{
     }
 
     @Override
-    public void mergePost(ModularPartStatMap id, ModularPart part){
+    public void mergePost(PartStatMap id, Part part){
         ValueMap armor = id.getOrCreate("armour");
         if(armor.has("realValue")){
             return;

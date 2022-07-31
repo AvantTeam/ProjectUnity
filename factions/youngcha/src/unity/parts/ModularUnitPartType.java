@@ -11,28 +11,16 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
+import unity.gen.entities.*;
 import unity.parts.stats.AdditiveStat.*;
 import unity.parts.stats.*;
 import unity.util.*;
 
 //like Block, this is a singleton
-public class ModularPartType implements Displayable{
-    public static IntMap<ModularPartType> partMap = new IntMap<>();
-
-    public static final float partSize = 4;
-    protected int partType = 0;
-
-    private static int idAcc = 0;
-    public final int id = idAcc++;
-
-    public String name;
+public class ModularUnitPartType extends PartType{
+    public static IntMap<ModularUnitPartType> partMap = new IntMap<>();
     public String category;
-    public int w = 1, h = 1;
 
-    //graphics
-    public TextureRegion icon;
-    /** if true will not have paneling **/
-    public boolean open = false;
     public static TextureRegion[][] panelling;
     public static final Seq<PanelDoodadPalette> unitDoodads = new Seq();
     /** texture will/may have three variants for the front middle and back **/
@@ -40,29 +28,23 @@ public class ModularPartType implements Displayable{
     public TextureRegion[] outline;
     public boolean hasExtraDecal = false;
     public boolean hasCellDecal = false;
-    public boolean hasCustomDraw = false;
     public TextureRegion[] cell;
-    public ItemStack[] cost = {};
     public int costTotal = 0;
     //module cost..
-
-
-    //stats
-    protected Seq<ModularPartStat> stats = new Seq<>();
 
     //places it can connect to
     public boolean root = false;
     public boolean visible = true;
 
 
-    public ModularPart create(int x, int y){
-        return new ModularPart(this, x, y);
+    public ModularUnitPart create(int x, int y){
+        return new ModularUnitPart(this, x, y);
     }
 
 
-    public ModularPartType(String name){
+    public ModularUnitPartType(String name){
+        super(name);
         arc.util.Log.info(id);
-        this.name = name;
         partMap.put(id, this);
     }
 
@@ -116,52 +98,38 @@ public class ModularPartType implements Displayable{
         }
     }
 
-    public boolean canBeUsedIn(int type){
-        return (type & partType) > 0;
-    }
-
-    public void drawCell(DrawTransform transform, ModularPart part){
+    @Override
+    public void drawCell(DrawTransform transform, Part part){
         if(hasCellDecal){
             TextureRegion cellSprite = cell[Math.abs(part.cx) < 0.01 ? 1 : 0];
             transform.drawRectScl(cellSprite, part.cx * partSize, part.cy * partSize, part.cx < 0 ? 1 : -1, 1);
         }
     }
 
-    public void drawTop(DrawTransform transform, ModularPart part){
+    @Override
+    public void drawTop(DrawTransform transform, Part part){
         if(hasExtraDecal)
             transform.drawRect(top[part.front], part.cx * partSize, part.cy * partSize);
     }
 
-    public void draw(DrawTransform transform, ModularPart part){
+    @Override
+    public void draw(DrawTransform transform, Part part, Modularc parent){
         var i = part.panelingIndexes[0];
         transform.drawRect(panelling[i % 12][i / 12], part.ax * partSize, part.ay * partSize);
     }
 
-    public void drawOutline(DrawTransform transform, ModularPart part){
+    @Override
+    public void drawOutline(DrawTransform transform, Part part){
         if(hasExtraDecal)
             transform.drawRect(outline[part.front], part.cx * partSize, part.cy * partSize);
     }
 
-    public static ModularPartType getPartFromId(int id){
+    public static ModularUnitPartType getPartFromId(int id){
         if(partMap.containsKey(id)){
             return partMap.get(id);
         }else{
             Log.info("Part of id " + id + " not found");
             return partMap.get(0);
-        }
-    }
-
-
-    //stats.
-    public void appendStats(ModularPartStatMap statMap, ModularPart part, ModularPart[][] grid){
-        for(var stat : stats){
-            stat.merge(statMap, part);
-        }
-    }
-
-    public void appendStatsPost(ModularPartStatMap statMap, ModularPart part, ModularPart[][] grid){
-        for(var stat : stats){
-            stat.mergePost(statMap, part);
         }
     }
 

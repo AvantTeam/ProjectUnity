@@ -48,7 +48,7 @@ public class TexturedTrail extends BaseTrail{
     public float trailWidth = 1f;
     /** The particle effect's color. */
     public Color trailColor = Pal.engine;
-    /** The trail speed's bare minimum at which the particle effects start appearing less. */
+    /** The trail statSpeed's bare minimum at which the particle effects start appearing less. */
     public float trailThreshold = 3f;
 
     private static final float[] vertices = new float[24];

@@ -9,16 +9,15 @@ import mindustry.type.*;
 import unity.entities.type.PUUnitTypeCommon.*;
 import unity.gen.entities.*;
 import unity.parts.Blueprint.*;
-import unity.parts.*;
-import unity.parts.types.*;
+import unity.parts.PartType.*;
 import unity.util.*;
 
-public class ModularProps extends Props{
+public class ModularUnitProps extends Props{
     public final UnitType parent;
     public final Seq<String> templates = new Seq<>();
-    public final Func<byte[], Construct<ModularPart>> decoder;
+    public final Func<byte[], Construct<? extends Part>> decoder;
 
-    public ModularProps(UnitType parent, Func<byte[], Construct<ModularPart>> decoder, String... templates){
+    public ModularUnitProps(UnitType parent, Func<byte[], Construct<? extends Part>> decoder, String... templates){
         super(true);
         this.parent = parent;
         this.decoder = decoder;
@@ -68,7 +67,6 @@ public class ModularProps extends Props{
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
         var construct = unit.construct();
         if(construct != null){
-            ModularMovementType.rollDistance = unit.driveDist();
             construct.hasCustomDraw.each((p) -> {
                 p.type.drawCell(dt, p);
             });
@@ -81,13 +79,12 @@ public class ModularProps extends Props{
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
         var construct = unit.construct();
         if(construct != null){
-            ModularMovementType.rollDistance = unit.driveDist();
             construct.doodads.each(d -> {
                 d.drawOutline(dt);
             });
             construct.hasCustomDraw.each((p) -> {
                 p.type.drawOutline(dt, p);
-                p.type.draw(dt, p);
+                p.type.draw(dt, p, unit);
             });
             construct.doodads.each(d -> {
                 d.drawTop(dt);
