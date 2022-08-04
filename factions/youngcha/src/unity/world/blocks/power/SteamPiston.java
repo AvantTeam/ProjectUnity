@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
+import mindustry.world.meta.*;
 import unity.world.blocks.*;
 import unity.world.blocks.power.FlyWheel.*;
 import unity.world.graph.*;
@@ -38,65 +39,67 @@ public class SteamPiston extends GenericGraphBlock{
 
     public class SteamPistonBuild extends GenericGraphBuild{
         FlyWheelBuild flywheel = null;
-        Vec2 flywheeldir = new Vec2();
-        boolean initConnect = false;
+        Vec2 flywheelDir = new Vec2();
         float pushForce = 0;
-        float rwater = 0;
+        float rWater = 0;
+
+        public void setFlywheel(FlyWheelBuild flywheel){
+            this.flywheel = flywheel;
+            if(flywheel != null){
+                flywheelDir.set(flywheel.x - x, flywheel.y - y).nor();
+            }
+        }
 
         @Override
-        public boolean shouldConsume(){
-            return super.shouldConsume() && heatNode().getTemp() > minTemp;
+        public BlockStatus status(){
+            if(!enabled) return BlockStatus.logicDisable;
+
+            if(efficiency <= 0 || !productionValid()) return BlockStatus.noInput;
+
+            if(flywheel == null) return BlockStatus.noOutput;
+
+            return BlockStatus.active;
+        }
+
+        @Override
+        public void updateEfficiencyMultiplier(){
+            var temp = heatNode().getTemp();
+            if(temp > minTemp) optionalEfficiency = Mathf.clamp(Mathf.map(temp, minTemp, maxTemp, 0, 1));
+            else optionalEfficiency = 0;
+            if(potentialEfficiency > 0) efficiency = optionalEfficiency;
+            else efficiency = 0;
         }
 
         @Override
         public void updateTile(){
             super.updateTile();
-            if(!initConnect){
-                tryConnect();
-                initConnect = true;
-            }
-            if(flywheel == null){
-                return;
-            }
-            var heatnode = heatNode();
-            float temp = heatnode.getTemp();
-            if(temp > minTemp){
-                float eff = Mathf.clamp(Mathf.map(temp, minTemp, maxTemp, 0, 1));
-                boolean pulling = flywheeldir.dot(flywheel.attachY - y, -(flywheel.attachX - x)) > 0;
+            if(flywheel == null) return;
+            var heatNode = heatNode();
+            if(optionalEfficiency > 0){
+                boolean pulling = flywheelDir.dot(flywheel.attachY - y, -(flywheel.attachX - x)) > 0;
                 if(pulling){
                     pushForce = 0;
                     if(timer(smokeTimer, 5) && liquids.currentAmount() > 1){
                         float rand = Mathf.random() > 0.5f ? -1 : 1;
-                        Fx.fuelburn.at(x + flywheeldir.y * tilesize * rand, y - flywheeldir.x * tilesize * rand);
+                        Fx.fuelburn.at(x + flywheelDir.y * tilesize * rand, y - flywheelDir.x * tilesize * rand);
                     }
                 }else{
-                    if(rwater <= 0 && efficiency > 0){
+                    if(rWater <= 0 && potentialEfficiency > 0){
                         consume();
-                        heatnode.addHeatEnergy(-eff * 150);
-                        rwater += 10;
+                        heatNode.addHeatEnergy(-optionalEfficiency * 150);
+                        rWater += 10;
                     }
-                    if(rwater > 0){
-                        rwater -= eff * this.delta();
-                        pushForce += (this.timeScale() * eff - pushForce) * 0.1f * this.delta();
-                    }else{
-                        pushForce = 0;
-                    }
+                    if(rWater > 0){
+                        rWater -= optionalEfficiency * delta();
+                        pushForce += (timeScale() * optionalEfficiency - pushForce) * 0.1f * delta();
+                    }else pushForce = 0;
                 }
             }
         }
 
         @Override
-        public void onDestroyed(){
-            super.onDestroyed();
-            if(flywheel != null){
-                flywheel.connected.remove(this);
-                setFlywheel(null);
-            }
-        }
-
-        @Override
-        public void onRemoved(){
-            super.onRemoved();
+        public void onProximityRemoved(){
+            super.onProximityRemoved();
             if(flywheel != null){
                 flywheel.connected.remove(this);
                 setFlywheel(null);
@@ -106,22 +109,19 @@ public class SteamPiston extends GenericGraphBlock{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            arc.util.Log.info("onProximityUpdate");
             tryConnect();
         }
 
         public void tryConnect(){
             var fb = front();
-            if(fb instanceof FlyWheelBuild fwb && (fb.x == x || fb.y == y)){
-                if(flywheel != fwb){
-                    if(flywheel != null){
-                        flywheel.connected.remove(this);
-                    }
-                    setFlywheel(fwb);
-                    flywheel.connected.add(this);
-                }
-            }else if(flywheel != null){
+            if(flywheel != null){
                 flywheel.connected.remove(this);
                 setFlywheel(null);
+            }
+            if(fb instanceof FlyWheelBuild fwb && (fb.x == x || fb.y == y)){
+                setFlywheel(fwb);
+                flywheel.connected.add(this);
             }
         }
 
@@ -135,27 +135,20 @@ public class SteamPiston extends GenericGraphBlock{
 
             if(flywheel != null){
                 float r = tilesize;
-                float yd = flywheeldir.dot(flywheel.attachX - x, flywheel.attachY - y);
-                float xd = flywheeldir.dot(flywheel.attachY - y, -(flywheel.attachX - x));
+                float yd = flywheelDir.dot(flywheel.attachX - x, flywheel.attachY - y);
+                float xd = flywheelDir.dot(flywheel.attachY - y, -(flywheel.attachX - x));
                 boolean left = xd > 0;
                 xd = Math.abs(xd);
                 float d = Math.max(0, yd - Mathf.sqrt(Math.max(0, r * r - xd * xd)));
-                float px = x + flywheeldir.x * d;
-                float py = y + flywheeldir.y * d;
+                float px = x + flywheelDir.x * d;
+                float py = y + flywheelDir.y * d;
                 Draw.z(Layer.blockOver + 0.1f);
                 Lines.stroke(4);
-                Lines.line(arm, x + flywheeldir.x * 10f, y + flywheeldir.y * 10f, px, py, false);
+                Lines.line(arm, x + flywheelDir.x * 10f, y + flywheelDir.y * 10f, px, py, false);
                 Lines.stroke(3);
                 Lines.line(arm, flywheel.attachX, flywheel.attachY, px, py, false);
                 Draw.rect(pivot, px, py, 0);
                 Draw.rect(pivot, flywheel.attachX, flywheel.attachY, 0);
-            }
-        }
-
-        public void setFlywheel(FlyWheelBuild flywheel){
-            this.flywheel = flywheel;
-            if(flywheel != null){
-                flywheeldir.set(flywheel.x - x, flywheel.y - y).nor();
             }
         }
     }

@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.graphics.*;
+import mindustry.world.meta.*;
 import unity.world.blocks.*;
 import unity.world.blocks.power.SteamPiston.*;
 import unity.world.graph.*;
@@ -37,8 +38,9 @@ public class FlyWheel extends GenericGraphBlock{
             attachX = x;
         }
 
-        public void update(){
-            super.update();
+        @Override
+        public void updateTile(){
+            super.updateTile();
             torqueNode().baseForce = 0;
             for(SteamPistonBuild spb : connected){
                 torqueNode().baseForce += spb.pushForce * 0.5f;
