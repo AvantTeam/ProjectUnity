@@ -39,12 +39,7 @@ public class BatchPress extends GenericGraphCrafter{
     }
 
     public class BatchPressBuild extends GenericGraphCrafterBuild{
-        public float lidopened = 0;
-
-        @Override
-        public float efficiency(){
-            return super.efficiency() * (items.has(outputItem.item) ? 0 : 1) * Mathf.clamp((torqueNode().getGraph().lastVelocity / torqueNode().maxSpeed));
-        }
+        public float lidOpened = 0;
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -52,9 +47,34 @@ public class BatchPress extends GenericGraphCrafter{
         }
 
         @Override
+        public void updateEfficiencyMultiplier(){
+            efficiency *= (items.has(outputItem.item) ? 0 : 1) * Mathf.clamp((torqueNode().getGraph().lastVelocity / torqueNode().maxSpeed));
+        }
+
+        //anuken's but return false when this has item even though one.
+        @Override
+        public boolean shouldConsume(){
+            if(outputItems != null){
+                for(var output : outputItems){
+                    if(items.has(output.item)) return false;
+                }
+            }
+            if(outputLiquids != null && !ignoreLiquidFullness){
+                boolean allFull = true;
+                for(var output : outputLiquids){
+                    if(liquids.get(output.liquid) >= liquidCapacity - 0.001f){
+                        if(!dumpExtraLiquid) return false;
+                    }else allFull = false;
+                }
+                if(allFull) return false;
+            }
+            return enabled;
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
-            lidopened += (efficiency > 0 ? 0 : 1 - lidopened) * 0.1;
+            lidOpened = Mathf.clamp(Mathf.lerp(0, 1, lidOpened + (potentialEfficiency > 0 && shouldConsume() ? -1 : 1) * 0.1f * delta()));
         }
 
         @Override
@@ -91,14 +111,14 @@ public class BatchPress extends GenericGraphCrafter{
 
             float spinnerrot = Mathf.sqr(spinprog) * 360;
             Draw.z(Layer.blockOver);
-            DrawUtils.drawRectOrtho(top[rotation % 2], x - 9 + Mathf.range(shake), y + Mathf.range(shake), 9, 0, 2, 18, 18, 90 * lidopened, 0);
-            DrawUtils.drawRectOrtho(topside, x - 9, y, -1, 0, 18, 2, 18, 90 * lidopened - 90, 0);
-            if(lidopened < 0.01){
+            DrawUtils.drawRectOrtho(top[rotation % 2], x - 9 + Mathf.range(shake), y + Mathf.range(shake), 9, 0, 2, 18, 18, 90 * lidOpened, 0);
+            DrawUtils.drawRectOrtho(topside, x - 9, y, -1, 0, 18, 2, 18, 90 * lidOpened - 90, 0);
+            if(lidOpened < 0.01){
                 Draw.color(Color.black, Mathf.clamp(progress * 0.6f, 0, 0.22f));
                 Draw.rect(spinner, x - (4 - spinprog * 3), y - (4 - spinprog * 3), spinnerrot);
                 Draw.color();
             }
-            DrawUtils.drawRectOrtho(spinner, x - 9, y, 9, 0, 2, 18, 18, 90 * lidopened, 0, -spinnerrot);
+            DrawUtils.drawRectOrtho(spinner, x - 9, y, 9, 0, 2, 18, 18, 90 * lidOpened, 0, -spinnerrot);
             drawTeamTop();
         }
     }
