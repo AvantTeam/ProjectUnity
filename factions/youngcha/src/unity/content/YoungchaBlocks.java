@@ -275,6 +275,7 @@ public final class YoungchaBlocks{
         batchMixer = register(Faction.youngcha, new BatchMixer("pyratite-batch-mixer"){{
             requirements(Category.crafting, with(YoungchaItems.nickel, 60, Items.metaglass, 40, Items.graphite, 30));
             size = 3;
+            rotate = false;
             health = 2600;
             itemCapacity = 100;
             craftTime = 30.0F;

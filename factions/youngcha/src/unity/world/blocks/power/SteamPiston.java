@@ -109,7 +109,6 @@ public class SteamPiston extends GenericGraphBlock{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-            arc.util.Log.info("onProximityUpdate");
             tryConnect();
         }
 

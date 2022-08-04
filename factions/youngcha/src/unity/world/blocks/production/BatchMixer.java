@@ -48,8 +48,8 @@ public class BatchMixer extends GenericGraphCrafter{
             float affect = Mathf.random(0.75f, 1.0f);
             Item i;
 
-            void update(float sr, float smul){
-                r += (Math.max(0, Mathf.cos(Math.min(Math.abs(sr - r), Math.abs((sr + pi) % Mathf.PI2 - r)))) + 0.1) * smul * 0.01 * affect;
+            void update(float sr, float sMul){
+                r += (Math.max(0, Mathf.cos(Math.min(Math.abs(sr - r), Math.abs((sr + pi) % Mathf.PI2 - r)))) + 0.1) * sMul * 0.01 * affect;
                 r = r % (2 * pi);
             }
 
@@ -82,8 +82,8 @@ public class BatchMixer extends GenericGraphCrafter{
         }
 
         @Override
-        public float efficiency(){
-            return super.efficiency() * Mathf.clamp((torqueNode().getGraph().lastVelocity / torqueNode().maxSpeed)) * saturation();
+        public void updateEfficiencyMultiplier(){
+            efficiency *= Mathf.clamp((torqueNode().getGraph().lastVelocity / torqueNode().maxSpeed)) * saturation();
         }
 
         @Override
@@ -98,7 +98,7 @@ public class BatchMixer extends GenericGraphCrafter{
                 }
                 int total = items.total();
                 if(total <= particles.size){
-                    //total items less then particles, items get mapped 1:1 to particles
+                    //total items less than particles, items get mapped 1:1 to particles
                     int[] index = {0};
                     items.each((item, a) -> {
                         for(int i = 0; i < a; i++){
@@ -113,12 +113,12 @@ public class BatchMixer extends GenericGraphCrafter{
                     }
                 }else{
                     float ratio = particles.size / (float)total;
-                    int lratio = Mathf.floor(1f / ratio);
+                    int lRatio = Mathf.floor(1f / ratio);
                     float[] index = {0};
                     items.each((item, a) -> {
-                        for(int i = 0; i < a; i += lratio){
+                        for(int i = 0; i < a; i += lRatio){
                             particles.get(Mathf.floor(index[0])).i = item;
-                            index[0] += ratio * lratio;
+                            index[0] += ratio * lRatio;
                             index[0] = Math.min(index[0], particles.size - 1);
                         }
                     });
