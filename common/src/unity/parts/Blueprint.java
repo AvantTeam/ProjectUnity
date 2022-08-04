@@ -60,10 +60,7 @@ public abstract class Blueprint<T extends PartType, P extends Part>{
 
     public abstract ItemSeq itemRequirements();
 
-    //Eliminate invalid parts.
-    protected abstract Blueprint validate();
-
-    public abstract Construct construct();
+    public abstract Construct<P> construct();
 
     public abstract byte[] encode();
 

@@ -165,14 +165,34 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
     }
 
     @Override
-    protected ModularUnitBlueprint validate(){
-        return new ModularUnitBlueprint(encodeCropped());
-    }
-
-    @Override
     public ModularUnitConstruct construct(){
-        var blueprint = validate();
-        return new ModularUnitConstruct(blueprint.parts, blueprint.partsList.orderedItems());
+        var copyPartsList = partsList.orderedItems().copy();
+
+        int maxX = 0, minX = 256;
+        int maxY = 0, minY = 256;
+        for(var validPart : partsList){
+            maxX = Math.max(validPart.x + validPart.type.w - 1, maxX);
+            minX = Math.min(validPart.x, minX);
+            maxY = Math.max(validPart.y + validPart.type.h - 1, maxY);
+            minY = Math.min(validPart.y, minY);
+        }
+
+        int w = Math.max(maxX - minX + 1, 0), h = Math.max(maxY - minY + 1, 0);
+        var copyParts = new ModularUnitPart[w][h];
+        for(var part : copyPartsList){
+            var x = part.x -= minX;
+            var y = part.y -= minY;
+            var type = part.type;
+            for(int i = x; i < x + type.w; i++){
+                for(int j = y; j < y + type.h; j++) copyParts[i][j] = part;
+            }
+            part.ax = x - w * 0.5f + 0.5f;
+            part.ay = y - h * 0.5f + 0.5f;
+            part.cx = x - w * 0.5f + type.w * 0.5f;
+            part.cy = y - h * 0.5f + type.h * 0.5f;
+        }
+
+        return new ModularUnitConstruct(copyParts, copyPartsList);
     }
 
     @Override
