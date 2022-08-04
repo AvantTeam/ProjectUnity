@@ -5,7 +5,6 @@ import mindustry.type.*;
 import unity.parts.PanelDoodadType.*;
 import unity.parts.PartType.*;
 
-//TODO is two Generics inevitable?
 //Assumes fields especially collections are immutable from outer direct access.
 public abstract class Blueprint<T extends PartType, P extends Part>{
     public P[][] parts;

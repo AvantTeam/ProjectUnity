@@ -23,8 +23,6 @@ public class YoungchaParts{
     public static ModularUnitPartType smallEngine, engine, smallWheel, smallTracks, mediumWheel, largeWheel, largeTracks, tankTracks, tankTracksLarge;
     //abilities
     public static ModularUnitPartType pipebomb, pretender;
-    //unit
-    //public static Seq<PanelDoodadPalette> unitDoodads = new Seq();TODO
 
     public static void load(){
         //region units
@@ -138,7 +136,6 @@ public class YoungchaParts{
                         ammoMultiplier = 4;
                         lifetime = 60f;
                     }};
-                    ;
                 }};
             }});
         }};

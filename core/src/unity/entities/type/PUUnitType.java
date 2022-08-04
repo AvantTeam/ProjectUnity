@@ -114,7 +114,6 @@ public class PUUnitType extends PUUnitTypeCommon{
         for(Props prop : properties.values()) prop.load();
     }
 
-    //TODO move methods impl that just iterating props to PUUnitTypeCommon
     @Override
     public void drawCell(Unit unit){
         boolean thisDraw = false;
