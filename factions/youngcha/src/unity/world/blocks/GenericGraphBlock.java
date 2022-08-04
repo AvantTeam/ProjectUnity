@@ -48,7 +48,7 @@ public class GenericGraphBlock extends Block implements GraphBlock{
     }
 
 
-    public class GenericGraphBuild extends Building implements GraphBuild{
+    public static class GenericGraphBuild extends Building implements GraphBuild{
         OrderedMap<Class<? extends Graph>, GraphNode> graphNodes = new OrderedMap<>();
         int prevTileRotation = -1;
         boolean placed = false;
@@ -98,7 +98,6 @@ public class GenericGraphBlock extends Block implements GraphBlock{
                 placed = true;
                 connectToGraph();
             }
-            super.updateTile();
             updateGraphs();
         }
 
@@ -151,27 +150,26 @@ public class GenericGraphBlock extends Block implements GraphBlock{
             if(debugGraph){
                 getNodes().each((cls, graphNode) -> {
                     for(var con : graphNode.connector){
-                        var cong = (GraphConnector)con;
-                        cong.getGraph().each((c) -> {
-                            GraphConnector extcon = (GraphConnector)c;
+                        var gCon = (GraphConnector)con;
+                        gCon.getGraph().each(c -> {
+                            GraphConnector extCon = (GraphConnector)c;
                             Draw.color(Pal.accent);
-                            Drawf.circles(extcon.getNode().build().x, extcon.getNode().build().y, tilesize * 0.3f);
+                            Drawf.circles(extCon.getNode().build().x, extCon.getNode().build().y, tilesize * 0.3f);
                         });
-                        if(cong.getGraph() instanceof TorqueGraph tg){
+                        if(gCon.getGraph() instanceof TorqueGraph tg){
                             tg.propagate(g -> {
-                                if(g == cong.getGraph()){
+                                if(g == gCon.getGraph()){
                                     return;
                                 }
-                                g.each((c) -> {
-                                    GraphConnector extcon = (GraphConnector)c;
+                                g.each(c -> {
                                     Draw.color(Pal.reactorPurple);
-                                    Drawf.circles(extcon.getNode().build().x, extcon.getNode().build().y, tilesize * 0.3f);
+                                    Drawf.circles(c.getNode().build().x, c.getNode().build().y, tilesize * 0.3f);
                                 });
                             });
                         }
 
 
-                        cong.getGraph().eachEdge(e -> {
+                        gCon.getGraph().eachEdge(e -> {
                             GraphEdge edge = (GraphEdge)e;
                             Drawf.line(Pal.accent, edge.n1.getNode().build().x, edge.n1.getNode().build().y, edge.n2.getNode().build().x, edge.n2.getNode().build().y);
                         });

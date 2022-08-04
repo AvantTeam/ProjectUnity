@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
-import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import unity.graphics.*;
@@ -23,6 +22,8 @@ public class CombustionHeater extends GenericGraphBlock{
     public float minConsumeAmount = 0.005f;
     public float maxConsumeAmount = 0.015f;
 
+    public @Nullable ConsumeItemFilter filterItem;
+
     public CombustionHeater(String name){
         super(name);
         rotate = true;
@@ -37,7 +38,7 @@ public class CombustionHeater extends GenericGraphBlock{
 
     @Override
     public void init(){
-        consume(new ConsumeItemFilter(item -> item.flammability >= 0.1f)).update(false).optional(true, false);
+        filterItem = consume(new ConsumeItemFlammable(0.1f));
         super.init();
     }
 
@@ -48,7 +49,7 @@ public class CombustionHeater extends GenericGraphBlock{
     }
 
     public class CombustionHeaterBuild extends GenericGraphBuild{
-        float generateTime, productionEfficiency;
+        float generateTime, productionEfficiency, efficiencyMultiplier = 1f;
 
         @Override
         public void initGraph(){
@@ -57,37 +58,39 @@ public class CombustionHeater extends GenericGraphBlock{
         }
 
         @Override
-        public boolean productionValid(){
-            return generateTime > 0f;
+        public void updateEfficiencyMultiplier(){
+            if(filterItem != null){
+                float m = filterItem.efficiencyMultiplier(this);
+                if(m > 0) efficiencyMultiplier = m;
+            }
         }
 
         @Override
-        public void update(){
-            super.update();
-            if(efficiency <= 0){
-                productionEfficiency = 0f;
-                return;
-            }
+        public void updateTile(){
+            super.updateTile();
+            boolean valid = efficiency > 0;
+            productionEfficiency = efficiency * efficiencyMultiplier;
 
-            if(generateTime <= 0f && items.total() > 0f){
+            if(valid && generateTime <= 0f && items.total() > 0f){
+                consume();
                 Fx.generatespark.at(x + Mathf.range(3f), y + Mathf.range(3f));
-                Item item = items.take();
-                productionEfficiency = item.flammability;
                 generateTime = 1f;
             }
 
             if(generateTime > 0f){
                 float mul = Mathf.lerp(minConsumeAmount, maxConsumeAmount, Mathf.clamp(heatNode().lastEnergyInput * 0.3f, 0.1f, 1.0f));
-                float am = Math.min(delta() * mul, generateTime);
-                ;
-                generateTime -= am;
-            }else{
-                productionEfficiency = 0f;
+                generateTime -= delta() * mul;
             }
             heatNode().targetTemp = baseTemp + Math.max(tempPerFlammability * (productionEfficiency - 1), -baseTemp * 0.5f);
             heatNode().efficency = productionEfficiency;
         }
 
+        @Override
+        public boolean consumeTriggerValid(){
+            return generateTime > 0;
+        }
+
+        //TODO use drawer. and drawLight
         @Override
         public void draw(){
             Draw.rect(baseRegions[rotation], x, y);
@@ -97,15 +100,29 @@ public class CombustionHeater extends GenericGraphBlock{
         }
 
         @Override
+        public float ambientVolume(){
+            return Mathf.clamp(productionEfficiency);
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(productionEfficiency);
+            write.f(generateTime);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             productionEfficiency = read.f();
+            if(revision >= 1){
+                generateTime = read.f();
+            }
         }
     }
 }

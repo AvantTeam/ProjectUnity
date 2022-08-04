@@ -101,11 +101,11 @@ public class HeatPipe extends GenericGraphBlock{
         @Override
         public void draw(){
             float temp = heatNode().getTemp();
-            Draw.rect(regions[spriteIndex / 8][spriteIndex % 8], x, y);
+            Draw.rect(regions[spriteIndex % 8][spriteIndex / 8], x, y);
             if(temp < HeatGraphNode.celsiusZero || temp > HeatGraphNode.celsiusZero + 150){
                 heatNode().heatColor(tempCol);
                 Draw.color(tempCol.add(baseColor));
-                Draw.rect(heatRegions[spriteIndex / 8][spriteIndex % 8], x, y);
+                Draw.rect(heatRegions[spriteIndex % 8][spriteIndex / 8], x, y);
                 Draw.color();
             }
             drawTeamTop();
