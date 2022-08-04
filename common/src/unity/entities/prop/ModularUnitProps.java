@@ -14,14 +14,12 @@ import unity.util.*;
 
 public class ModularUnitProps extends Props{
     public final UnitType parent;
-    public final Seq<String> templates = new Seq<>();
     public final Func<byte[], Construct<? extends Part>> decoder;
 
-    public ModularUnitProps(UnitType parent, Func<byte[], Construct<? extends Part>> decoder, String... templates){
+    public ModularUnitProps(UnitType parent, Func<byte[], Construct<? extends Part>> decoder){
         super(true);
         this.parent = parent;
         this.decoder = decoder;
-        this.templates.add(templates);
     }
 
     @Override
@@ -67,9 +65,7 @@ public class ModularUnitProps extends Props{
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
         var construct = unit.construct();
         if(construct != null){
-            construct.hasCustomDraw.each((p) -> {
-                p.type.drawCell(dt, p);
-            });
+            construct.hasCustomDraw.each((p) -> p.type.drawCell(dt, p));
         }
         Draw.reset();
     }
@@ -79,19 +75,13 @@ public class ModularUnitProps extends Props{
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
         var construct = unit.construct();
         if(construct != null){
-            construct.doodads.each(d -> {
-                d.drawOutline(dt);
-            });
+            construct.doodads.each(d -> d.drawOutline(dt));
             construct.hasCustomDraw.each((p) -> {
                 p.type.drawOutline(dt, p);
                 p.type.draw(dt, p, unit);
             });
-            construct.doodads.each(d -> {
-                d.drawTop(dt);
-            });
-            construct.hasCustomDraw.each((p) -> {
-                p.type.drawTop(dt, p);
-            });
+            construct.doodads.each(d -> d.drawTop(dt));
+            construct.hasCustomDraw.each((p) -> p.type.drawTop(dt, p));
         }
         Draw.reset();
     }

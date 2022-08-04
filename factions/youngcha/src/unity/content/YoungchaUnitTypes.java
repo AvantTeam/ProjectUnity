@@ -23,10 +23,7 @@ public class YoungchaUnitTypes{
             omniMovement = false;
             weapons.add(new Weapon("gun")); //blank weapon so mobile doesn't die
             //stats? what stats? :D
-            prop(new ModularUnitProps(this, data -> new ModularUnitBlueprint(data).construct(), "g4SFgICEgIGEgIKFgIOBgYCDgYGAgYOFgoCFgoM=", "g4OFgICCgIGBgYCEgYGFgYKFgoCCgoE=",
-            "g4SFgICEgIGEgIKCgIOBgYCIgYGFgYOFgoCCgoM=", "gYSFgICBgIGCgIKFgIM=", "g4SFgICEgIGEgIKFgIOBgYCVgYGFgYOFgoCFgoM=",
-            "g4OFgICAgIGFgIKBgYCEgYGCgYKFgoCAgoGFgoI="
-            ));
+            prop(new ModularUnitProps(this, data -> new ModularUnitBlueprint(data).construct()));
         }}));
     }
 }
