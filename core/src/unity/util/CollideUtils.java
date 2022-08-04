@@ -1,12 +1,15 @@
 package unity.util;
 
+import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
+import mindustry.core.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -16,9 +19,13 @@ public final class CollideUtils{
     private static final Rect rect = new Rect(), hitRect = new Rect();
     private static final BoolGrid collideLineCollided = new BoolGrid();
     private static final IntSeq lineCast = new IntSeq(), lineCastNext = new IntSeq();
-    private static final Seq<Hit> hitEffects = new Seq();
+    private static final Seq<Hit> hitEffects = new Seq<>();
     private static final Vec2 v1 = new Vec2(), v2 = new Vec2();
     private static boolean hit, hitB;
+
+    public static void init(){
+        Events.on(WorldLoadEvent.class, event -> collideLineCollided.resize(world.width(), world.height()));
+    }
 
     static class Hit implements Poolable{
         Healthc ent;
@@ -165,7 +172,7 @@ public final class CollideUtils{
                 lineCastNext.clear();
             };
 
-            world.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
+            World.raycastEachWorld(x, y, x2, y2, (cx, cy) -> {
                 if(collideLineCollided.within(cx, cy) && !collideLineCollided.get(cx, cy)){
                     lineCast.add(Point2.pack(cx, cy));
                     collideLineCollided.set(cx, cy, true);

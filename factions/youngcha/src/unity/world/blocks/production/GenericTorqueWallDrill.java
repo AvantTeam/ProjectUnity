@@ -51,29 +51,24 @@ public class GenericTorqueWallDrill extends GenericGraphBlock{
         public float time = 0;
         public Item lastItem = null;
         public Point2[] checkPoints = new Point2[size];
-        public OreDistance[] oredist = new OreDistance[size];
+        public OreDistance[] oreDist = new OreDistance[size];
 
         float targetDrillAngle = 0, targetDrillExtend = 0;
         float drillAngle = 0, drillExtend = 0;
         int tilesDrilling = 0;
 
         @Override
-        public float efficiency(){
-            return super.efficiency() * Mathf.clamp(Mathf.map(getGraph(TorqueGraph.class).lastVelocity, 0, torqueNode().maxSpeed, 0, 1.0f), 0, 1);
-        }
-
-
-        @Override
         public void updateTile(){
+            efficiency *= Mathf.clamp(Mathf.map(getGraph(TorqueGraph.class).lastVelocity, 0, torqueNode().maxSpeed, 0, 1.0f), 0, 1);
             super.updateTile();
             if(checkPoints[0] == null){
                 for(int i = 0; i < size; i++){
                     if(checkPoints[i] == null) checkPoints[i] = new Point2();
                     getCheckPos(tileX(), tileY(), rotation, i, checkPoints[i]);
-                    oredist[i] = new OreDistance(null, 0);
+                    oreDist[i] = new OreDistance(null, 0);
                 }
             }
-            int mindist = range + 1;
+            int minDist = range + 1;
             tilesDrilling = 0;
             for(int p = 0; p < size; p++){
                 Point2 l = checkPoints[p];
@@ -84,30 +79,30 @@ public class GenericTorqueWallDrill extends GenericGraphBlock{
                     if(other != null && other.solid()){
                         Item drop = other.wallDrop();
                         if(drop != null && drop.hardness <= tier){
-                            oredist[p].tiledis = i;
-                            mindist = Math.min(mindist, i);
-                            oredist[p].ore = drop;
-                            oredist[p].tile = dest = other;
+                            oreDist[p].tileDis = i;
+                            minDist = Math.min(minDist, i);
+                            oreDist[p].ore = drop;
+                            oreDist[p].tile = dest = other;
                             tilesDrilling++;
                         }
                         break;
                     }
                 }
                 if(dest == null){
-                    oredist[p].ore = null;
+                    oreDist[p].ore = null;
                 }
             }
             //linear regression :p
-            float n = 0, sy = 0, sx = 0, sxy = 0, sx2 = 0, tx = 0;
+            float n = 0, sy = 0, sx = 0, sxy = 0, sx2 = 0, tx;
             float s2 = size * 0.5f;
             for(int p = 0; p < size; p++){
-                if(oredist[p].ore != null){
+                if(oreDist[p].ore != null){
                     n++;
                     tx = p - s2 + 0.5f;
                     sx += tx;
                     sx2 += tx * tx;
-                    sxy += tx * oredist[p].tiledis;
-                    sy += oredist[p].tiledis;
+                    sxy += tx * oreDist[p].tileDis;
+                    sy += oreDist[p].tileDis;
                 }
             }
             if(n > 1){
@@ -134,9 +129,9 @@ public class GenericTorqueWallDrill extends GenericGraphBlock{
                     if(items.total() >= itemCapacity){
                         break;
                     }
-                    if(oredist[p].ore != null){
-                        items.add(oredist[p].ore, 1);
-                        lastItem = oredist[p].ore;
+                    if(oreDist[p].ore != null){
+                        items.add(oreDist[p].ore, 1);
+                        lastItem = oreDist[p].ore;
                     }
                 }
                 time %= drillTime;
@@ -176,12 +171,12 @@ public class GenericTorqueWallDrill extends GenericGraphBlock{
 
         class OreDistance{
             Item ore;
-            int tiledis;
+            int tileDis;
             Tile tile;
 
-            public OreDistance(Item ore, int tiledis){
+            public OreDistance(Item ore, int tileDis){
                 this.ore = ore;
-                this.tiledis = tiledis;
+                this.tileDis = tileDis;
             }
         }
 

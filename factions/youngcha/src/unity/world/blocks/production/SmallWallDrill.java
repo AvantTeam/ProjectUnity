@@ -15,8 +15,8 @@ import unity.world.graph.*;
 import static mindustry.Vars.tilesize;
 
 public class SmallWallDrill extends GenericTorqueWallDrill{
-    TextureRegion base[];
-    TextureRegion floor, rotator, armbase, arm, bore;
+    TextureRegion[] base = new TextureRegion[4];
+    TextureRegion floor, rotator, armBase, arm, bore;
     int hitTimer = timers++;
 
     public SmallWallDrill(String name){
@@ -26,14 +26,13 @@ public class SmallWallDrill extends GenericTorqueWallDrill{
     @Override
     public void load(){
         super.load();
-        base = new TextureRegion[4];
         for(int i = 0; i < 4; i++)
             base[i] = loadTex("" + (i + 1));
         floor = loadTex("base");
         rotator = loadTex("top");
         arm = loadTex("arm");
         bore = loadTex("bore");
-        armbase = loadTex("armbase");
+        armBase = loadTex("armBase");
     }
 
     @Override
@@ -66,8 +65,8 @@ public class SmallWallDrill extends GenericTorqueWallDrill{
                     YoungchaFx.dust.at(rx + Mathf.range(1), ry + Mathf.range(1), 0, col, new Vec2(vx * 14.0f * eff, vy * 14.0f * eff));
                 }
             }
-            var tnode = torqueNode();
-            tnode.baseForce = 0;
+            var tNode = torqueNode();
+            tNode.baseForce = 0;
             float spd = torqueNode().getGraph().lastVelocity;
             if(tilesDrilling == 0 && timer(hitTimer, 10) && spd > 5){
                 float ang = targetDrillAngle + rotdeg();
@@ -97,7 +96,7 @@ public class SmallWallDrill extends GenericTorqueWallDrill{
                             }
                         }
                     }
-                    tnode.baseForce -= t;
+                    tNode.baseForce -= t;
 
                     Fx.hitBulletSmall.at(h.x(), h.y());
                     return true;
@@ -115,7 +114,7 @@ public class SmallWallDrill extends GenericTorqueWallDrill{
             float ang = drillAngle + rotdeg();
             Draw.rect(floor, x, y);
             Lines.stroke(3);
-            Lines.line(armbase, x + Geometry.d4x(rotation) * (s2 * 0.5f) * tilesize, y + Geometry.d4y(rotation) * (s2 * 0.5f) * tilesize, rx, ry, false);
+            Lines.line(armBase, x + Geometry.d4x(rotation) * (s2 * 0.5f) * tilesize, y + Geometry.d4y(rotation) * (s2 * 0.5f) * tilesize, rx, ry, false);
             if(lastItem != null){
                 float progress = time / drillTime;
                 Draw.rect(

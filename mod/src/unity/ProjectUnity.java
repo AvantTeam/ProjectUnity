@@ -87,6 +87,7 @@ public class ProjectUnity extends ProjectUnityCommon{
         dev.init();
         ui.init();
         UnityCalls.registerPackets();
+        CollideUtils.init();
     }
 
     @Override
