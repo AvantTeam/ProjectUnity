@@ -141,11 +141,9 @@ public class GenericTorqueWallDrill extends GenericGraphBlock{
             }
         }
 
-        public BlockStatus status(){
-            if(items.total() >= itemCapacity){
-                return BlockStatus.noOutput;
-            }
-            return BlockStatus.active;
+        @Override
+        public boolean shouldConsume(){
+            return items.total() < itemCapacity;
         }
 
         @Override

@@ -14,10 +14,10 @@ import unity.world.blocks.*;
 import unity.world.blocks.units.ModularUnitAssembler.*;
 
 public class UnitAssemblerArm extends GenericGraphBlock{
-    public float armfoldsize = 8;
+    public float armFoldSize = 8;
     public float constructSpeed = 1.0f;
-    TextureRegion arm[] = new TextureRegion[3];
-    TextureRegion base[] = new TextureRegion[4];
+    TextureRegion[] arm = new TextureRegion[3];
+    TextureRegion[] base = new TextureRegion[4];
     TextureRegion spinner;
 
     public UnitAssemblerArm(String name){
@@ -49,7 +49,7 @@ public class UnitAssemblerArm extends GenericGraphBlock{
         public void onInit(){
             super.onInit();
 
-            arm = new ZipperArm(0, 0, armfoldsize, armfoldsize, armfoldsize * 4, 2);
+            arm = new ZipperArm(0, 0, armFoldSize, armFoldSize, armFoldSize * 4, 2);
         }
 
         @Override
@@ -63,9 +63,9 @@ public class UnitAssemblerArm extends GenericGraphBlock{
             if(attached == null){
                 return false;
             }
-            var itemreq = attached.blueprint.itemRequirements();
-            for(var itemstack : itemreq){
-                if(itemstack.item == item){
+            var itemReq = attached.blueprint.itemRequirements();
+            for(var itemStack : itemReq){
+                if(itemStack.item == item){
                     return items.get(item) < itemCapacity;
                 }
             }
@@ -73,12 +73,8 @@ public class UnitAssemblerArm extends GenericGraphBlock{
         }
 
         @Override
-        public float efficiency(){
-            return super.efficiency() * Mathf.clamp(torqueNode().getGraph().lastVelocity / torqueNode().maxSpeed);
-        }
-
-        @Override
         public void updateTile(){
+            efficiency *= Mathf.clamp(torqueNode().getGraph().lastVelocity / torqueNode().maxSpeed);
             super.updateTile();
             if(!enabled){
                 buildProgress = 0;

@@ -335,7 +335,7 @@ public class ModularUnitAssembler extends PayloadBlock{
             DrawTransform dt = new DrawTransform();
             dt.setTranslate(x, y);
             dt.setRotation(rotdeg());
-            if(construct != null && !sandbox && payload == null){
+            if(construct != null && !construct.isEmpty() && !sandbox && payload == null){
                 //9 slice?
 
                 Draw.color(0, 0, 0, 0.4f);
