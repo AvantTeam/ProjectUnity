@@ -18,11 +18,10 @@ public class HeatGraph extends Graph<HeatGraph>{
     @Override
     public void onUpdate(){
         //for each vertex distribute heat to neighbours via the gauss siedel method.
-        float k = 0;
-        float e = 0;
-        float t = 0;
-        float cond = 0;
-        float b = 0;
+        float k;
+        float e;
+        float cond;
+        float b;
         HeatGraphNode hgn;
         HeatGraphNode hgno;
 
@@ -39,7 +38,7 @@ public class HeatGraph extends Graph<HeatGraph>{
                 cond = hgno.conductivity;
                 // my brain hurt
                 //but essentially the energy only GS equality is eₙ = (e꜀ + kTₛ)/(1+k/c) as T꜀ is e꜀/c
-                for(GraphEdge ge : v.connections){
+                for(var ge : v.connections){
                     hgn = ((HeatGraphNode)ge.other(v).node);
                     b = (hgn.conductivity + cond) * Time.delta;
                     k += b;
@@ -62,14 +61,14 @@ public class HeatGraph extends Graph<HeatGraph>{
         for(int i = 0; i < s; i++){
             removeEdge(vertex.connections.first());
         }
-        var ngraph = createFromThis();
-        ngraph.addVertex(vertex);
+        var nGraph = createFromThis();
+        nGraph.addVertex(vertex);
         vertexes.remove(vertex);
         onGraphChanged();
     }
 
     @Override
-    public void removeEdge(GraphEdge edge){
+    public void removeEdge(GraphEdge<HeatGraph> edge){
         removeEdgeNonSplit(edge);
         //no graph splitting.
     }

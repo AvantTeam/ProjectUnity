@@ -95,7 +95,7 @@ public class TorqueDrill extends Drill implements GraphBlock{
 
 
     public class TorqueDrillBuild extends DrillBuild implements GraphBuild{
-        OrderedMap<Class<? extends Graph>, GraphNode> graphNodes = new OrderedMap<>();
+        OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> graphNodes = new OrderedMap<>();
         int prevTileRotation = -1;
         boolean placed = false;
 
@@ -207,7 +207,7 @@ public class TorqueDrill extends Drill implements GraphBlock{
         }
 
         @Override
-        public OrderedMap<Class<? extends Graph>, GraphNode> getNodes(){
+        public OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> getNodes(){
             return graphNodes;
         }
 

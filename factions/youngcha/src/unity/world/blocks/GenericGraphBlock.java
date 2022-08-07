@@ -49,7 +49,7 @@ public class GenericGraphBlock extends Block implements GraphBlock{
 
 
     public static class GenericGraphBuild extends Building implements GraphBuild{
-        OrderedMap<Class<? extends Graph>, GraphNode> graphNodes = new OrderedMap<>();
+        OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> graphNodes = new OrderedMap<>();
         int prevTileRotation = -1;
         boolean placed = false;
 
@@ -102,7 +102,7 @@ public class GenericGraphBlock extends Block implements GraphBlock{
         }
 
         @Override
-        public OrderedMap<Class<? extends Graph>, GraphNode> getNodes(){return graphNodes;}
+        public OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> getNodes(){return graphNodes;}
 
         @Override
         public Building getBuild(){return this;}
@@ -150,15 +150,13 @@ public class GenericGraphBlock extends Block implements GraphBlock{
             if(debugGraph){
                 getNodes().each((cls, graphNode) -> {
                     for(var con : graphNode.connector){
-                        var gCon = (GraphConnector)con;
-                        gCon.getGraph().each(c -> {
-                            GraphConnector extCon = (GraphConnector)c;
+                        con.getGraph().each(c -> {
                             Draw.color(Pal.accent);
-                            Drawf.circles(extCon.getNode().build().x, extCon.getNode().build().y, tilesize * 0.3f);
+                            Drawf.circles(c.getNode().build().x, c.getNode().build().y, tilesize * 0.3f);
                         });
-                        if(gCon.getGraph() instanceof TorqueGraph tg){
+                        if(con.getGraph() instanceof TorqueGraph tg){
                             tg.propagate(g -> {
-                                if(g == gCon.getGraph()){
+                                if(g == con.getGraph()){
                                     return;
                                 }
                                 g.each(c -> {
@@ -169,10 +167,7 @@ public class GenericGraphBlock extends Block implements GraphBlock{
                         }
 
 
-                        gCon.getGraph().eachEdge(e -> {
-                            GraphEdge edge = (GraphEdge)e;
-                            Drawf.line(Pal.accent, edge.n1.getNode().build().x, edge.n1.getNode().build().y, edge.n2.getNode().build().x, edge.n2.getNode().build().y);
-                        });
+                        con.getGraph().eachEdge(e -> Drawf.line(Pal.accent, e.n1.getNode().build().x, e.n1.getNode().build().y, e.n2.getNode().build().x, e.n2.getNode().build().y));
                         if(con instanceof GraphConnector.FixedGraphConnector fg){
                             for(var port : fg.connectionPoints){
                                 Draw.color(port.edge == null ? Color.red : Color.green);

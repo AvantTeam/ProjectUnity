@@ -7,8 +7,8 @@ import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-//orginally GraphModule
-public class GraphNode<T extends Graph>{
+//originally GraphModule
+public class GraphNode<T extends Graph<T>>{
     public final GraphBuild build;
     public Seq<GraphConnector<T>> connector = new Seq<>();
     int connectors = 0;
@@ -134,5 +134,4 @@ public class GraphNode<T extends Graph>{
     public Building build(){return build.getBuild();}
 
     public T getGraph(){return connector.first().graph;}
-
 }

@@ -28,9 +28,9 @@ public abstract class Graph<T extends Graph<T>>{
         addVertex(gc);
     }
 
-    public abstract <U extends Graph<T>> U copy();
+    public abstract T copy();
 
-    public <U extends Graph<T>> U createFromThis(){
+    public T createFromThis(){
         var c = copy();
         c.authoritative = authoritative;
         c.authoritativeUntil = authoritativeUntil;
@@ -44,13 +44,13 @@ public abstract class Graph<T extends Graph<T>>{
     public void addEdge(GraphEdge<T> edge){
 
         edges.put(edge.id, edge);
-        Graph<T> g = edge.other(this).graph;
+        var g = edge.other(this).graph;
         if(g != this){
             //CONSUME THE INFERIOR GRAPH
             if(g.vertexes.size < vertexes.size){
                 mergeGraph(g);
             }else{
-                g.mergeGraph(this);
+                g.mergeGraph(self());
             }
         }
     }
@@ -201,12 +201,12 @@ public abstract class Graph<T extends Graph<T>>{
         onGraphChanged();
     }
 
-    public void mergeGraph(Graph<T> graph){
+    public void mergeGraph(T graph){
         if(!graph.authoritative && !authoritative){
-            onMergeBegin((T)graph);
+            onMergeBegin(graph);
         }else{
             if(graph.authoritative){
-                graph.authoritativeOverride((T)this);
+                graph.authoritativeOverride(self());
                 this.authoritative = true;
                 this.authoritativeUntil = graph.authoritativeUntil;
             }
@@ -240,7 +240,7 @@ public abstract class Graph<T extends Graph<T>>{
         vertexes.each(cons);
     }
 
-    public void eachEdge(Cons<GraphEdge> cons){
+    public void eachEdge(Cons<GraphEdge<T>> cons){
         edges.forEach((e) -> cons.get(e.value));
     }
 

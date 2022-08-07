@@ -48,7 +48,7 @@ public class GenericGraphCrafter extends GenericCrafter implements GraphBlock{
     }
 
     public class GenericGraphCrafterBuild extends GenericCrafterBuild implements GraphBuild{
-        OrderedMap<Class<? extends Graph>, GraphNode> graphNodes = new OrderedMap<>();
+        OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> graphNodes = new OrderedMap<>();
         int prevTileRotation = -1;
         boolean placed = false;
 
@@ -102,7 +102,7 @@ public class GenericGraphCrafter extends GenericCrafter implements GraphBlock{
         }
 
         @Override
-        public OrderedMap<Class<? extends Graph>, GraphNode> getNodes(){return graphNodes;}
+        public OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> getNodes(){return graphNodes;}
 
         @Override
         public Building getBuild(){return this;}

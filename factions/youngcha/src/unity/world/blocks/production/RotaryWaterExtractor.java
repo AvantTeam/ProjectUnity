@@ -85,7 +85,7 @@ public class RotaryWaterExtractor extends SolidPump implements GraphBlock{
         float flowRate;
 
         ///////////
-        OrderedMap<Class<? extends Graph>, GraphNode> graphNodes = new OrderedMap<>();
+        OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> graphNodes = new OrderedMap<>();
         int prevTileRotation = -1;
         boolean placed = false;
 
@@ -126,7 +126,7 @@ public class RotaryWaterExtractor extends SolidPump implements GraphBlock{
         }
 
         @Override
-        public OrderedMap<Class<? extends Graph>, GraphNode> getNodes(){return graphNodes;}
+        public OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> getNodes(){return graphNodes;}
 
         @Override
         public Building getBuild(){return this;}

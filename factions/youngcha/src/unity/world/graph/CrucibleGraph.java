@@ -7,13 +7,9 @@ import unity.world.meta.CrucibleRecipes.*;
 public class CrucibleGraph extends Graph<CrucibleGraph>{
     //probably have each crucible store their own shit, then the graph distributes it as usual
     //abstract guass siedel graph?
-    //public float totalCapacity;
-    //ObjectMap<Item,CrucibleFluid> fluids = new ObjectMap<>();
-
     @Override
-    public <U extends Graph<CrucibleGraph>> U copy(){
-        CrucibleGraph crucibleGraph = new CrucibleGraph();
-        return (U)crucibleGraph;
+    public CrucibleGraph copy(){
+        return new CrucibleGraph();
     }
 
     @Override
@@ -57,7 +53,6 @@ public class CrucibleGraph extends Graph<CrucibleGraph>{
     public static class CrucibleFluid{
         CrucibleIngredient ingredient;
         public float melted;
-        public float meltedBuffer;//?
         public float solid;
 
         public CrucibleFluid(CrucibleIngredient item){

@@ -32,7 +32,7 @@ public class TorqueGraph extends Graph<TorqueGraph>{
     }
 
     @Override
-    public boolean canConnect(GraphConnector v1, GraphConnector v2){
+    public boolean canConnect(GraphConnector<TorqueGraph> v1, GraphConnector<TorqueGraph> v2){
         return v1.getNode().build().team == v2.getNode().build().team;
     }
 

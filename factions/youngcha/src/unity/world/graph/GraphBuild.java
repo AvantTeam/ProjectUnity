@@ -48,7 +48,7 @@ public interface GraphBuild{
                 node.connectors++;
             }
             for(var connectionConfig : cfg.connections){
-                var node = getGraphNode(connectionConfig.getGraphType());
+                GraphNode node = getGraphNode(connectionConfig.getGraphType());
                 node.connector.add(connectionConfig.getConnector(node));
             }
         }

@@ -92,7 +92,7 @@ public class HeatGraphNode extends GraphNode<HeatGraph>{
     }
 
     public static void heatColor(float t, Color input){
-        float a = 0;
+        float a;
         if(t > celsiusZero){
             a = Math.max(0, (t - 498) * 0.001f);
             if(a < 0.01){
