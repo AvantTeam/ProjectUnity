@@ -14,6 +14,7 @@ import unity.net.*;
 import unity.parts.*;
 import unity.util.*;
 import unity.world.graph.*;
+import unity.world.meta.*;
 
 import java.io.*;
 
@@ -88,6 +89,7 @@ public class ProjectUnity extends ProjectUnityCommon{
         ui.init();
         UnityCalls.registerPackets();
         CollideUtils.init();
+        CrucibleRecipes.loadStatic();
     }
 
     @Override

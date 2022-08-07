@@ -7,6 +7,7 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 import unity.content.*;
 import unity.net.*;
 import unity.parts.*;
@@ -73,8 +74,28 @@ public class UnitAssemblerArm extends GenericGraphBlock{
         }
 
         @Override
+        public void updateEfficiencyMultiplier(){
+            var tNode = torqueNode();
+            efficiency *= Mathf.clamp(tNode.getGraph().lastVelocity / tNode.maxSpeed);
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(!enabled){
+                return BlockStatus.logicDisable;
+            }
+
+            if(efficiency > 0){
+                if(currentJob != null){
+                    if(items.hasOne(currentJob.remaining)) return BlockStatus.active;
+                }
+            }
+
+            return BlockStatus.noInput;
+        }
+
+        @Override
         public void updateTile(){
-            efficiency *= Mathf.clamp(torqueNode().getGraph().lastVelocity / torqueNode().maxSpeed);
             super.updateTile();
             if(!enabled){
                 buildProgress = 0;

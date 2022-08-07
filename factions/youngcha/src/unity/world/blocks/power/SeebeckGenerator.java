@@ -63,13 +63,13 @@ public class SeebeckGenerator extends GenericGraphBlock{
     }
 
     public class SeebeckGeneratorBuild extends GenericGraphBuild{
-        float leftheat, rightheat;
-        float[] heatdiff = {0};
-        float powergen = 0;
+        float leftHeat, rightHeat;
+        float[] heatDiff = {0};
+        float powerGen = 0;
 
         @Override
         public float getPowerProduction(){
-            return Mathf.clamp(powergen, 0, maxPower);
+            return Mathf.clamp(powerGen, 0, maxPower);
         }
 
 
@@ -78,28 +78,28 @@ public class SeebeckGenerator extends GenericGraphBlock{
             super.updateTile();
 
             var node = heatNode();
-            leftheat = node.getTemp();
-            rightheat = node.getTemp();
-            heatdiff[0] = 0;
+            leftHeat = node.getTemp();
+            rightHeat = node.getTemp();
+            heatDiff[0] = 0;
             ((FixedGraphConnector<HeatGraph>)node.connector.get(0)).eachConnected((connector, port) -> {
-                if(connector.getNode() instanceof HeatGraphNode heatnode){
-                    heatdiff[0] += Math.abs(node.getTemp() - heatnode.getTemp()) * heatnode.conductivity; /// well to stop low conductivity from making huge temperature differentials
+                if(connector.getNode() instanceof HeatGraphNode heatNode){
+                    heatDiff[0] += Math.abs(node.getTemp() - heatNode.getTemp()) * heatNode.conductivity; /// well to stop low conductivity from making huge temperature differentials
                     if(port.getOrdinal() != 0){
-                        leftheat = heatnode.getTemp();
+                        leftHeat = heatNode.getTemp();
                     }else{
-                        rightheat = heatnode.getTemp();
+                        rightHeat = heatNode.getTemp();
                     }
                 }
             });
-            powergen += (seebeckStrength * heatdiff[0] - powergen) * Mathf.clamp(0.1f * Time.delta);
+            powerGen += (seebeckStrength * heatDiff[0] - powerGen) * Mathf.clamp(0.1f * Time.delta);
         }
 
         @Override
         public void draw(){
             var node = heatNode();
             Draw.rect(rotations[rotation], x, y);
-            YoungchaDrawf.drawHeat(heat[0], x, y, rotdeg(), leftheat);
-            YoungchaDrawf.drawHeat(heat[1], x, y, rotdeg(), rightheat);
+            YoungchaDrawf.drawHeat(heat[0], x, y, rotdeg(), leftHeat);
+            YoungchaDrawf.drawHeat(heat[1], x, y, rotdeg(), rightHeat);
             YoungchaDrawf.drawHeat(heat[2], x, y, rotdeg(), node.getTemp());
             drawTeamTop();
         }

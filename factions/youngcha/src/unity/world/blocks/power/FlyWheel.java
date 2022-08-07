@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.graphics.*;
-import mindustry.world.meta.*;
 import unity.world.blocks.*;
 import unity.world.blocks.power.SteamPiston.*;
 import unity.world.graph.*;
@@ -36,6 +35,11 @@ public class FlyWheel extends GenericGraphBlock{
             super.created();
             attachY = y;
             attachX = x;
+        }
+
+        @Override
+        public void updateEfficiencyMultiplier(){
+            efficiency = connected.isEmpty() ? 0 : 1;
         }
 
         @Override

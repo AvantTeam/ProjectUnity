@@ -7,7 +7,7 @@ import unity.world.blocks.*;
 import unity.world.meta.*;
 
 public class CrucibleFluidLoader extends GenericGraphBlock{
-    TextureRegion top[];
+    TextureRegion[] top;
     TextureRegion bottom;
 
     public CrucibleFluidLoader(String name){
@@ -34,20 +34,14 @@ public class CrucibleFluidLoader extends GenericGraphBlock{
 
             var cr = CrucibleRecipes.liquids.get(liquids.current());
             if(cr != null && liquids.get(liquids.current()) >= 0){
-                float wentin = crucibleNode().addLiquidIngredient(cr, liquids.get(liquids.current()));
-                liquids.remove(liquids.current(), wentin);
+                float wentIn = crucibleNode().addLiquidIngredient(cr, liquids.get(liquids.current()));
+                liquids.remove(liquids.current(), wentIn);
             }
-            ;
         }
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return hasLiquids && (liquids.current() == liquid || liquids.currentAmount() < 0.2f) && liquids.get(liquid) < liquidCapacity && CrucibleRecipes.liquids.get(liquid) != null;
-        }
-
-        @Override
-        public void handleLiquid(Building source, Liquid liquid, float amount){
-            super.handleLiquid(source, liquid, amount);
         }
 
         @Override

@@ -18,6 +18,7 @@ import unity.world.blocks.payloads.*;
 import unity.world.blocks.power.*;
 import unity.world.blocks.production.*;
 import unity.world.blocks.units.*;
+import unity.world.consumers.*;
 import unity.world.graph.*;
 
 import static mindustry.type.ItemStack.with;
@@ -227,6 +228,7 @@ public final class YoungchaBlocks{
             liquidCapacity = 60f;
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
+            consume(new ConsumeGraph());
 
             config.nodeConfig.put(TorqueGraph.class, b -> new TorqueGraphNode(0.15f, 30f, 40, b));
             config.fixedConnection(TorqueGraph.class, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0);
@@ -252,6 +254,7 @@ public final class YoungchaBlocks{
             tier = 3;
             range = 2;
             drillTime = 40;
+            consume(new ConsumeGraph());
             config.nodeConfig.put(TorqueGraph.class, b -> new TorqueGraphNode(0.07f, 20f, 50, b));
             config.fixedConnection(TorqueGraph.class, 0, 0, 0, 0, 1, 1, 0, 0);
         }});
@@ -300,6 +303,7 @@ public final class YoungchaBlocks{
             rotate = true;
             health = 2600;
             solid = true;
+            consume(new ConsumeGraph());
             config.nodeConfig.put(TorqueGraph.class, b -> new TorqueGraphNode(0.05f, 1000f, 30f, 10, b));
             config.fixedConnection(TorqueGraph.class, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
         }});
@@ -317,6 +321,7 @@ public final class YoungchaBlocks{
 
         inserterArm = register(Faction.youngcha, new PayloadArm("inserter-arm"){{
             health = 150; // more delicate uwu
+            consume(new ConsumeGraph());
 
             config.nodeConfig.put(TorqueGraph.class, b -> new TorqueGraphNode(0.07f, 13f, 40, b));
             config.fixedConnection(TorqueGraph.class, 0, 1, 0, 1);
@@ -389,6 +394,7 @@ public final class YoungchaBlocks{
             health = 300;
             rotate = true;
             solid = true;
+            consume(new ConsumeGraph());
 
             config.nodeConfig.put(CrucibleGraph.class, b -> new CrucibleGraphNode(b, 5));
             config.fixedConnection(CrucibleGraph.class, 0, 0, 1, 0);
@@ -416,6 +422,7 @@ public final class YoungchaBlocks{
             size = 3;
             itemCapacity = 4;
             hasItems = true;
+            consume(new ConsumeGraph());
 
             config.nodeConfig.put(CrucibleGraph.class, b -> new CrucibleGraphNode(b, 5));
             config.fixedConnection(CrucibleGraph.class, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
@@ -431,6 +438,7 @@ public final class YoungchaBlocks{
             solid = true;
             size = 3;
             moveTime = 50;
+            consume(new ConsumeGraph());
 
             config.nodeConfig.put(CrucibleGraph.class, b -> new CrucibleGraphNode(b, 50));
             config.fixedConnection(CrucibleGraph.class, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0);
@@ -460,6 +468,7 @@ public final class YoungchaBlocks{
             itemCapacity = 30;
             health = 2600;
             constructSpeed = 0.14f;
+            consume(new ConsumeGraph());
             config.nodeConfig.put(TorqueGraph.class, b -> new TorqueGraphNode(0.2f, 100f, 40, b));
             config.fixedConnection(TorqueGraph.class, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0);
         }});

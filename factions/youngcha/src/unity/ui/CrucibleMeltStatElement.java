@@ -24,7 +24,7 @@ public class CrucibleMeltStatElement extends Element{
     @Override
     public void draw(){
         var font = Fonts.def;
-        var lay = Pools.obtain(GlyphLayout.class, (() -> {return new GlyphLayout();}));
+        var lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         var melt = CrucibleRecipes.items.get(item);
         Drawable top = Tex.barTop;
         Draw.color(item.color);
@@ -35,14 +35,13 @@ public class CrucibleMeltStatElement extends Element{
         Draw.color();
         Draw.rect(item.fullIcon, x + 16, y + 18, 24, 24);
 
-        text(Core.bundle.format("stat.unity-itemmeltpoint", melt.meltingpoint - HeatGraphNode.celsiusZero), x + 50, y + 16, lay, font, Align.left);
-        float xpos = x + lay.width + 50 + 8;
+        text(Core.bundle.format("stat.unity-itemmeltpoint", melt.meltingPoint - HeatGraphNode.celsiusZero), x + 50, y + 16, lay, font, Align.left);
+        float xPos = x + lay.width + 50 + 8;
         Color col = new Color();
-        HeatGraphNode.heatColor(melt.meltingpoint, col);
+        HeatGraphNode.heatColor(melt.meltingPoint, col);
         Draw.color(col);
-        top.draw(xpos, y, 32, height);
+        top.draw(xPos, y, 32, height);
         Draw.color();
-        xpos += 32;
 
 
         Pools.free(lay);

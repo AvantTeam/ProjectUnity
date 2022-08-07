@@ -16,8 +16,8 @@ import unity.world.graph.CrucibleGraph.*;
 import unity.world.meta.CrucibleRecipes.*;
 
 public class CrucibleDisplayElement extends Element{
-    private static Rect scissor = new Rect();
-    public OrderedMap<CrucibleIngredient, CrucibleFluid> fluids = new OrderedMap<>();
+    private static final Rect scissor = new Rect();
+    public final OrderedMap<CrucibleIngredient, CrucibleFluid> fluids;
     int columns;
 
     public CrucibleDisplayElement(OrderedMap<CrucibleIngredient, CrucibleFluid> fluids, int columns){
@@ -28,34 +28,35 @@ public class CrucibleDisplayElement extends Element{
     @Override
     public void draw(){
         var font = Fonts.outline;
-        var lay = Pools.obtain(GlyphLayout.class, (() -> {return new GlyphLayout();}));
+        var lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         Drawable bar = Tex.bar;
         Drawable top = Tex.barTop;
         int i = 0;
-        float cwidth = width / columns;
+        float cWidth = width / columns;
         for(var fluid : fluids){
+            arc.util.Log.info(fluid.key.name);
             if(fluid.value.total() < 0.0001){
                 continue;
             }
-            float xpos = x + (i % columns) * cwidth;
-            float ypos = y + (i / columns) * 32;
+            float xPos = x + (i % columns) * cWidth;
+            float yPos = y + (i / columns) * 32;
 
             Draw.color(fluid.key.color, 0.2f);
-            bar.draw(xpos, y + (i / columns) * 32, cwidth, 32);
+            bar.draw(xPos, y + (i / columns) * 32, cWidth, 32);
             Draw.color(fluid.key.color);
-            if(ScissorStack.push(scissor.set(xpos, y + (i / columns) * 32, cwidth * fluid.value.meltedRatio(), 32))){
-                top.draw(xpos, y + (i / columns) * 32, cwidth, 32);
+            if(ScissorStack.push(scissor.set(xPos, y + (i / columns) * 32, cWidth * fluid.value.meltedRatio(), 32))){
+                top.draw(xPos, y + (i / columns) * 32, cWidth, 32);
                 ScissorStack.pop();
             }
             Draw.color(Pal.darkerGray);
-            Draw.rect(fluid.key.icon, xpos + 16, ypos + 14, 24, 24);
+            Draw.rect(fluid.key.icon, xPos + 16, yPos + 14, 24, 24);
             Draw.color();
-            Draw.rect(fluid.key.icon, xpos + 16, ypos + 18, 24, 24);
+            Draw.rect(fluid.key.icon, xPos + 16, yPos + 18, 24, 24);
 
             String text = Strings.fixed(fluid.value.total(), 1);
             lay.setText(font, text);
             font.setColor(Color.white);
-            font.draw(text, xpos + cwidth * 0.5f - lay.width / 2.0f + 8, ypos + lay.height / 2.0f + 16);
+            font.draw(text, xPos + cWidth * 0.5f - lay.width / 2.0f + 8, yPos + lay.height / 2.0f + 16);
             i++;
         }
         Draw.color();
@@ -72,10 +73,10 @@ public class CrucibleDisplayElement extends Element{
 
     @Override
     public float getMinHeight(){
-        float notempty = 0;
+        float notEmpty = 0;
         for(var fluid : fluids){
-            notempty += fluid.value.total() > 0 ? 1 : 0;
+            notEmpty += fluid.value.total() > 0 ? 1 : 0;
         }
-        return Mathf.ceil(notempty / columns) * 32;
+        return Mathf.ceil(notEmpty / columns) * 32;
     }
 }

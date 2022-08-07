@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import unity.world.blocks.*;
-import unity.world.graph.*;
 
 public abstract class GenericCaster extends GenericGraphBlock{
 
@@ -29,10 +28,14 @@ public abstract class GenericCaster extends GenericGraphBlock{
         public abstract boolean canOffloadCast();
 
         @Override
+        public void updateEfficiencyMultiplier(){
+            var tNode = torqueNode();
+            efficiency *= Mathf.curve(tNode.getGraph().lastVelocity, 0, tNode.maxSpeed);
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
-            var torque = getGraph(TorqueGraph.class);
-            var torqueNode = torqueNode();
 
             if(!isCasting()){
                 tryStartCast();
@@ -42,10 +45,10 @@ public abstract class GenericCaster extends GenericGraphBlock{
                     if(progress > castTime){
                         float f = progress - castTime;
                         progress -= f;
-                        progress += f * Mathf.curve(torque.lastVelocity, 0, torqueNode.maxSpeed);
+                        progress += f * efficiency;
                     }
                 }else{
-                    progress += Time.delta * Mathf.curve(torque.lastVelocity, 0, torqueNode.maxSpeed);
+                    progress += Time.delta * efficiency;
                     if(progress >= castTime + moveTime){
                         if(canOffloadCast()){
                             offloadCast();

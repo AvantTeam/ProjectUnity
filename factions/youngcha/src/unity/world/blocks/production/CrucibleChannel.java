@@ -45,17 +45,18 @@ public class CrucibleChannel extends GenericGraphBlock{
                 }
             }
         }
-        Draw.rect(regions[spriteIndex * 8][spriteIndex / 8], req.drawx(), req.drawy(), scl, scl);
+        Draw.rect(regions[spriteIndex % 8][spriteIndex / 8], req.drawx(), req.drawy(), scl, scl);
     }
 
     public class CrucibleChannelBuild extends GenericGraphBuild{
         int spriteIndex;
 
+        @Override
         public void onConnectionChanged(GraphConnector g){
             spriteIndex = 0;
             for(int i = 0; i < 4; i++){
-                if(nearby((4 - i) % 4) instanceof GraphBuild gbuild){
-                    if(!g.isConnected(gbuild)){continue;}
+                if(nearby((4 - i) % 4) instanceof GraphBuild gBuild){
+                    if(!g.isConnected(gBuild)) continue;
                     spriteIndex += 1 << i;
                 }
             }

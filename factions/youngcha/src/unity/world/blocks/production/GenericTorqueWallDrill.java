@@ -58,8 +58,12 @@ public class GenericTorqueWallDrill extends GenericGraphBlock{
         int tilesDrilling = 0;
 
         @Override
-        public void updateTile(){
+        public void updateEfficiencyMultiplier(){
             efficiency *= Mathf.clamp(Mathf.map(getGraph(TorqueGraph.class).lastVelocity, 0, torqueNode().maxSpeed, 0, 1.0f), 0, 1);
+        }
+
+        @Override
+        public void updateTile(){
             super.updateTile();
             if(checkPoints[0] == null){
                 for(int i = 0; i < size; i++){

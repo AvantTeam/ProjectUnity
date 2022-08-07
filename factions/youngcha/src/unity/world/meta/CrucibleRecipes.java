@@ -12,12 +12,12 @@ import unity.content.*;
 import unity.world.graph.*;
 
 public class CrucibleRecipes{
-    public static IntMap<CrucibleIngredient> ingredients = new IntMap<>();
-    public static ObjectMap<Item, CrucibleItem> items = new ObjectMap<>();
-    public static ObjectMap<Liquid, CrucibleLiquid> liquids = new ObjectMap<>();
-    public static Seq<CrucibleRecipe> recipes = new Seq<>();
+    public static final IntMap<CrucibleIngredient> ingredients = new IntMap<>();
+    public static final ObjectMap<Item, CrucibleItem> items = new ObjectMap<>();
+    public static final ObjectMap<Liquid, CrucibleLiquid> liquids = new ObjectMap<>();
+    public static final Seq<CrucibleRecipe> recipes = new Seq<>();
 
-    static{
+    public static void loadStatic(){
         int id = 0;
         addItem(id++, Items.copper, 900, 0.1f, 30);
         addItem(id++, Items.lead, 400, 0.15f, 10);
@@ -99,13 +99,13 @@ public class CrucibleRecipes{
 //        ));
     }
 
-    public static void addItem(int id, Item item, float meltpointCelsius, float meltspeed, float energy){
-        items.put(item, new CrucibleItem(id, item, HeatGraphNode.celsiusZero + meltpointCelsius, meltspeed, energy));
+    public static void addItem(int id, Item item, float meltPointCelsius, float meltSpeed, float energy){
+        items.put(item, new CrucibleItem(id, item, HeatGraphNode.celsiusZero + meltPointCelsius, meltSpeed, energy));
         ingredients.put(id, items.get(item));
     }
 
-    public static void addLiquid(int id, Liquid liquid, float meltpointCelsius, float meltspeed, float boilingpointCelsius, float boilingspeed, float energy){
-        liquids.put(liquid, new CrucibleLiquid(id, liquid, HeatGraphNode.celsiusZero + meltpointCelsius, meltspeed, HeatGraphNode.celsiusZero + boilingpointCelsius, boilingspeed, energy));
+    public static void addLiquid(int id, Liquid liquid, float meltPointCelsius, float meltSpeed, float boilingPointCelsius, float boilingSpeed, float energy){
+        liquids.put(liquid, new CrucibleLiquid(id, liquid, HeatGraphNode.celsiusZero + meltPointCelsius, meltSpeed, HeatGraphNode.celsiusZero + boilingPointCelsius, boilingSpeed, energy));
         ingredients.put(id, liquids.get(liquid));
     }
 
@@ -114,11 +114,11 @@ public class CrucibleRecipes{
         public String name;
         public Color color = Color.pink;
         public int id;
-        public float meltingpoint = -1;
-        public float meltspeed;
+        public float meltingPoint = -1;
+        public float meltSpeed;
         public float phaseChangeEnergy = 0;
-        public float boilpoint = -1;
-        public float boilspeed;
+        public float boilPoint = -1;
+        public float boilSpeed;
 
         public CrucibleIngredient(TextureRegion icon, String name, int id){
             this.icon = icon;
@@ -138,11 +138,12 @@ public class CrucibleRecipes{
     public static class CrucibleItem extends CrucibleIngredient{
         public Item item;
 
-        public CrucibleItem(int id, Item item, float meltingpoint, float meltspeed, float phaseChangeEnergy){
+        public CrucibleItem(int id, Item item, float meltingPoint, float meltSpeed, float phaseChangeEnergy){
             super(item.fullIcon, item.name, id);
+            arc.util.Log.info(item.fullIcon);
             this.item = item;
-            this.meltingpoint = meltingpoint;
-            this.meltspeed = meltspeed;
+            this.meltingPoint = meltingPoint;
+            this.meltSpeed = meltSpeed;
             this.phaseChangeEnergy = phaseChangeEnergy;
             color = item.color;
         }
@@ -151,13 +152,13 @@ public class CrucibleRecipes{
     public static class CrucibleLiquid extends CrucibleIngredient{
         public Liquid liquid;
 
-        public CrucibleLiquid(int id, Liquid liquid, float meltingpoint, float meltspeed, float boilingpoint, float boilingspeed, float phaseChangeEnergy){
+        public CrucibleLiquid(int id, Liquid liquid, float meltingPoint, float meltSpeed, float boilingPoint, float boilingSpeed, float phaseChangeEnergy){
             super(liquid.fullIcon, liquid.name, id);
             this.liquid = liquid;
-            this.meltingpoint = meltingpoint;
-            this.meltspeed = meltspeed;
-            this.boilpoint = boilingpoint;
-            this.boilspeed = boilingspeed;
+            this.meltingPoint = meltingPoint;
+            this.meltSpeed = meltSpeed;
+            this.boilPoint = boilingPoint;
+            this.boilSpeed = boilingSpeed;
             this.phaseChangeEnergy = phaseChangeEnergy;
             color = liquid.color;
         }
@@ -222,10 +223,10 @@ public class CrucibleRecipes{
     }
 
     public static class CrucibleRecipe{
-        public RecipeIngredient items[];
+        public RecipeIngredient[] items;
         public CrucibleIngredient output;
-        public float minTemp = 0;
-        public float speed = 0.1f;
+        public float minTemp;
+        public float speed;
 
         //most would be melted items i think
         CrucibleRecipe(CrucibleIngredient output, float speed, float minTemp, RecipeIngredient... items){

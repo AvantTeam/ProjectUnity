@@ -15,7 +15,7 @@ import unity.world.meta.CrucibleRecipes.*;
 import static mindustry.Vars.content;
 
 public class CrucibleCaster extends GenericCaster{
-    TextureRegion floor, platter, platterside, liquid, castliquid;
+    TextureRegion floor, platter, platterSide, liquid, castLiquid;
     TextureRegion[] base;
     public Vec2[] itemPos = {
     new Vec2(0.4f * 8, 0.4f * 8),
@@ -35,9 +35,9 @@ public class CrucibleCaster extends GenericCaster{
         super.load();
         floor = loadTex("floor");
         platter = loadTex("platter");
-        platterside = loadTex("platterside");
+        platterSide = loadTex("platterSide");
         liquid = loadTex("liquid");
-        castliquid = loadTex("cast-liquid");
+        castLiquid = loadTex("cast-liquid");
         base = new TextureRegion[4];
         base[0] = loadTex("base1");
         base[1] = loadTex("base2");
@@ -69,10 +69,9 @@ public class CrucibleCaster extends GenericCaster{
             for(var fluid : crucible.fluids){
                 if(fluid.key instanceof CrucibleItem item && fluid.value.melted >= 4){
                     currentCast = item.item;
+                    crucible.getFluid(CrucibleRecipes.items.get(currentCast)).melted -= 4;
+                    break;
                 }
-            }
-            if(currentCast != null){
-                crucible.getFluid(CrucibleRecipes.items.get(currentCast)).melted -= 4;
             }
         }
 
@@ -91,6 +90,16 @@ public class CrucibleCaster extends GenericCaster{
         @Override
         public boolean canOffloadCast(){
             return items.empty();
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return super.shouldConsume() && canOffloadCast();
+        }
+
+        @Override
+        public boolean productionValid(){
+            return currentCast != null;
         }
 
         @Override
@@ -150,31 +159,31 @@ public class CrucibleCaster extends GenericCaster{
             if(currentCast != null){
                 //items
                 //cast liquid
-                float castprog = Mathf.curve(progress, 0, castTime);
-                float itemsize = Vars.itemSize * castprog;
+                float castProg = Mathf.curve(progress, 0, castTime);
+                float itemSize = Vars.itemSize * castProg;
                 if(progress < castTime){
                     Draw.rect(platter, x, y);
-                    Draw.color(crucible.getColor(), 4 * Mathf.sqr(castprog));
-                    Draw.rect(castliquid, x, y);
+                    Draw.color(crucible.getColor(), 4 * Mathf.sqr(castProg));
+                    Draw.rect(castLiquid, x, y);
                     Draw.color();
-                    for(int i = 0; i < itemPos.length; i++){
-                        Draw.rect(currentCast.fullIcon, x + itemPos[i].x, y + itemPos[i].y, itemsize, itemsize);
+                    for(Vec2 itemPo : itemPos){
+                        Draw.rect(currentCast.fullIcon, x + itemPo.x, y + itemPo.y, itemSize, itemSize);
                     }
                 }else{
-                    float moveprog = Mathf.curve(progress, castTime, castTime + moveTime);
+                    float moveProg = Mathf.curve(progress, castTime, castTime + moveTime);
 
-                    float ang = MathUtils.interp(0, 180, moveprog);
+                    float ang = MathUtils.interp(0, 180, moveProg);
 
                     if(ang < 90){
                         DrawUtils.drawRectOrtho(platter, x, y, -2, platter.width * 0.25f, platter.height * 0.25f, ang, rotdeg());
                     }else{
                         DrawUtils.drawRectOrtho(platter, x, y, 2, platter.width * 0.25f, platter.height * 0.25f, ang, rotdeg());
                     }
-                    DrawUtils.drawRectOrtho(platterside, x, y, -8, 4, 16, ang - 90, rotdeg());
+                    DrawUtils.drawRectOrtho(platterSide, x, y, -8, 4, 16, ang - 90, rotdeg());
 
                     if(ang < 90){
-                        for(int i = 0; i < itemPos.length; i++){
-                            DrawUtils.drawRectOrtho(currentCast.fullIcon, x, y, itemPos[i].x, itemPos[i].y, -3, itemsize, itemsize, ang, rotdeg());
+                        for(Vec2 itemPo : itemPos){
+                            DrawUtils.drawRectOrtho(currentCast.fullIcon, x, y, itemPo.x, itemPo.y, -3, itemSize, itemSize, ang, rotdeg());
                         }
                     }
                 }

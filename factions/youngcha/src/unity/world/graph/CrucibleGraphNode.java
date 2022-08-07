@@ -65,7 +65,7 @@ public class CrucibleGraphNode extends GraphNode<CrucibleGraph>{
         table.row();
         ///temp
         var cell = table.add(new CrucibleDisplayElement(fluids, 3)).grow();
-        cell.update((element) -> cell.height(element.getMinHeight()));
+        cell.update(element -> cell.height(element.getMinHeight()));
     }
 
     //returns how many items went in
@@ -129,9 +129,9 @@ public class CrucibleGraphNode extends GraphNode<CrucibleGraph>{
         this.color.set(color.x, color.y, color.z, Mathf.clamp(10f * t / capacity));
     }
 
-    private Seq<CrucibleIngredient> smeltOrder = new Seq<>();
-    private Seq<CrucibleIngredient> boilOrder = new Seq<>();
-    private Seq<CrucibleIngredient> coolOrder = new Seq<>();
+    private final Seq<CrucibleIngredient> smeltOrder = new Seq<>();
+    private final Seq<CrucibleIngredient> boilOrder = new Seq<>();
+    private final Seq<CrucibleIngredient> coolOrder = new Seq<>();
 
     @Override
     public void update(){
@@ -145,55 +145,52 @@ public class CrucibleGraphNode extends GraphNode<CrucibleGraph>{
             boilOrder.clear();
             for(var fluid : fluids){
                 var i = fluid.key;
-                if(i.meltingpoint != -1 && heat.getTemp() >= i.meltingpoint && fluid.value.solid > 0){
+                if(i.meltingPoint != -1 && heat.getTemp() >= i.meltingPoint && fluid.value.solid > 0){
                     smeltOrder.add(i);
                 }
-                if(i.meltingpoint != -1 && heat.getTemp() < i.meltingpoint && fluid.value.melted > 0){
+                if(i.meltingPoint != -1 && heat.getTemp() < i.meltingPoint && fluid.value.melted > 0){
                     coolOrder.add(i);
                 }
-                if(i.boilpoint != -1 && heat.getTemp() >= i.boilpoint && fluid.value.melted > 0){
+                if(i.boilPoint != -1 && heat.getTemp() >= i.boilPoint && fluid.value.melted > 0){
                     boilOrder.add(i);
                 }
             }
-            smeltOrder.sort((a, b) -> Float.compare(a.meltingpoint, b.meltingpoint));
-            coolOrder.sort((a, b) -> -Float.compare(a.meltingpoint, b.meltingpoint));
-            boilOrder.sort((a, b) -> -Float.compare(a.boilpoint, b.boilpoint));
+            smeltOrder.sort((a, b) -> Float.compare(a.meltingPoint, b.meltingPoint));
+            coolOrder.sort((a, b) -> -Float.compare(a.meltingPoint, b.meltingPoint));
+            boilOrder.sort((a, b) -> -Float.compare(a.boilPoint, b.boilPoint));
             //solidify
 
             for(var item : coolOrder){
-                var i = item;
-                float remaining = (i.meltingpoint - heat.getTemp()) * heat.heatcapacity;
+                float remaining = (item.meltingPoint - heat.getTemp()) * heat.heatcapacity;
                 if(remaining <= 0){
                     break;
                 }
-                float reqSmelt = Math.min(fluids.get(item).melted, Math.max(0.1f, fluids.get(item).melted * i.meltspeed * Time.delta));
-                float reqSmeltEnergy = reqSmelt * i.phaseChangeEnergy;
+                float reqSmelt = Math.min(fluids.get(item).melted, Math.max(0.1f, fluids.get(item).melted * item.meltSpeed * Time.delta));
+                float reqSmeltEnergy = reqSmelt * item.phaseChangeEnergy;
                 float smeltRatio = Mathf.clamp(remaining / reqSmeltEnergy);
                 getFluid(item).melt(-smeltRatio * reqSmelt);
                 heat.addHeatEnergy(smeltRatio * reqSmeltEnergy);
             }
             //melt
             for(var item : smeltOrder){
-                var i = item;
-                float remaining = (heat.getTemp() - i.meltingpoint) * heat.heatcapacity;
+                float remaining = (heat.getTemp() - item.meltingPoint) * heat.heatcapacity;
                 if(remaining <= 0){
                     break;
                 }
-                float reqSmelt = Math.min(fluids.get(item).solid, Math.max(0.1f, fluids.get(item).solid * i.meltspeed * Time.delta));
-                float reqSmeltEnergy = reqSmelt * i.phaseChangeEnergy;
+                float reqSmelt = Math.min(fluids.get(item).solid, Math.max(0.1f, fluids.get(item).solid * item.meltSpeed * Time.delta));
+                float reqSmeltEnergy = reqSmelt * item.phaseChangeEnergy;
                 float smeltRatio = Mathf.clamp(remaining / reqSmeltEnergy);
                 getFluid(item).melt(smeltRatio * reqSmelt);
                 heat.addHeatEnergy(-smeltRatio * reqSmeltEnergy);
             }
             //vapourise
             for(var item : boilOrder){
-                var i = item;
-                float remaining = (heat.getTemp() - i.boilpoint) * heat.heatcapacity;
+                float remaining = (heat.getTemp() - item.boilPoint) * heat.heatcapacity;
                 if(remaining <= 0){
                     break;
                 }
-                float reqSmelt = Math.min(fluids.get(item).melted, Math.max(0.1f, fluids.get(item).melted * i.boilspeed * Time.delta));
-                float reqSmeltEnergy = reqSmelt * i.phaseChangeEnergy;
+                float reqSmelt = Math.min(fluids.get(item).melted, Math.max(0.1f, fluids.get(item).melted * item.boilSpeed * Time.delta));
+                float reqSmeltEnergy = reqSmelt * item.phaseChangeEnergy;
                 float smeltRatio = Mathf.clamp(remaining / reqSmeltEnergy);
                 getFluid(item).vapourise(smeltRatio * reqSmelt);
                 item.onVapourise(this, smeltRatio * reqSmelt);

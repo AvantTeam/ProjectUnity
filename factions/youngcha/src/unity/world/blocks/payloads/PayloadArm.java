@@ -19,6 +19,7 @@ import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.payloads.PayloadBlock.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.meta.*;
 import unity.net.*;
 import unity.parts.*;
 import unity.util.*;
@@ -33,10 +34,10 @@ public class PayloadArm extends GenericGraphBlock{
     public float maxSize = 8 * 8;
     public float moveTime = 60;
     public float rotateTime = 30;
-    public int armjoints = 1;
+    public int armJoints = 1;
 
     TextureRegion[] rotateIcons = new TextureRegion[4];
-    TextureRegion[] armsegments;
+    TextureRegion[] armSegments;
     TextureRegion base, top, claw;
 
     public PayloadArm(String name){
@@ -57,36 +58,33 @@ public class PayloadArm extends GenericGraphBlock{
             Point2 i2 = Point2.unpack((int)(value & 0xFFFFFFFFL));
             i2.sub(256, 256);
             switch(i1){
-                case SEL_IN:
+                case SEL_IN -> {
                     if(i2.equals(0, 0)){
                         break;
                     }
                     build.from.set(i2);
                     build.recalcPositions();
                     switch(build.state){
-                        case MOVINGTOPICKUP, PICKINGUP -> build.switchState(ArmState.MOVINGTOPICKUP);
+                        case MOVING_TO_PICKUP, PICKING_UP -> build.switchState(ArmState.MOVING_TO_PICKUP);
                     }
-                    break;
-                case SEL_OUT:
+                }
+                case SEL_OUT -> {
                     if(i2.equals(0, 0)){
                         break;
                     }
                     build.to.set(i2);
                     build.recalcPositions();
                     switch(build.state){
-                        case MOVINGTOTARGET:
-                        case DROPPING:
-                        case ROTATINGTARGET:
-                            build.switchState(ArmState.MOVINGTOTARGET);
+                        case MOVING_TO_TARGET, DROPPING, ROTATING_TARGET -> build.switchState(ArmState.MOVING_TO_TARGET);
                     }
-                    break;
-                case 2:
+                }
+                case 2 -> {
                     build.rotateTargetBy++;
                     if(build.rotateTargetBy > 3){
                         build.rotateTargetBy = 0;
                     }
                     build.growAnim = 0;
-                    break;
+                }
             }
         });
     }
@@ -103,9 +101,9 @@ public class PayloadArm extends GenericGraphBlock{
         for(int i = 0; i < rotateIcons.length; i++){
             rotateIcons[i] = Core.atlas.find("unity-rotate" + (i + 1));
         }
-        armsegments = new TextureRegion[armjoints + 1];
-        for(int i = 0; i < armsegments.length; i++){
-            armsegments[i] = loadTex("seg" + (i));
+        armSegments = new TextureRegion[armJoints + 1];
+        for(int i = 0; i < armSegments.length; i++){
+            armSegments[i] = loadTex("seg" + (i));
         }
         base = loadTex("base");
         top = loadTex("top");
@@ -128,28 +126,28 @@ public class PayloadArm extends GenericGraphBlock{
     }
 
     enum ArmState{
-        PICKINGUP, MOVINGTOTARGET, ROTATINGTARGET, DROPPING, MOVINGTOPICKUP
+        PICKING_UP, MOVING_TO_TARGET, ROTATING_TARGET, DROPPING, MOVING_TO_PICKUP
     }
 
     public class PayloadArmBuild extends GenericGraphBuild{
         public float progress, progressInterop;
         public float armBaseRotation, armExtend, payloadRotation;
-        public float targetArmBaseRotation, targetArmExtend, targetpayloadRotation;
+        public float targetArmBaseRotation, targetArmExtend, targetPayloadRotation;
         Vec2[] calculatedPositions = new Vec2[2];
         public Point2 from, to;
         public int rotateTargetBy = 0;
-        ArmState state = ArmState.PICKINGUP;
+        ArmState state = ArmState.PICKING_UP;
         public Payload carrying;
 
         public transient boolean selected = false;
-        public transient int ioselect = -1;
+        public transient int ioSelect = -1;
         final static int SEL_IN = 0;
         final static int SEL_OUT = 1;
 
         public transient float growAnim = 0;
 
         public transient ZipperArm arm;
-        public transient float clawopen = 0;
+        public transient float clawOpen = 0;
 
         @Override
         public void onPlaced(){
@@ -159,7 +157,7 @@ public class PayloadArm extends GenericGraphBlock{
 
         @Override
         public void onInit(){
-            arm = new ZipperArm(0, 0, 1, 1, range * tilesize + 4, armjoints);
+            arm = new ZipperArm(0, 0, 1, 1, range * tilesize + 4, armJoints);
             targetArmBaseRotation = armBaseRotation = (180 + rotdeg()) % 360;
             targetArmExtend = armExtend = tilesize;
             if(from == null){
@@ -167,12 +165,12 @@ public class PayloadArm extends GenericGraphBlock{
                 to = new Point2(Geometry.d4x(rotation), Geometry.d4y(rotation));
             }
             Events.on(EventType.TapEvent.class, e -> {
-                var thisbuild = PayloadArmBuild.this;
+                var thisBuild = PayloadArmBuild.this;
                 if(Vars.net.server()){
                     return;
                 }
                 if(!selected){
-                    if(Vars.control.input.config.getSelected() == thisbuild){
+                    if(Vars.control.input.config.getSelected() == thisBuild){
                         deselect();
                     }
                     return;
@@ -180,20 +178,20 @@ public class PayloadArm extends GenericGraphBlock{
                 if(e.tile == null || e.tile.dst(tile) > range * tilesize){
                     selected = false;
                     deselect();
-                    ioselect = -1;
+                    ioSelect = -1;
                     return;
                 }
                 Point2 relpt = new Point2(e.tile.x - tile.x, e.tile.y - tile.y);
-                if(ioselect != -1 && !relpt.equals(0, 0)){
+                if(ioSelect != -1 && !relpt.equals(0, 0)){
                     configure(getCode(relpt));
-                    ioselect = -1;
+                    ioSelect = -1;
                 }else{
                     if(relpt.equals(from)){
-                        ioselect = SEL_IN;
+                        ioSelect = SEL_IN;
                     }else if(relpt.equals(to)){
-                        ioselect = SEL_OUT;
+                        ioSelect = SEL_OUT;
                     }else if(relpt.equals(0, 0)){
-                        ioselect = 2;
+                        ioSelect = 2;
                         configure(getCode(relpt));
                     }else{
                         selected = false;
@@ -204,7 +202,7 @@ public class PayloadArm extends GenericGraphBlock{
         }
 
         long getCode(Point2 pt){
-            return ((long)ioselect << 32) | (Point2.pack(pt.x + 256, pt.y + 256));
+            return ((long)ioSelect << 32) | (Point2.pack(pt.x + 256, pt.y + 256));
         }
 
         private void setTargetNoReset(Vec2 tar){
@@ -265,10 +263,10 @@ public class PayloadArm extends GenericGraphBlock{
             float[] poss = new float[]{(tile.x + from.x) * tilesize, (tile.y + from.y) * tilesize, (tile.x + to.x) * tilesize, (tile.y + to.y) * tilesize};
             float s1 = Math.abs(Mathf.sin(Time.globalTime * 0.1f));
             float s2 = s1;
-            if(ioselect == 0){
+            if(ioSelect == 0){
                 s1 = -0.5f;
             }
-            if(ioselect == 1){
+            if(ioSelect == 1){
                 s2 = -0.5f;
             }
             growAnim += (1 - growAnim) * 0.3f;
@@ -288,37 +286,29 @@ public class PayloadArm extends GenericGraphBlock{
         public void switchState(ArmState state){
             if(calculatedPositions[0] == null){
                 recalcPositions();
-                ;
             }
             if(this.state == state){
                 switch(state){
-                    case MOVINGTOTARGET:
-                        setTargetNoReset(calculatedPositions[1]);
-                        break;
-                    case DROPPING:
-                        payloadRotation = targetpayloadRotation;
-                        break;
-                    case PICKINGUP:
-                    case MOVINGTOPICKUP:
-                        setTargetNoReset(calculatedPositions[0]);
-                        break;
+                    case MOVING_TO_TARGET -> setTargetNoReset(calculatedPositions[1]);
+                    case DROPPING -> payloadRotation = targetPayloadRotation;
+                    case PICKING_UP, MOVING_TO_PICKUP -> setTargetNoReset(calculatedPositions[0]);
                 }
                 return;
             }
             this.state = state;
 
             switch(state){
-                case ROTATINGTARGET:
+                case ROTATING_TARGET:
                     payloadRotation = carrying.rotation();
-                    targetpayloadRotation = carrying.rotation() + rotateTargetBy * 90;
-                case MOVINGTOTARGET:
+                    targetPayloadRotation = carrying.rotation() + rotateTargetBy * 90;
+                case MOVING_TO_TARGET:
                     setTarget(calculatedPositions[1]);
                     break;
                 case DROPPING:
-                    payloadRotation = targetpayloadRotation;
+                    payloadRotation = targetPayloadRotation;
                     break;
-                case PICKINGUP:
-                case MOVINGTOPICKUP:
+                case PICKING_UP:
+                case MOVING_TO_PICKUP:
                     setTarget(calculatedPositions[0]);
                     break;
             }
@@ -336,17 +326,17 @@ public class PayloadArm extends GenericGraphBlock{
         public void grabBuild(BuildPayload p){
             carrying = p;
             payloadRotation = p.build.rotdeg();
-            targetpayloadRotation = p.build.rotdeg();
+            targetPayloadRotation = p.build.rotdeg();
             Fx.unitPickup.at(p.build);
-            switchState(ArmState.MOVINGTOTARGET);
+            switchState(ArmState.MOVING_TO_TARGET);
         }
 
         public void grabUnit(UnitPayload p){
             carrying = p;
             payloadRotation = carrying.rotation();
-            targetpayloadRotation = carrying.rotation();
+            targetPayloadRotation = carrying.rotation();
             Fx.unitPickup.at(p.unit);
-            switchState(ArmState.MOVINGTOTARGET);
+            switchState(ArmState.MOVING_TO_TARGET);
         }
 
         public void grabUnit(Unit unit){
@@ -354,10 +344,40 @@ public class PayloadArm extends GenericGraphBlock{
         }
 
         public void dropBlock(){
-            switchState(ArmState.MOVINGTOPICKUP);
+            switchState(ArmState.MOVING_TO_PICKUP);
             carrying = null;
         }
 
+        @Override
+        public BlockStatus status(){
+            if(!enabled){
+                return BlockStatus.logicDisable;
+            }
+
+            if(efficiency > 0){
+                BlockStatus status = switch(state){
+                    case PICKING_UP -> {
+                        if(efficiency < 0.1) yield BlockStatus.noInput;
+                        else if(carrying != null) yield BlockStatus.active;
+                        else yield BlockStatus.noOutput;
+                    }
+                    case MOVING_TO_TARGET, ROTATING_TARGET, MOVING_TO_PICKUP -> BlockStatus.active;
+                    case DROPPING -> {
+                        if(carrying != null) yield BlockStatus.noOutput;
+                        else yield BlockStatus.noInput;
+                    }
+                };
+                return status;
+            }
+
+            return BlockStatus.noInput;
+        }
+
+        @Override
+        public void updateEfficiencyMultiplier(){
+            TorqueGraphNode tNode = torqueNode();
+            efficiency = Mathf.clamp(tNode.getGraph().lastVelocity / tNode.maxSpeed);
+        }
 
         @Override
         public void updateTile(){
@@ -367,12 +387,10 @@ public class PayloadArm extends GenericGraphBlock{
                     Vars.control.input.config.showConfig(this); // force config to be open....
                 }
             }
-            TorqueGraphNode tnode = torqueNode();
-            TorqueGraph tgraph = tnode.getGraph();
             switch(state){
-                case PICKINGUP:
+                case PICKING_UP:
                     if(carrying == null){
-                        if(tgraph.lastVelocity / tnode.maxSpeed < 0.1){
+                        if(efficiency < 0.1){
                             break;
                         }
                         Tile t = Vars.world.tile(tile.x + from.x, tile.y + from.y);
@@ -386,8 +404,8 @@ public class PayloadArm extends GenericGraphBlock{
                                 if(t.build.getPayload() != null && Mathf.sqr(t.build.getPayload().size()) <= maxSize + 0.01f && t.build.getPayload().dst((tile.x + from.x) * tilesize, (tile.y + from.y) * tilesize) < 5){
                                     carrying = t.build.takePayload();
                                     payloadRotation = carrying.rotation();
-                                    targetpayloadRotation = carrying.rotation();
-                                    switchState(ArmState.MOVINGTOTARGET);
+                                    targetPayloadRotation = carrying.rotation();
+                                    switchState(ArmState.MOVING_TO_TARGET);
                                 }
                             }else if(!Vars.net.client() && t.build != this && t.build.block.size * t.build.block.size * 8 * 8 <= maxSize && canPickupBlock(t.block())){
                                 ///theres a block we can grab directly...
@@ -411,18 +429,18 @@ public class PayloadArm extends GenericGraphBlock{
                         }
                         break;
                     }else{
-                        switchState(ArmState.MOVINGTOTARGET);
+                        switchState(ArmState.MOVING_TO_TARGET);
                     }
                     break;
-                case MOVINGTOTARGET:
-                    progress += Time.delta * Mathf.clamp(tgraph.lastVelocity / tnode.maxSpeed) / moveTime;
+                case MOVING_TO_TARGET:
+                    progress += Time.delta * efficiency / moveTime;
                     if(progress >= 1){
                         progress = 1;
-                        switchState(ArmState.ROTATINGTARGET);
+                        switchState(ArmState.ROTATING_TARGET);
                     }
                     break;
-                case ROTATINGTARGET:
-                    progress += Time.delta * Mathf.clamp(tgraph.lastVelocity / tnode.maxSpeed) / (rotateTime);
+                case ROTATING_TARGET:
+                    progress += Time.delta * efficiency / rotateTime;
                     if(carrying instanceof BuildPayload buildp){
                         if(!buildp.block().rotate){
                             switchState(ArmState.DROPPING);
@@ -445,7 +463,7 @@ public class PayloadArm extends GenericGraphBlock{
                 case DROPPING:
                     if(carrying == null){
                         //uh.
-                        switchState(ArmState.MOVINGTOPICKUP);
+                        switchState(ArmState.MOVING_TO_PICKUP);
                     }
                     Tile t = Vars.world.tile(tile.x + to.x, tile.y + to.y);
                     if(isPayload()){
@@ -455,19 +473,19 @@ public class PayloadArm extends GenericGraphBlock{
                         break;
                     }
                     if(t.build != null){
-                        //theres a payload block to push to...
+                        //there's a payload block to push to...
                         if(t.build.acceptPayload(this, carrying)){
                             t.build.handlePayload(this, carrying);
                             carrying = null;
-                            switchState(ArmState.MOVINGTOPICKUP);
+                            switchState(ArmState.MOVING_TO_PICKUP);
                         }
                     }else{
-                        Vec2 targetout = new Vec2(t.worldx(), t.worldy());
+                        Vec2 targetOut = new Vec2(t.worldx(), t.worldy());
                         if(carrying instanceof UnitPayload unitp){
-                            carrying.set(targetout.x, targetout.y, carrying.rotation());
+                            carrying.set(targetOut.x, targetOut.y, carrying.rotation());
                             if(unitp.dump()){
-                                Fx.unitDrop.at(targetout.x, targetout.y);
-                                switchState(ArmState.MOVINGTOPICKUP);
+                                Fx.unitDrop.at(targetOut.x, targetOut.y);
+                                switchState(ArmState.MOVING_TO_PICKUP);
                                 carrying = null;
                             }
                         }else if(carrying instanceof BuildPayload buildp){
@@ -480,11 +498,11 @@ public class PayloadArm extends GenericGraphBlock{
                         }
                     }
                     break;
-                case MOVINGTOPICKUP:
-                    progress += Time.delta * Mathf.clamp(tgraph.lastVelocity / tnode.maxSpeed) / moveTime;
+                case MOVING_TO_PICKUP:
+                    progress += Time.delta * efficiency / moveTime;
                     if(progress >= 1){
                         progress = 1;
-                        switchState(ArmState.PICKINGUP);
+                        switchState(ArmState.PICKING_UP);
                     }
                     break;
             }
@@ -492,13 +510,13 @@ public class PayloadArm extends GenericGraphBlock{
             arm.start.set(0, 0);
             arm.end.set(Mathf.cosDeg(getCurrentArmRotation()) * getCurrentArmExtend(), Mathf.sinDeg(getCurrentArmRotation()) * getCurrentArmExtend());
             arm.update();
-            clawopen += ((carrying == null ? 1 : 0) - clawopen) * 0.1f;
+            clawOpen += ((carrying == null ? 1 : 0) - clawOpen) * 0.1f;
 
             if(carrying != null){
                 carrying.set(
                 arm.end.x + x,
                 arm.end.y + y,
-                Mathf.lerp(payloadRotation, targetpayloadRotation, progressInterop)
+                Mathf.lerp(payloadRotation, targetPayloadRotation, progressInterop)
                 );
             }
         }
@@ -509,7 +527,7 @@ public class PayloadArm extends GenericGraphBlock{
             Draw.rect(base, x, y, this.get2SpriteRotationVert());
             Draw.z(Layer.power - 1);
             if(carrying != null){
-                if(carrying instanceof BuildPayload bp && (state.equals(ArmState.ROTATINGTARGET) || bp.build instanceof ConveyorBuild)){
+                if(carrying instanceof BuildPayload bp && (state.equals(ArmState.ROTATING_TARGET) || bp.build instanceof ConveyorBuild)){
                     bp.drawShadow(1.0F);
                     bp.build.tile = Vars.emptyTile;
                     Draw.rect(bp.icon(), bp.x(), bp.y(), bp.build.payloadRotation + bp.build.rotdeg());
@@ -520,18 +538,18 @@ public class PayloadArm extends GenericGraphBlock{
             Draw.color();
             Draw.z(Layer.power);
             for(int i = 0; i < 4; i++){
-                float ang = i * 90 + Mathf.lerp(payloadRotation, targetpayloadRotation, progressInterop);
-                Draw.rect(claw, arm.end.x + x + Mathf.cosDeg(ang) * clawopen, arm.end.y + y + Mathf.sinDeg(ang) * clawopen, ang);
+                float ang = i * 90 + Mathf.lerp(payloadRotation, targetPayloadRotation, progressInterop);
+                Draw.rect(claw, arm.end.x + x + Mathf.cosDeg(ang) * clawOpen, arm.end.y + y + Mathf.sinDeg(ang) * clawOpen, ang);
             }
             Lines.stroke(4);
             for(int i = 0; i < arm.joints; i++){
                 if(i == 0){
-                    Lines.line(armsegments[0], arm.start.x + x, arm.start.y + y, arm.jointPositions[0].x + x, arm.jointPositions[0].y + y, true);
+                    Lines.line(armSegments[0], arm.start.x + x, arm.start.y + y, arm.jointPositions[0].x + x, arm.jointPositions[0].y + y, true);
                 }
                 if(i == arm.joints - 1){
-                    Lines.line(armsegments[i + 1], arm.end.x + x, arm.end.y + y, arm.jointPositions[i].x + x, arm.jointPositions[i].y + y, false);
+                    Lines.line(armSegments[i + 1], arm.end.x + x, arm.end.y + y, arm.jointPositions[i].x + x, arm.jointPositions[i].y + y, false);
                 }else{
-                    Lines.line(armsegments[i], arm.jointPositions[i].x + x, arm.jointPositions[i].y + y, arm.jointPositions[i + 1].x + x, arm.jointPositions[i + 1].y + y, true);
+                    Lines.line(armSegments[i], arm.jointPositions[i].x + x, arm.jointPositions[i].y + y, arm.jointPositions[i + 1].x + x, arm.jointPositions[i + 1].y + y, true);
                 }
             }
             Drawf.spinSprite(top, x, y, getCurrentArmRotation());

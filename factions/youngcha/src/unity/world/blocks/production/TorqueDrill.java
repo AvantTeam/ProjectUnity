@@ -107,7 +107,7 @@ public class TorqueDrill extends Drill implements GraphBlock{
         }
 
         @Override
-        public void created(){if(!placed){initGraph();}}
+        public void created(){if(!placed) initGraph();}
 
         @Override
         public void displayBars(Table table){
@@ -148,12 +148,16 @@ public class TorqueDrill extends Drill implements GraphBlock{
         }
 
         @Override
+        public void updateEfficiencyMultiplier(){
+            efficiency *= Mathf.clamp(Mathf.map(getGraph(TorqueGraph.class).lastVelocity, 0, torqueNode().maxSpeed, 0, maxEfficiency), 0, maxEfficiency);
+        }
+
+        @Override
         public void updateTile(){
             if(!placed){
                 placed = true;
                 connectToGraph();
             }
-            efficiency *= Mathf.clamp(Mathf.map(getGraph(TorqueGraph.class).lastVelocity, 0, torqueNode().maxSpeed, 0, maxEfficiency), 0, maxEfficiency);
             super.updateTile();
             updateGraphs();
         }

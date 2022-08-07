@@ -73,19 +73,28 @@ public class CruciblePump extends GenericGraphBlock{
         }
 
         @Override
+        public void updateEfficiencyMultiplier(){
+            var torque = getGraph(TorqueGraph.class);
+            efficiency = Mathf.curve(torque.lastVelocity, 0, 50) * 0.2f;
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return super.shouldConsume() && front() != null;
+        }
+
+        @Override
         public void updateTile(){
             var crucibleNode = crucibleNode();
-            var torque = getGraph(TorqueGraph.class);
 
             crucibleNode.accessConnector = crucibleNode.connector.first();
 
             super.updateTile();
 
-            float eff = Mathf.curve(torque.lastVelocity, 0, 50) * 0.2f;
             if(front() == null){
                 if(config != null){
                     var f = crucibleNode.getFluid(config);
-                    float remove = Mathf.clamp(eff * f.melted + 0.001f, 0, f.melted);
+                    float remove = Mathf.clamp(efficiency * f.melted + 0.001f, 0, f.melted);
                     f.melted -= remove;
                     Liquid liquid = Liquids.slag;
                     if(f.getIngredient() instanceof CrucibleLiquid cl){
@@ -99,7 +108,7 @@ public class CruciblePump extends GenericGraphBlock{
                     if(config != null){
                         var f = crucibleNode.getFluid(config);
                         var of = other.getFluid(config);
-                        float remove = Mathf.clamp(eff * f.melted + 0.001f, 0, Math.min(f.melted, other.capacity - of.total()));
+                        float remove = Mathf.clamp(efficiency * f.melted + 0.001f, 0, Math.min(f.melted, other.capacity - of.total()));
                         f.melted -= remove;
                         of.melted += remove;
                     }

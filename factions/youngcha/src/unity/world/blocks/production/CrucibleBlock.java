@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 
 public class CrucibleBlock extends GenericGraphBlock{
     TextureRegion floor, liquid, heat, chunks;
-    TextureRegion[] base, baseopen;
+    TextureRegion[] base, baseOpen;
     Vec2[] pos;
 
     public CrucibleBlock(String name){
@@ -37,9 +37,9 @@ public class CrucibleBlock extends GenericGraphBlock{
         base[0] = loadTex("base1");
         base[1] = loadTex("base2");
 
-        baseopen = new TextureRegion[2];
-        baseopen[0] = loadTex("base-open1");
-        baseopen[1] = loadTex("base-open2");
+        baseOpen = new TextureRegion[2];
+        baseOpen[0] = loadTex("base-open1");
+        baseOpen[1] = loadTex("base-open2");
 
         pos = new Vec2[30];
         for(int i = 0; i < pos.length; i++){
@@ -54,10 +54,7 @@ public class CrucibleBlock extends GenericGraphBlock{
         public boolean acceptItem(Building source, Item item){
             var crucible = crucibleNode();
             var ingre = CrucibleRecipes.items.get(item);
-            if(ingre != null && crucible.capacity - crucible.getFluid(ingre).total() >= 1){
-                return true;
-            }
-            return false;
+            return ingre != null && crucible.capacity - crucible.getFluid(ingre).total() >= 1;
         }
 
         @Override
@@ -129,7 +126,7 @@ public class CrucibleBlock extends GenericGraphBlock{
             Draw.color();
             for(int i = 0; i < 4; i++){
                 if(connection[i]){
-                    Draw.rect(baseopen[i == 2 || i == 3 ? 0 : 1], x, y, 180 + i * 90);
+                    Draw.rect(baseOpen[i == 2 || i == 3 ? 0 : 1], x, y, 180 + i * 90);
                 }else{
                     Draw.rect(base[i == 2 || i == 3 ? 0 : 1], x, y, 180 + i * 90);
                 }
