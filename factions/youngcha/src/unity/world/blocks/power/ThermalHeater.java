@@ -38,7 +38,7 @@ public class ThermalHeater extends GenericGraphBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            heatNode().efficency = sum + attri.env(); /// <---------------
+            heatNode().efficiency = sum + attri.env(); /// <---------------
         }
 
         @Override

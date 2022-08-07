@@ -17,15 +17,15 @@ import static mindustry.Vars.tilesize;
 
 //the uh block settings part of graphs ig
 public class GraphBlockConfig{
-    public ObjectMap<Class<? extends Graph>, Func<GraphBuild, GraphNode<?>>> nodeConfig = new ObjectMap<>();
-    public Seq<ConnectionConfig> connections = new Seq<>();
+    public ObjectMap<Class<? extends Graph<?>>, Func<GraphBuild, GraphNode<?>>> nodeConfig = new ObjectMap<>();
+    public Seq<ConnectionConfig<? extends Graph<?>>> connections = new Seq<>();
     Block block;
 
     public GraphBlockConfig(Block block){
         this.block = block;
     }
 
-    public void addConnectionConfig(ConnectionConfig cfg){
+    public void addConnectionConfig(ConnectionConfig<?> cfg){
         //this is basically an assert right
         if(cfg.config != null){
             throw new IllegalArgumentException("GraphBlockConfig cannot accept an already-bound ConnectionConfig");
@@ -34,10 +34,10 @@ public class GraphBlockConfig{
         cfg.setConfig(this);
     }
 
-    public <T extends Graph> void fixedConnection(Class<T> tClass, int... connectionIndexes){
+    public <T extends Graph<T>> void fixedConnection(Class<T> tClass, int... connectionIndexes){
         try{
             var constructor = tClass.getConstructor();
-            addConnectionConfig(new FixedConnectionConfig(tClass, () -> {
+            addConnectionConfig(new FixedConnectionConfig<>(tClass, () -> {
                 try{return constructor.newInstance();}catch(Exception e){e.printStackTrace();}
                 return null;
             }, connectionIndexes));
@@ -46,10 +46,10 @@ public class GraphBlockConfig{
         }
     }
 
-    public <T extends Graph> void distanceConnection(Class<T> tClass, int connections){
+    public <T extends Graph<T>> void distanceConnection(Class<T> tClass, int connections){
         try{
             var constructor = tClass.getConstructor();
-            addConnectionConfig(new DistanceConnectionConfig(tClass, () -> {
+            addConnectionConfig(new DistanceConnectionConfig<>(tClass, () -> {
                 try{return constructor.newInstance();}catch(Exception e){e.printStackTrace();}
                 return null;
             }, connections));
@@ -58,11 +58,11 @@ public class GraphBlockConfig{
         }
     }
 
-    public static abstract class ConnectionConfig<T extends Graph>{
+    public static abstract class ConnectionConfig<T extends Graph<T>>{
         public GraphBlockConfig config;
         Class<T> graphType;
 
-        public abstract GraphConnector getConnector(GraphNode gn);
+        public abstract GraphConnector<T> getConnector(GraphNode<T> gn);
 
         public Prov<T> newGraph;
 
@@ -80,7 +80,7 @@ public class GraphBlockConfig{
         }
     }
 
-    public static class DistanceConnectionConfig<T extends Graph> extends ConnectionConfig<T>{
+    public static class DistanceConnectionConfig<T extends Graph<T>> extends ConnectionConfig<T>{
         int connections;
 
         public DistanceConnectionConfig(Class<T> tClass, Prov<T> newGraph, int connections){
@@ -89,13 +89,13 @@ public class GraphBlockConfig{
         }
 
         @Override
-        public GraphConnector getConnector(GraphNode gn){
-            return new DistanceGraphConnector(connections, gn, newGraph.get());
+        public GraphConnector<T> getConnector(GraphNode<T> gn){
+            return new DistanceGraphConnector<>(connections, gn, newGraph.get());
         }
     }
 
     //for connections on the sides, most probably the most common type.
-    public static class FixedConnectionConfig<T extends Graph> extends ConnectionConfig<T>{
+    public static class FixedConnectionConfig<T extends Graph<T>> extends ConnectionConfig<T>{
         int[] connectionIndexes;
 
         public FixedConnectionConfig(Class<T> tClass, Prov<T> newGraph, int... connectionIndexes){
@@ -104,8 +104,8 @@ public class GraphBlockConfig{
         }
 
         @Override
-        public GraphConnector getConnector(GraphNode gn){
-            return new GraphConnector.FixedGraphConnector(gn, newGraph.get(), connectionIndexes);
+        public GraphConnector<T> getConnector(GraphNode<T> gn){
+            return new GraphConnector.FixedGraphConnector<>(gn, newGraph.get(), connectionIndexes);
         }
 
         @Override
@@ -119,12 +119,12 @@ public class GraphBlockConfig{
 
     public void setStats(Stats stats){
         stats.add(Stat.abilities, table -> {
-            for(var gcnfig : nodeConfig){
+            for(var gConfig : nodeConfig){
                 table.row();
-                table.add(Core.bundle.get("ui.graph." + Graphs.graphInfo.get(gcnfig.key).name)).growX().left().color(Pal.accent);
+                table.add(Core.bundle.get("ui.graph." + Graphs.graphInfo.get(gConfig.key).name)).growX().left().color(Pal.accent);
                 table.row();
                 table.image().growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
-                GraphNode gn = gcnfig.value.get(null);
+                var gn = gConfig.value.get(null);
                 table.row();
                 table.table(gn::displayStats).growX();
             }
@@ -137,7 +137,7 @@ public class GraphBlockConfig{
 
     public void drawConnectionPoints(BuildPlan req, Eachable<BuildPlan> list){
         //soon
-        for(ConnectionConfig c : connections){
+        for(var c : connections){
             TextureRegion tr = Graphs.graphInfo.get(c.graphType).icon;
             if(tr == null){
                 return;
@@ -165,8 +165,8 @@ public class GraphBlockConfig{
         }
     }
 
-    //this came from js, but im not sure if it relative to the center or the bl corner of the building.
-    //gets positions along the sides.
+    //this came from js, but im not sure if it's relative to the center or the bl corner of the building.
+    //get positions along the sides.
     public Point2 getConnectSidePos(int index, int size, int rotation){
         int side = index / size;
         side = (side + rotation) % 4;

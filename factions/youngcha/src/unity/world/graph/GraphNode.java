@@ -24,13 +24,13 @@ public class GraphNode<T extends Graph>{
     }
 
     public void onPlace(){
-        for(GraphConnector gc : connector){
+        for(var gc : connector){
             gc.recalcNeighbours();
         }
     }
 
     public void onRotate(){
-        for(GraphConnector gc : connector){
+        for(var gc : connector){
             if(gc.disconnectWhenRotate){
                 gc.disconnect();
                 gc.recalcPorts();
@@ -40,13 +40,13 @@ public class GraphNode<T extends Graph>{
     }
 
     public void onRemove(){
-        for(GraphConnector gc : connector){
+        for(var gc : connector){
             gc.disconnect();
         }
     }
 
     public <W extends GraphConnector<T>> W getConnectorOfType(Class<W> cls){
-        for(GraphConnector<T> gc : connector){
+        for(var gc : connector){
             if(cls.isAssignableFrom(gc.getClass())){
                 return (W)gc;
             }
@@ -58,8 +58,7 @@ public class GraphNode<T extends Graph>{
 
     public void displayStats(Table table){}
 
-    ;
-    private static String[] levelNames = {
+    private static final String[] levelNames = {
     "stat.unity-negligible",
     "stat.unity-small",
     "stat.unity-moderate",
@@ -68,7 +67,7 @@ public class GraphNode<T extends Graph>{
     "stat.unity-extreme"
     };
 
-    public String getNamedLevel(float val, float level[]){
+    public String getNamedLevel(float val, float[] level){
         for(int i = 0; i < level.length; i++){
             if(val <= level[i]){
                 return levelNames[i];
@@ -77,12 +76,12 @@ public class GraphNode<T extends Graph>{
         return levelNames[levelNames.length - 1];
     }
 
-    public void addBundleStatLevelLine(Table table, String bundlename, float val, float level[]){
-        addStatLine(table, Core.bundle.get(bundlename + ".name"), Core.bundle.format(getNamedLevel(val, level), Core.bundle.format(bundlename, val)));
+    public void addBundleStatLevelLine(Table table, String bundleName, float val, float[] level){
+        addStatLine(table, Core.bundle.get(bundleName + ".name"), Core.bundle.format(getNamedLevel(val, level), Core.bundle.format(bundleName, val)));
     }
 
-    public void addBundleStatLine(Table table, String bundlename, Object val){
-        addStatLine(table, Core.bundle.get(bundlename + ".name"), Core.bundle.format(bundlename, val));
+    public void addBundleStatLine(Table table, String bundleName, Object val){
+        addStatLine(table, Core.bundle.get(bundleName + ".name"), Core.bundle.format(bundleName, val));
     }
 
     public void addStatLine(Table table, String name, String val){
@@ -96,7 +95,7 @@ public class GraphNode<T extends Graph>{
         }).fillX().padLeft(10);
     }
 
-    public void removeEdge(GraphNode g){
+    public void removeEdge(GraphNode<T> g){
     }
 
     public void addSelf(){

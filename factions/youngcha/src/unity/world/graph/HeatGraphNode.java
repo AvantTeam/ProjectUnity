@@ -16,39 +16,39 @@ public class HeatGraphNode extends GraphNode<HeatGraph>{
     public static final float celsiusZero = 273.15f;
     public static float ambientTemp = celsiusZero + 20;
     public float flux = 0;
-    public float heatenergy = 1f;
+    public float heatEnergy = 1f;
     float energyBuffer = 0; //write to
-    public float emissiveness = 0.01f;
+    public float emission = 0.01f;
     public float conductivity = 0.1f;
-    public float heatcapacity = 1f;
+    public float heatCapacity = 1f;
     public float maxTemp = celsiusZero + 1000;
 
     public boolean heatProducer = false;
     public float targetTemp = 1000;
-    public float prodEfficency = 0.1f;
+    public float prodEfficiency = 0.1f;
     public float minGenerate = -9999999999999999f;
     public float lastEnergyInput = 0;
-    public float efficency = 0;
+    public float efficiency = 0;
 
-    public HeatGraphNode(GraphBuild build, float emissiveness, float conductivity, float heatcapacity, float maxTemp){
+    public HeatGraphNode(GraphBuild build, float emission, float conductivity, float heatCapacity, float maxTemp){
         super(build);
-        this.emissiveness = emissiveness;
+        this.emission = emission;
         this.conductivity = conductivity;
         this.maxTemp = maxTemp;
-        this.heatcapacity = heatcapacity;
-        energyBuffer = this.heatenergy = heatcapacity * ambientTemp;
+        this.heatCapacity = heatCapacity;
+        energyBuffer = this.heatEnergy = heatCapacity * ambientTemp;
     }
 
-    public HeatGraphNode(GraphBuild build, float emissiveness, float conductivity, float heatcapacity, float maxTemp, float targetTemp, float prodEfficency){
+    public HeatGraphNode(GraphBuild build, float emission, float conductivity, float heatCapacity, float maxTemp, float targetTemp, float prodEfficiency){
         super(build);
-        this.emissiveness = emissiveness;
+        this.emission = emission;
         this.conductivity = conductivity;
         this.maxTemp = maxTemp;
         this.targetTemp = targetTemp;
-        this.prodEfficency = prodEfficency;
+        this.prodEfficiency = prodEfficiency;
         this.heatProducer = true;
-        this.heatcapacity = heatcapacity;
-        energyBuffer = this.heatenergy = heatcapacity * ambientTemp;
+        this.heatCapacity = heatCapacity;
+        energyBuffer = this.heatEnergy = heatCapacity * ambientTemp;
     }
 
     public HeatGraphNode(GraphBuild build){
@@ -71,7 +71,7 @@ public class HeatGraphNode extends GraphNode<HeatGraph>{
     @Override
     public void update(){
         //graph handles all heat transmission.
-        heatenergy += (ambientTemp - getTemp()) * emissiveness * Time.delta / 60f;
+        heatEnergy += (ambientTemp - getTemp()) * emission * Time.delta / 60f;
         if(heatProducer){
             generateHeat();
         }
@@ -115,39 +115,39 @@ public class HeatGraphNode extends GraphNode<HeatGraph>{
 
     @Override
     public void read(Reads read){
-        this.energyBuffer = this.heatenergy = read.f();
+        this.energyBuffer = this.heatEnergy = read.f();
     }
 
     @Override
     public void write(Writes write){
-        write.f(this.heatenergy);
+        write.f(this.heatEnergy);
     }
 
     public void generateHeat(float targetTemp, float eff){
-        heatenergy += (targetTemp - getTemp()) * eff;
+        heatEnergy += (targetTemp - getTemp()) * eff;
     }
 
     public void generateHeat(){
-        lastEnergyInput = Math.max(minGenerate, (targetTemp - getTemp()) * efficency * prodEfficency);
-        heatenergy += lastEnergyInput * Time.delta;
+        lastEnergyInput = Math.max(minGenerate, (targetTemp - getTemp()) * efficiency * prodEfficiency);
+        heatEnergy += lastEnergyInput * Time.delta;
     }
 
     public float getTemp(){
-        return heatenergy / heatcapacity;
+        return heatEnergy / heatCapacity;
     }
 
     public void setTemp(float temp){
-        heatenergy = temp * heatcapacity;
+        heatEnergy = temp * heatCapacity;
     }
 
     public void addHeatEnergy(float e){
-        heatenergy += e;
+        heatEnergy += e;
     }
 
     @Override
     public void displayStats(Table table){
-        addBundleStatLevelLine(table, "stat.unity-emissiveness", emissiveness * 60, new float[]{0.5f, 1f, 3f, 10, 20});
-        addBundleStatLine(table, "stat.unity-heatcapacity", heatcapacity);
+        addBundleStatLevelLine(table, "stat.unity-emission", emission * 60, new float[]{0.5f, 1f, 3f, 10, 20});
+        addBundleStatLine(table, "stat.unity-heatcapacity", heatCapacity);
         addBundleStatLine(table, "stat.unity-heatconductivity", conductivity * 60);
         addBundleStatLine(table, "stat.unity-maxtemp", maxTemp - celsiusZero);
         //

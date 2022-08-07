@@ -161,7 +161,7 @@ public class CrucibleGraphNode extends GraphNode<CrucibleGraph>{
             //solidify
 
             for(var item : coolOrder){
-                float remaining = (item.meltingPoint - heat.getTemp()) * heat.heatcapacity;
+                float remaining = (item.meltingPoint - heat.getTemp()) * heat.heatCapacity;
                 if(remaining <= 0){
                     break;
                 }
@@ -173,7 +173,7 @@ public class CrucibleGraphNode extends GraphNode<CrucibleGraph>{
             }
             //melt
             for(var item : smeltOrder){
-                float remaining = (heat.getTemp() - item.meltingPoint) * heat.heatcapacity;
+                float remaining = (heat.getTemp() - item.meltingPoint) * heat.heatCapacity;
                 if(remaining <= 0){
                     break;
                 }
@@ -185,7 +185,7 @@ public class CrucibleGraphNode extends GraphNode<CrucibleGraph>{
             }
             //vapourise
             for(var item : boilOrder){
-                float remaining = (heat.getTemp() - item.boilPoint) * heat.heatcapacity;
+                float remaining = (heat.getTemp() - item.boilPoint) * heat.heatCapacity;
                 if(remaining <= 0){
                     break;
                 }

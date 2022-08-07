@@ -8,7 +8,7 @@ import arc.util.io.*;
 import mindustry.gen.*;
 
 public interface GraphBuild{
-    OrderedMap<Class<? extends Graph>, GraphNode> getNodes();
+    OrderedMap<Class<? extends Graph<?>>, GraphNode<?>> getNodes();
 
     Building getBuild();
 
@@ -16,16 +16,16 @@ public interface GraphBuild{
 
     void setPrevRotation(int t);
 
-    default <T extends Graph> GraphNode<T> getGraphNode(Class<T> c){
+    default <T extends Graph<T>> GraphNode<T> getGraphNode(Class<T> c){
         return (GraphNode<T>)getNodes().get(c);
     }
 
-    default <T extends Graph> T getGraph(Class<T> c){
+    default <T extends Graph<T>> T getGraph(Class<T> c){
         return getGraph(c, 0);
     }
 
-    default <T extends Graph> T getGraph(Class<T> c, int index){
-        return this.getGraphNode(c).connector.get(index).getGraph();
+    default <T extends Graph<T>> T getGraph(Class<T> c, int index){
+        return getGraphNode(c).connector.get(index).getGraph();
     }
 
     default void onInit(){}
@@ -40,9 +40,9 @@ public interface GraphBuild{
             //fishes all relevant things from GraphBlockConfig in the GraphBlock
             //and populates the build using the settings.
             for(var connectionConfig : cfg.connections){
-                if(!getNodes().containsKey(connectionConfig.getGraphType())){
-                    var gnode = cfg.nodeConfig.get(connectionConfig.getGraphType()).get(this);
-                    getNodes().put(connectionConfig.getGraphType(), (GraphNode)gnode);
+                if(!this.getNodes().containsKey(connectionConfig.getGraphType())){
+                    var gNode = cfg.nodeConfig.get(connectionConfig.getGraphType()).get(this);
+                    getNodes().put(connectionConfig.getGraphType(), gNode);
                 }
                 var node = getGraphNode(connectionConfig.getGraphType());
                 node.connectors++;
@@ -56,7 +56,7 @@ public interface GraphBuild{
     }
 
 
-    default <T extends Graph> void addNode(Class<T> c, Prov<GraphNode<T>> prov){
+    default <T extends Graph<T>> void addNode(Class<T> c, Prov<GraphNode<T>> prov){
         getNodes().put(c, prov.get());
     }
 
@@ -83,7 +83,7 @@ public interface GraphBuild{
         }
     }
 
-    default void eachNode(Cons2<Class<? extends Graph>, GraphNode> cons){
+    default void eachNode(Cons2<Class<? extends Graph<?>>, GraphNode<?>> cons){
         var graphIterator = new Entries<>(getNodes());
         for(var e : graphIterator){
             cons.get(e.key, e.value);
@@ -105,31 +105,25 @@ public interface GraphBuild{
             //change later.
             graphNode.update();
             for(var graphConn : graphNode.connector){
-                ((GraphConnector)graphConn).getGraph().update();
+                graphConn.getGraph().update();
             }
         });
     }
 
     default void displayGraphBars(Table table){
-        getNodes().each((cls, graphNode) -> {
-            graphNode.displayBars(table);
-        });
+        getNodes().each((cls, graphNode) -> graphNode.displayBars(table));
     }
 
-    default void onConnectionChanged(GraphConnector g){
+    default void onConnectionChanged(GraphConnector<?> g){
     }
 
     ///I pray they are in the same order.
     default void writeGraphs(Writes write){
-        getNodes().each((cls, graphNode) -> {
-            graphNode.write(write);
-        });
+        getNodes().each((cls, graphNode) -> graphNode.write(write));
     }
 
     default void readGraphs(Reads read){
-        getNodes().each((cls, graphNode) -> {
-            graphNode.read(read);
-        });
+        getNodes().each((cls, graphNode) -> graphNode.read(read));
     }
 
     //conv for getting

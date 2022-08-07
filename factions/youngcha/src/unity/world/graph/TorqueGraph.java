@@ -124,4 +124,9 @@ public class TorqueGraph extends Graph<TorqueGraph>{
         write.f(lastVelocity);
         write.f(rotation);
     }
+
+    @Override
+    public TorqueGraph self(){
+        return this;
+    }
 }

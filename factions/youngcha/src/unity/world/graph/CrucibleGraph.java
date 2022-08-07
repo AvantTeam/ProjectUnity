@@ -29,25 +29,25 @@ public class CrucibleGraph extends Graph<CrucibleGraph>{
             if(cgn.accessConnector != null && v != cgn.accessConnector){
                 continue;
             }
-            float transfer = 0;
-            for(GraphEdge ge : v.connections){
+            float transfer;
+            for(var ge : v.connections){
                 CrucibleGraphNode cgno = (CrucibleGraphNode)ge.other(v).getNode();
                 if(cgno.accessConnector != null && ge.other(v) != cgno.accessConnector){
                     continue;
                 }
                 for(var fluid : cgn.fluids){
-                    var otherfluid = cgno.getFluid(fluid.key);
-                    var thisfluid = cgn.getFluid(fluid.key);
-                    transfer = thisfluid.total() / cgn.baseSize - otherfluid.total() / cgno.baseSize;
+                    var otherFluid = cgno.getFluid(fluid.key);
+                    var thisFluid = cgn.getFluid(fluid.key);
+                    transfer = thisFluid.total() / cgn.baseSize - otherFluid.total() / cgno.baseSize;
                     if(transfer > 0.1f){
                         transfer *= 0.3f * Time.delta;
-                        transfer = Math.min(transfer, Math.min(thisfluid.melted, cgno.capacity - otherfluid.total()));
+                        transfer = Math.min(transfer, Math.min(thisFluid.melted, cgno.capacity - otherFluid.total()));
                     }else{
                         continue;
                     }
 
-                    otherfluid.melted += transfer;
-                    thisfluid.melted -= transfer;
+                    otherFluid.melted += transfer;
+                    thisFluid.melted -= transfer;
                 }
             }
         }
@@ -101,4 +101,8 @@ public class CrucibleGraph extends Graph<CrucibleGraph>{
         return true;
     }
 
+    @Override
+    public CrucibleGraph self(){
+        return this;
+    }
 }

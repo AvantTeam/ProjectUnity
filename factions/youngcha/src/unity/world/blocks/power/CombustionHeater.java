@@ -82,7 +82,7 @@ public class CombustionHeater extends GenericGraphBlock{
                 generateTime -= delta() * mul;
             }
             heatNode().targetTemp = baseTemp + Math.max(tempPerFlammability * (productionEfficiency - 1), -baseTemp * 0.5f);
-            heatNode().efficency = productionEfficiency;
+            heatNode().efficiency = productionEfficiency;
         }
 
         @Override

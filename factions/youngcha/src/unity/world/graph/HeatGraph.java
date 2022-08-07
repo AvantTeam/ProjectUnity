@@ -35,8 +35,7 @@ public class HeatGraph extends Graph<HeatGraph>{
             for(GraphConnector<HeatGraph> v : vertexes){
                 hgno = ((HeatGraphNode)v.node);
                 k = 0;
-                e = hgno.heatenergy;
-                t = hgno.getTemp();
+                e = hgno.heatEnergy;
                 cond = hgno.conductivity;
                 // my brain hurt
                 //but essentially the energy only GS equality is eₙ = (e꜀ + kTₛ)/(1+k/c) as T꜀ is e꜀/c
@@ -46,12 +45,12 @@ public class HeatGraph extends Graph<HeatGraph>{
                     k += b;
                     e += b * hgn.getTemp();
                 }
-                hgno.energyBuffer = e / (1 + k / hgno.heatcapacity);
+                hgno.energyBuffer = e / (1 + k / hgno.heatCapacity);
             }
             for(GraphConnector<HeatGraph> v : vertexes){
                 hgno = ((HeatGraphNode)v.node);
-                hgno.flux += hgno.energyBuffer - hgno.heatenergy;
-                hgno.heatenergy = hgno.energyBuffer;
+                hgno.flux += hgno.energyBuffer - hgno.heatEnergy;
+                hgno.heatEnergy = hgno.energyBuffer;
             }
         }
     }
@@ -78,5 +77,10 @@ public class HeatGraph extends Graph<HeatGraph>{
     @Override
     public boolean isRoot(GraphConnector<HeatGraph> t){
         return true;
+    }
+
+    @Override
+    public HeatGraph self(){
+        return this;
     }
 }

@@ -176,7 +176,7 @@ public class GenericGraphBlock extends Block implements GraphBlock{
                         if(con instanceof GraphConnector.FixedGraphConnector fg){
                             for(var port : fg.connectionPoints){
                                 Draw.color(port.edge == null ? Color.red : Color.green);
-                                Drawf.tri((port.getRelpos().x + tile.x + port.getDir().x * 0.5f) * tilesize, (port.getRelpos().y + tile.y + port.getDir().y * 0.5f) * tilesize, 4, 4, 0);
+                                Drawf.tri((port.getRelPos().x + tile.x + port.getDir().x * 0.5f) * tilesize, (port.getRelPos().y + tile.y + port.getDir().y * 0.5f) * tilesize, 4, 4, 0);
                             }
                         }
                     }

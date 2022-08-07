@@ -7,9 +7,9 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 
-public abstract class Graph<T extends Graph>{
+public abstract class Graph<T extends Graph<T>>{
     protected OrderedSet<GraphConnector<T>> vertexes = new OrderedSet<>();
-    protected LongMap<GraphEdge> edges = new LongMap<>();
+    protected LongMap<GraphEdge<T>> edges = new LongMap<>();
     public final int id;
     private static int lastId;
     //graphs recently read from save, and will override any graph mergers until the next update.
@@ -34,14 +34,14 @@ public abstract class Graph<T extends Graph>{
         var c = copy();
         c.authoritative = authoritative;
         c.authoritativeUntil = authoritativeUntil;
-        return (U)c;
+        return c;
     }
 
     public abstract void onMergeBegin(T g);
 
     public abstract void authoritativeOverride(T g);
 
-    public void addEdge(GraphEdge edge){
+    public void addEdge(GraphEdge<T> edge){
 
         edges.put(edge.id, edge);
         Graph<T> g = edge.other(this).graph;
@@ -68,28 +68,27 @@ public abstract class Graph<T extends Graph>{
     }
 
     public void removeVertex(GraphConnector<T> vertex){
-        if(vertex.getGraph() != this){return;}
+        if(vertex.getGraph() != this) return;
         if(vertex.connections.size == 0){
             //trivial case 1, node has no connections anyway
             if(vertexes.size > 1){
                 //somehow disconnected but still in the graph?
-                Graph<T> ngraph = createFromThis();
-                ngraph.addVertex(vertex);
+                Graph<T> nGraph = createFromThis();
+                nGraph.addVertex(vertex);
                 vertexes.remove(vertex);
                 onVertexRemoved(vertex);
                 onGraphChanged();
             }
-            return;
         }else if(vertex.connections.size == 1){
-            //trivial case 2, node has 1 connection so we can just detach node into new graph,
+            //trivial case 2, node has 1 connection, so we can just detach node into new graph,
             removeEdgeNonSplit(vertex.connections.first());
-            Graph<T> ngraph = createFromThis();
-            ngraph.addVertex(vertex);
+            Graph<T> nGraph = createFromThis();
+            nGraph.addVertex(vertex);
             vertexes.remove(vertex);
             onVertexRemoved(vertex);
             onGraphChanged();
         }else{
-            //non trivial case, need to detach edges and check for splits.
+            //nontrivial case, need to detach edges and check for splits.
             //probably change to do all the edges at once hmm
             int size = vertex.connections.size;
             for(int i = 0; i < size; i++){
@@ -100,8 +99,8 @@ public abstract class Graph<T extends Graph>{
                     }
                     return;
                 }else{
-                    GraphEdge vconn = vertex.connections.removeIndex(0);
-                    removeEdge(vconn);
+                    GraphEdge<T> vConn = vertex.connections.removeIndex(0);
+                    removeEdge(vConn);
                 }
             }
             if(vertexes.size > 1){
@@ -113,7 +112,7 @@ public abstract class Graph<T extends Graph>{
 
     }
 
-    public void removeEdgeNonSplit(GraphEdge edge){
+    public void removeEdgeNonSplit(GraphEdge<T> edge){
         edges.remove(edge.id);
         edge.n1.removeEdge(edge);
         edge.n2.removeEdge(edge);
@@ -121,39 +120,38 @@ public abstract class Graph<T extends Graph>{
 
     protected OrderedSet<GraphConnector<T>> floodTemp = new OrderedSet<>();
 
-    public void removeEdge(GraphEdge edge){
+    public void removeEdge(GraphEdge<T> edge){
         removeEdgeNonSplit(edge);
         onGraphChanged();
         if(!isConnected(edge.n1, edge.n2, floodTemp)){
             //OHNO
+            Graph<T> nGraph = createFromThis();
             if(floodTemp.size <= vertexes.size - floodTemp.size){
                 //new graph will be the flooded area
-                Graph<T> ngraph = createFromThis();
                 for(GraphConnector<T> other : floodTemp){
                     this.removeOnlyVertex(other);
-                    ngraph.addVertex(other);
-                    for(GraphEdge ge : other.connections){
+                    nGraph.addVertex(other);
+                    for(var ge : other.connections){
                         if(ge != edge){
-                            ngraph.edges.put(ge.id, ge);
+                            nGraph.edges.put(ge.id, ge);
                             edges.remove(ge.id);
                         }
                     }
                 }
             }else{
                 //this graph will be the flooded area
-                Graph<T> ngraph = createFromThis();
-                for(GraphConnector<T> other : vertexes){
+                for(var other : vertexes){
                     if(!floodTemp.contains(other)){
-                        ngraph.addVertex(other);
-                        for(GraphEdge ge : other.connections){
+                        nGraph.addVertex(other);
+                        for(var ge : other.connections){
                             if(ge != edge){
-                                ngraph.edges.put(ge.id, ge);
+                                nGraph.edges.put(ge.id, ge);
                                 edges.remove(ge.id);
                             }
                         }
                     }
                 }
-                for(GraphConnector<T> other : ngraph.vertexes){
+                for(GraphConnector<T> other : nGraph.vertexes){
                     this.vertexes.remove(other);
                     onVertexRemoved(other);
                 }
@@ -169,7 +167,7 @@ public abstract class Graph<T extends Graph>{
         flood.add(gc);
         while(front.any()){
             var current = front.pop();
-            for(GraphEdge ge : current.connections){
+            for(var ge : current.connections){
                 var next = ge.other(current);
                 if(flood.contains(next)){
                     continue;
@@ -187,7 +185,7 @@ public abstract class Graph<T extends Graph>{
         return flood.contains(v2);
     }
 
-    //whether its allowed to join the graph :3
+    //whether it's allowed to join the graph :3
     public boolean canConnect(GraphConnector<T> v1, GraphConnector<T> v2){
         return true;
     }
@@ -198,7 +196,7 @@ public abstract class Graph<T extends Graph>{
 
     public void addVertex(GraphConnector<T> vertex){
         vertexes.add(vertex);
-        vertex.graph = (T)this;
+        vertex.graph = self();
         onVertexAdded(vertex);
         onGraphChanged();
     }
@@ -256,7 +254,7 @@ public abstract class Graph<T extends Graph>{
     }
 
     public GraphConnector<T> randomVertex(){
-        int skip = Mathf.random((int)vertexes.size);
+        int skip = Mathf.random(vertexes.size);
         for(var vertex : vertexes){
             skip--;
             if(skip < 0){
@@ -278,4 +276,5 @@ public abstract class Graph<T extends Graph>{
         return vertexes.first() == t;
     }
 
+    public abstract T self();
 }
