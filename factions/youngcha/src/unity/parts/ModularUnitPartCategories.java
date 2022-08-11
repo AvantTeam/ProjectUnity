@@ -1,6 +1,6 @@
 package unity.parts;
 
-public class PartCategories{
+public class ModularUnitPartCategories{
     public static final String miscUnit = "unit-misc";
     public static final String weaponsUnit = "unit-weapons";
     public static final String movementUnit = "unit-movement";

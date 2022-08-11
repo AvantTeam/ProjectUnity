@@ -24,7 +24,7 @@ public class ModularUnitPartType extends PartType{
     public String category;
 
     public static TextureRegion[][] panelling;
-    public static final Seq<PanelDoodadPalette> unitDoodads = new Seq<>();
+    public static final Seq<PartDoodadPalette> unitDoodads = new Seq<>();
     /** texture will/may have three variants for the front middle and back **/
     public TextureRegion[] top;
     public TextureRegion[] outline;
@@ -55,10 +55,10 @@ public class ModularUnitPartType extends PartType{
 
     public static void loadStatic(){
         panelling = Core.atlas.find("unity-panel").split(16, 16);
-        unitDoodads.add(new PanelDoodadPalette(true, true, 1, 1, "1x1", 12));
-        unitDoodads.add(new PanelDoodadPalette(false, true, 2, 2, "2x2", 5));
-        unitDoodads.add(new PanelDoodadPalette(false, true, 3, 3, "3x3", 4));
-        unitDoodads.add(new PanelDoodadPalette(true, true, 3, 2, "3x2", 3));
+        unitDoodads.add(new PartDoodadPalette(true, true, 1, 1, "1x1", 12));
+        unitDoodads.add(new PartDoodadPalette(false, true, 2, 2, "2x2", 5));
+        unitDoodads.add(new PartDoodadPalette(false, true, 3, 3, "3x3", 4));
+        unitDoodads.add(new PartDoodadPalette(true, true, 3, 2, "3x2", 3));
 
         for(int i = 0; i < unitDoodads.size; i++){
             unitDoodads.get(i).load();

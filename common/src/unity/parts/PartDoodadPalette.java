@@ -5,15 +5,16 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 
-public class PanelDoodadPalette{
+//Generic base regions for parts. Same as turret's one.
+public class PartDoodadPalette{
     public boolean center;
     public boolean sides;
     public int w, h;
-    public Seq<PanelDoodadType> doodads = new Seq<>();
+    public Seq<PartDoodadType> doodads = new Seq<>();
     int amount;
     String name;
 
-    public PanelDoodadPalette(boolean center, boolean sides, int w, int h, String name, int amount){
+    public PartDoodadPalette(boolean center, boolean sides, int w, int h, String name, int amount){
         this.center = center;
         this.sides = sides;
         this.w = w;
@@ -23,17 +24,17 @@ public class PanelDoodadPalette{
     }
 
     public void load(){
-        Point2[] parray = new Point2[w * h];
+        Point2[] points = new Point2[w * h];
         for(int i = 0; i < w * h; i++){
-            parray[i] = new Point2(i % w, i / w);
+            points[i] = new Point2(i % w, i / w);
         }
         for(int i = 0; i < amount; i++){
-            var d = new PanelDoodadType(parray, Core.atlas.find("unity-doodad-" + name + "-" + (i + 1)), Core.atlas.find("unity-doodad-" + name + "-outline-" + (i + 1)), w, h);
+            var d = new PartDoodadType(points, Core.atlas.find("unity-doodad-" + name + "-" + (i + 1)), Core.atlas.find("unity-doodad-" + name + "-outline-" + (i + 1)), w, h);
             doodads.add(d);
         }
     }
 
-    public PanelDoodadType get(float b){
+    public PartDoodadType get(float b){
         return doodads.get((int)Mathf.clamp(doodads.size * b, 0, doodads.size - 1));
     }
 

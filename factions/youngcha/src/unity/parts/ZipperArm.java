@@ -12,10 +12,10 @@ public class ZipperArm{
     public Vec2 start = new Vec2();
     public Vec2 end = new Vec2();
     public Vec2[] jointPositions;
-    Vec2 prevnorm = new Vec2();
+    Vec2 prevNorm = new Vec2();
 
-    public ZipperArm(float sx, float sy, float tx, float ty, float maxlen, int joints){
-        this.maxlen = maxlen;
+    public ZipperArm(float sx, float sy, float tx, float ty, float maxLen, int joints){
+        this.maxlen = maxLen;
         this.joints = joints;
         start.set(sx, sy);
         end.set(tx, ty);
@@ -29,16 +29,16 @@ public class ZipperArm{
         Tmp.v1.set(end).sub(start);
         float d = Tmp.v1.len();
         Tmp.v1.scl(1f / d);
-        float armseg = 0.5f * maxlen / joints;
-        float dseg = 0.5f * d / joints;
-        float offset = Mathf.sqrt(Math.max(0, armseg * armseg - dseg * dseg));
-        float flipnor = prevnorm.dot(Tmp.v1.y, -Tmp.v1.x) > 0 ? 1 : -1;
-        prevnorm.set(Tmp.v1.y * flipnor, -Tmp.v1.x * flipnor);
+        float armSeg = 0.5f * maxlen / joints;
+        float dSeg = 0.5f * d / joints;
+        float offset = Mathf.sqrt(Math.max(0, armSeg * armSeg - dSeg * dSeg));
+        float flipNor = prevNorm.dot(Tmp.v1.y, -Tmp.v1.x) > 0 ? 1 : -1;
+        prevNorm.set(Tmp.v1.y * flipNor, -Tmp.v1.x * flipNor);
         for(int i = 0; i < joints; i++){
             int flip = i % 2 == 0 ? 1 : -1;
             jointPositions[i].set(
-            start.x + Tmp.v1.x * dseg * (2 * i + 1) + prevnorm.x * offset * flip,
-            start.y + Tmp.v1.y * dseg * (2 * i + 1) + prevnorm.y * offset * flip
+            start.x + Tmp.v1.x * dSeg * (2 * i + 1) + prevNorm.x * offset * flip,
+            start.y + Tmp.v1.y * dSeg * (2 * i + 1) + prevNorm.y * offset * flip
             );
         }
     }

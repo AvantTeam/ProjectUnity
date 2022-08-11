@@ -87,7 +87,7 @@ public class ProjectUnity extends ProjectUnityCommon{
         JSBridge.importDefaults(JSBridge.defaultScope);
         dev.init();
         ui.init();
-        UnityCalls.registerPackets();
+        YoungchaCalls.registerPackets();
         CollideUtils.init();
         CrucibleRecipes.loadStatic();
     }

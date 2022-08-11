@@ -132,7 +132,7 @@ public class UnitAssemblerArm extends GenericGraphBlock{
                         }
                     }
                     if(currentJob != null && !Vars.net.client() && currentJob.isComplete()){
-                        UnityCalls.moduleComplete(attached, this, currentJob);
+                        YoungchaCalls.moduleComplete(attached, this, currentJob);
                         currentJob.takenBy = -1;
                         currentJob = null;
                         buildProgress = 0;

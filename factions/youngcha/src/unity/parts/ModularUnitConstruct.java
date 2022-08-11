@@ -5,7 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.*;
 import unity.parts.ModularUnitBlueprint.*;
-import unity.parts.PanelDoodadType.*;
+import unity.parts.PartDoodadType.*;
 
 import static unity.parts.Blueprint.sb;
 
@@ -141,8 +141,8 @@ public class ModularUnitConstruct extends Blueprint.Construct<ModularUnitPart>{
         float ox = -w * 0.5f;
         float oy = -h * 0.5f;
         int middleX = Math.round(w / 2f) - 1;
-        Seq<PanelDoodadType> draw = new Seq<>();
-        PanelDoodadType mirrored;
+        Seq<PartDoodadType> draw = new Seq<>();
+        PartDoodadType mirrored;
         for(int i = 0; i < Math.round(w / 2f); i++){
             for(int j = 0; j < h; j++){
                 mirrored = null;
@@ -160,7 +160,7 @@ public class ModularUnitConstruct extends Blueprint.Construct<ModularUnitPart>{
                             }
                         }
                     }
-                    PanelDoodadType doodad = draw.random(rand);
+                    PartDoodadType doodad = draw.random(rand);
                     mirrored = doodad;
 
                     addDoodad(placed, get(doodad, i + ox, j + oy), i, j);
@@ -182,7 +182,7 @@ public class ModularUnitConstruct extends Blueprint.Construct<ModularUnitPart>{
                             }
                         }
                     }
-                    PanelDoodadType doodad = draw.random(rand);
+                    PartDoodadType doodad = draw.random(rand);
                     addDoodad(placed, get(doodad, w - i - doodad.w + ox, j + oy), w - i - doodad.w, j);
                 }
             }
@@ -190,7 +190,7 @@ public class ModularUnitConstruct extends Blueprint.Construct<ModularUnitPart>{
         }
     }
 
-    void addDoodad(boolean[][] placed, PanelDoodad p, int x, int y){
+    void addDoodad(boolean[][] placed, partDoodad p, int x, int y){
         doodads.add(p);
         for(int i = 0; i < p.type.w; i++){
             for(int j = 0; j < p.type.h; j++){
@@ -199,7 +199,7 @@ public class ModularUnitConstruct extends Blueprint.Construct<ModularUnitPart>{
         }
     }
 
-    PanelDoodad get(PanelDoodadType type, float x, float y){
+    partDoodad get(PartDoodadType type, float x, float y){
         return type.create((type.w * 0.5f + x) * PartType.partSize, (type.h * 0.5f + y) * PartType.partSize, x > 0);
     }
 }

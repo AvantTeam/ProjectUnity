@@ -5,13 +5,13 @@ import arc.math.geom.*;
 import unity.parts.PartType.*;
 import unity.util.*;
 
-public class PanelDoodadType{
+public class PartDoodadType{
     Point2[] needsPoints;
     TextureRegion front, outline;
     public int w;
     public int h;
 
-    public PanelDoodadType(Point2[] needsPoints, TextureRegion front, TextureRegion outline, int w, int h){
+    public PartDoodadType(Point2[] needsPoints, TextureRegion front, TextureRegion outline, int w, int h){
         this.needsPoints = needsPoints;
         this.front = front;
         this.outline = outline;
@@ -19,8 +19,8 @@ public class PanelDoodadType{
         this.h = h;
     }
 
-    public PanelDoodad create(float x, float y, boolean flipped){
-        return new PanelDoodad(this, x, y, flipped);
+    public partDoodad create(float x, float y, boolean flipped){
+        return new partDoodad(this, x, y, flipped);
     }
 
     //from the corner
@@ -36,12 +36,12 @@ public class PanelDoodadType{
         return true;
     }
 
-    public static class PanelDoodad{
-        public PanelDoodadType type;
+    public static class partDoodad{
+        public PartDoodadType type;
         float x, y;
         boolean flipped;
 
-        public PanelDoodad(PanelDoodadType type, float x, float y, boolean flipped){
+        public partDoodad(PartDoodadType type, float x, float y, boolean flipped){
             this.type = type;
             this.x = x;
             this.y = y;

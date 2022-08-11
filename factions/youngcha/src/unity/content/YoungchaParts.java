@@ -28,13 +28,13 @@ public class YoungchaParts{
         //region units
         ///DO NOT CHANGE ORDER (will break saves)
         panel = new ModularUnitPartType("panel"){{
-            requirements(PartCategories.miscUnit, ItemStack.with(Items.copper, 5, YoungchaItems.nickel, 5));
+            requirements(ModularUnitPartCategories.miscUnit, ItemStack.with(Items.copper, 5, YoungchaItems.nickel, 5));
             health(40);
             mass(20);
             armor(2);
         }};
         smallRoot = new ModularUnitPartType("root-small"){{
-            requirements(PartCategories.miscUnit, ItemStack.with(YoungchaItems.nickel, 10));
+            requirements(ModularUnitPartCategories.miscUnit, ItemStack.with(YoungchaItems.nickel, 10));
             health(100);
             mass(10);
             producesPower(15);
@@ -45,7 +45,7 @@ public class YoungchaParts{
             hasCellDecal = true;
         }};
         gun = new ModularUnitWeaponMountType("gun"){{
-            requirements(PartCategories.weaponsUnit, ItemStack.with(Items.graphite, 10));
+            requirements(ModularUnitPartCategories.weaponsUnit, ItemStack.with(Items.graphite, 10));
             health(10);
             mass(20);
             usesPower(5);
@@ -56,7 +56,7 @@ public class YoungchaParts{
             }});
         }};
         cannon = new ModularUnitWeaponMountType("cannon"){{
-            requirements(PartCategories.weaponsUnit, ItemStack.with(Items.silicon, 40, Items.graphite, 20, YoungchaItems.nickel, 30));
+            requirements(ModularUnitPartCategories.weaponsUnit, ItemStack.with(Items.silicon, 40, Items.graphite, 20, YoungchaItems.nickel, 30));
             health(40);
             mass(100);
             usesPower(20);
@@ -80,20 +80,20 @@ public class YoungchaParts{
             }});
         }};
         smallEngine = new ModularUnitPartType("engine-small"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(Items.copper, 10, YoungchaItems.nickel, 5));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(Items.copper, 10, YoungchaItems.nickel, 5));
             health(10);
             mass(15);
             producesPower(20);
         }};
         smallWheel = new ModularUnitMovementType("wheel-small"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(YoungchaItems.nickel, 5));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(YoungchaItems.nickel, 5));
             health(15);
             mass(15);
             wheel(1, 30, 1.5f);
             usesPower(7);
         }};
         smallTracks = new ModularUnitMovementType("tracks-small"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 15, YoungchaItems.nickel, 10));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(Items.silicon, 15, YoungchaItems.nickel, 10));
             w = 1;
             h = 3;
             health(60);
@@ -102,7 +102,7 @@ public class YoungchaParts{
             usesPower(20);
         }};
         howitzer = new ModularUnitWeaponMountType("howitzer"){{
-            requirements(PartCategories.weaponsUnit, ItemStack.with(Items.silicon, 80, Items.titanium, 120, Items.graphite, 80, YoungchaItems.nickel, 50));
+            requirements(ModularUnitPartCategories.weaponsUnit, ItemStack.with(Items.silicon, 80, Items.titanium, 120, Items.graphite, 80, YoungchaItems.nickel, 50));
             health(75);
             mass(550);
             usesPower(80);
@@ -140,7 +140,7 @@ public class YoungchaParts{
             }});
         }};
         mediumPanel = new ModularUnitPartType("medium-panel"){{
-            requirements(PartCategories.miscUnit, ItemStack.with(Items.silicon, 20, Items.titanium, 50));
+            requirements(ModularUnitPartCategories.miscUnit, ItemStack.with(Items.silicon, 20, Items.titanium, 50));
             w = 2;
             h = 2;
             health(200);
@@ -148,14 +148,14 @@ public class YoungchaParts{
             armor(100);
         }};
         gunBridge = new ModularUnitPartType("gun-bridge"){{
-            requirements(PartCategories.weaponsUnit, ItemStack.with(Items.graphite, 10, YoungchaItems.nickel, 10));
+            requirements(ModularUnitPartCategories.weaponsUnit, ItemStack.with(Items.graphite, 10, YoungchaItems.nickel, 10));
             usesPower(20);
             mass(20);
             addsWeaponSlots(4);
             hasCellDecal = true;
         }};
         engine = new ModularUnitPartType("engine"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(YoungchaItems.cupronickel, 90, Items.lead, 50, Items.silicon, 30));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(YoungchaItems.cupronickel, 90, Items.lead, 50, Items.silicon, 30));
             w = 3;
             h = 3;
             health(90);
@@ -163,7 +163,7 @@ public class YoungchaParts{
             producesPower(400);
         }};
         mediumRoot = new ModularUnitPartType("root-medium"){{
-            requirements(PartCategories.miscUnit, ItemStack.with(Items.silicon, 30, Items.graphite, 20, YoungchaItems.cupronickel, 45));
+            requirements(ModularUnitPartCategories.miscUnit, ItemStack.with(Items.silicon, 30, Items.graphite, 20, YoungchaItems.cupronickel, 45));
             w = 2;
             h = 2;
             health(250);
@@ -177,7 +177,7 @@ public class YoungchaParts{
             hasCellDecal = true;
         }};
         largeRoot = new ModularUnitPartType("root-large"){{
-            requirements(PartCategories.miscUnit, ItemStack.with(Items.silicon, 75, Items.titanium, 50, YoungchaItems.nickel, 30, YoungchaItems.superAlloy, 15));
+            requirements(ModularUnitPartCategories.miscUnit, ItemStack.with(Items.silicon, 75, Items.titanium, 50, YoungchaItems.nickel, 30, YoungchaItems.superAlloy, 15));
             w = 3;
             h = 3;
             health(900);
@@ -191,7 +191,7 @@ public class YoungchaParts{
             hasCellDecal = true;
         }};
         largePanel = new ModularUnitPartType("large-panel"){{
-            requirements(PartCategories.miscUnit, ItemStack.with(Items.silicon, 50, Items.titanium, 100, YoungchaItems.nickel, 50));
+            requirements(ModularUnitPartCategories.miscUnit, ItemStack.with(Items.silicon, 50, Items.titanium, 100, YoungchaItems.nickel, 50));
             w = 3;
             h = 3;
             health(600);
@@ -199,7 +199,7 @@ public class YoungchaParts{
             armor(2000);
         }};
         mediumWheel = new ModularUnitMovementType("wheel-medium"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 50, Items.titanium, 25));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(Items.silicon, 50, Items.titanium, 25));
             w = 2;
             h = 4;
             health(75);
@@ -208,7 +208,7 @@ public class YoungchaParts{
             usesPower(50);
         }};
         largeWheel = new ModularUnitMovementType("wheel-large"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 400, Items.titanium, 150, Items.thorium, 90, YoungchaItems.cupronickel, 100));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(Items.silicon, 400, Items.titanium, 150, Items.thorium, 90, YoungchaItems.cupronickel, 100));
             w = 3;
             h = 8;
             health(150);
@@ -217,7 +217,7 @@ public class YoungchaParts{
             usesPower(250);
         }};
         pointDefense = new ModularUnitWeaponMountType("point-defense"){{
-            requirements(PartCategories.weaponsUnit, ItemStack.with(Items.silicon, 60, YoungchaItems.nickel, 30));
+            requirements(ModularUnitPartCategories.weaponsUnit, ItemStack.with(Items.silicon, 60, YoungchaItems.nickel, 30));
             w = 2;
             h = 3;
             health(60);
@@ -239,7 +239,7 @@ public class YoungchaParts{
             }});
         }};
         largeTracks = new ModularUnitMovementType("tracks-large"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 50, Items.thorium, 40, YoungchaItems.nickel, 30));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(Items.silicon, 50, Items.thorium, 40, YoungchaItems.nickel, 30));
             w = 2;
             h = 9;
             health(180);
@@ -248,7 +248,7 @@ public class YoungchaParts{
             usesPower(60);
         }};
         tankTracks = new ModularUnitMovementType("tank-tracks"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 250, Items.titanium, 100, YoungchaItems.nickel, 100, YoungchaItems.cupronickel, 50));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(Items.silicon, 250, Items.titanium, 100, YoungchaItems.nickel, 100, YoungchaItems.cupronickel, 50));
             w = 3;
             h = 16;
             health(210);
@@ -257,7 +257,7 @@ public class YoungchaParts{
             usesPower(200);
         }};
         tankTracksLarge = new ModularUnitMovementType("tank-tracks-large"){{
-            requirements(PartCategories.movementUnit, ItemStack.with(Items.silicon, 700, Items.titanium, 500, YoungchaItems.nickel, 300, YoungchaItems.cupronickel, 200, YoungchaItems.superAlloy, 100));
+            requirements(ModularUnitPartCategories.movementUnit, ItemStack.with(Items.silicon, 700, Items.titanium, 500, YoungchaItems.nickel, 300, YoungchaItems.cupronickel, 200, YoungchaItems.superAlloy, 100));
             w = 5;
             h = 30;
             health(500);
@@ -266,7 +266,7 @@ public class YoungchaParts{
             usesPower(1200);
         }};
         tankCannon = new ModularUnitWeaponMountType("arbiter"){{
-            requirements(PartCategories.weaponsUnit, ItemStack.with(Items.silicon, 500, Items.titanium, 500, YoungchaItems.superAlloy, 200, YoungchaItems.nickel, 300, YoungchaItems.cupronickel, 150));
+            requirements(ModularUnitPartCategories.weaponsUnit, ItemStack.with(Items.silicon, 500, Items.titanium, 500, YoungchaItems.superAlloy, 200, YoungchaItems.nickel, 300, YoungchaItems.cupronickel, 150));
             health(750);
             mass(1800);
             usesPower(400);
@@ -304,7 +304,7 @@ public class YoungchaParts{
         }};
 
         storage = new ModularUnitPartType("storage"){{
-            requirements(PartCategories.miscUnit, ItemStack.with(Items.silicon, 75, Items.titanium, 50, YoungchaItems.nickel, 30, Items.thorium, 15));
+            requirements(ModularUnitPartCategories.miscUnit, ItemStack.with(Items.silicon, 75, Items.titanium, 50, YoungchaItems.nickel, 30, Items.thorium, 15));
             w = 2;
             h = 2;
             itemCapacity(20);
@@ -313,7 +313,7 @@ public class YoungchaParts{
         }};
 
         flamethrower = new ModularUnitWeaponMountType("flamethrower"){{
-            requirements(PartCategories.weaponsUnit, ItemStack.with(Items.coal, 10, Items.graphite, 30));
+            requirements(ModularUnitPartCategories.weaponsUnit, ItemStack.with(Items.coal, 10, Items.graphite, 30));
             health(10);
             mass(60);
             usesPower(10);
@@ -342,7 +342,7 @@ public class YoungchaParts{
         }};
 
         grenadeLauncher = new ModularUnitWeaponMountType("grenade-launcher"){{
-            requirements(PartCategories.weaponsUnit, ItemStack.with(Items.metaglass, 20, YoungchaItems.nickel, 30, Items.graphite, 30));
+            requirements(ModularUnitPartCategories.weaponsUnit, ItemStack.with(Items.metaglass, 20, YoungchaItems.nickel, 30, Items.graphite, 30));
             health(20);
             mass(80);
             usesPower(20);
@@ -369,7 +369,7 @@ public class YoungchaParts{
         }};
 
         pipebomb = new ModularUnitAbilityType("pipebomb"){{
-            requirements(PartCategories.specialUnit, ItemStack.with(Items.coal, 20, Items.titanium, 10, Items.lead, 10));
+            requirements(ModularUnitPartCategories.specialUnit, ItemStack.with(Items.coal, 20, Items.titanium, 10, Items.lead, 10));
             health(20);
             mass(80);
             usesPower(5);
@@ -382,7 +382,7 @@ public class YoungchaParts{
         }};
 
         pretender = new ModularUnitAbilityType("pretender"){{
-            requirements(PartCategories.specialUnit, ItemStack.with(Items.sporePod, 20));
+            requirements(ModularUnitPartCategories.specialUnit, ItemStack.with(Items.sporePod, 20));
             health(10);
             mass(80);
             usesPower(15);

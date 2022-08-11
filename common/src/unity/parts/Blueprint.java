@@ -2,7 +2,7 @@ package unity.parts;
 
 import arc.struct.*;
 import mindustry.type.*;
-import unity.parts.PanelDoodadType.*;
+import unity.parts.PartDoodadType.*;
 import unity.parts.PartType.*;
 
 //Assumes fields especially collections are immutable from outer direct access.
@@ -79,16 +79,14 @@ public abstract class Blueprint<T extends PartType, P extends Part>{
     public static abstract class Data{
         public abstract void pack(byte[] data, int offset);
 
-        public <D extends Data> D self(){
-            return (D)this;
-        }
+        public abstract <D extends Data> D self();
     }
 
     public static abstract class Construct<P extends Part>{
         public final P[][] parts;
         public final Seq<P> partsList;
         public final Seq<P> hasCustomDraw = new Seq<>();
-        public final Seq<PanelDoodad> doodads = new Seq<>();
+        public final Seq<partDoodad> doodads = new Seq<>();
 
         public Construct(P[][] parts, Seq<P> partsList){
             this.parts = parts;
