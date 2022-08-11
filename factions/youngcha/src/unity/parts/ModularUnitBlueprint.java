@@ -266,6 +266,11 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
         }
 
         @Override
+        public PartData self(){
+            return this;
+        }
+
+        @Override
         public boolean equals(Object obj){
             if(this == obj) return true;
             if(obj instanceof PartData data) return id == data.id && x == data.x && y == data.y;
