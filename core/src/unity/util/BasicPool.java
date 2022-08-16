@@ -1,4 +1,4 @@
-package unity.mod;
+package unity.util;
 
 import arc.func.*;
 import arc.util.pooling.*;

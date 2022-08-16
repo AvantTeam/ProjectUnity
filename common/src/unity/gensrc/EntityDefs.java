@@ -15,6 +15,9 @@ final class EntityDefs{
     /** Youngcha modular + unit. */
     @EntityDef({Unitc.class, Modularc.class}) Object modularUnit;
 
+    /** End mech + unit */
+    @EntityDef({Unitc.class, Mechc.class, Endc.class}) Object endMechUnit;
+
     private EntityDefs(){
         throw new AssertionError();
     }
