@@ -18,7 +18,7 @@ public class YoungchaUnitTypes{
     }
 
     public static void load(){
-        modularUnitSmall = register(Faction.youngcha, content("modularUnit", ModularUnit.class, n -> new PUUnitType(n){{
+        modularUnitSmall = register(Faction.youngcha, content("modularUnit", ModularUnit.class, n -> new ModularUnitType(n){{
             faceTarget = false;
             omniMovement = false;
             weapons.add(new Weapon("gun")); //blank weapon so mobile doesn't die

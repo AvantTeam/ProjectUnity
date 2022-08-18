@@ -46,14 +46,5 @@ public abstract class PUUnitTypeCommon extends UnitType{
         public void preLoad(){}
 
         public void load(){}
-
-        public boolean drawCell(Unit unit){return true;}
-
-        public boolean drawBody(Unit unit){return true;}
-
-        //In most cases.
-        public boolean drawSoftShadow(Unit unit, float alpha){return drawSoftShadow(unit.x, unit.y, unit.rotation, alpha);}
-
-        public boolean drawSoftShadow(float x, float y, float rotation, float alpha){return true;}
     }
 }
