@@ -143,7 +143,7 @@ abstract class ModularComp implements Unitc, Factionc, ElevationMovec{
         float wheelSpeed = statMap.getFloat("wheel", "nominal statSpeed");
         float wheelCap = statMap.getFloat("wheel", "weightCapacity");
         statSpeed = eff * Mathf.clamp(wheelCap / this.massStat, 0, 1) * wheelSpeed;
-        rotateSpeed = Mathf.clamp(10f * statSpeed / (float)Math.max(construct.parts.length, construct.parts[0].length), 0, 5);
+        rotateSpeed = eff * Mathf.clamp(10f * statSpeed / (float)Math.max(construct.parts.length, construct.parts[0].length), 0, 5);
 
         armor = statMap.getFloat("realArmor");
         itemCap = (int)statMap.getFloat("itemCapacity");
