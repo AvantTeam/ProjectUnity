@@ -81,9 +81,15 @@ public class ModularUnitPartType extends PartType{
         getPartSprite(prefix + "-back-outline"),
         };
         cell = new TextureRegion[]{
+        getPartSprite(prefix + "-cell-center"),
+        null,
         getPartSprite(prefix + "-cell-side"),
-        getPartSprite(prefix + "-cell-center")
+        null,
         };
+        cell[1] = new TextureRegion(cell[0]);
+        cell[1].flip(false, true);
+        cell[3] = new TextureRegion(cell[2]);
+        cell[3].flip(false, true);
     }
 
     public static TextureRegion getPartSprite(String e){
@@ -94,11 +100,11 @@ public class ModularUnitPartType extends PartType{
         return f;
     }
 
-    public void requirements(String category, ItemStack[] itemcost){
+    public void requirements(String category, ItemStack[] itemCost){
         this.category = category;
-        this.cost = itemcost;
+        this.cost = itemCost;
         costTotal = 0;
-        for(var i : itemcost){
+        for(var i : itemCost){
             costTotal += i.amount;
         }
     }
@@ -106,7 +112,7 @@ public class ModularUnitPartType extends PartType{
     @Override
     public void drawCell(DrawTransform transform, Part part){
         if(hasCellDecal){
-            TextureRegion cellSprite = cell[Math.abs(part.cx) < 0.01 ? 1 : 0];
+            TextureRegion cellSprite = cell[(Math.abs(part.cx) < 0.01 ? 0 : 2) + (part.cy >= 0 ? 0 : 1)];
             transform.drawRectScl(cellSprite, part.cx * partSize, part.cy * partSize, part.cx < 0 ? 1 : -1, 1);
         }
     }
