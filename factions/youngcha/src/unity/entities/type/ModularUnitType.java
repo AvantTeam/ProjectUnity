@@ -48,7 +48,7 @@ public class ModularUnitType extends PUUnitType{
         DrawTransform dt = new DrawTransform(new Vec2(unit.x, unit.y), unit.rotation);
         var construct = unit.construct();
         if(construct != null){
-            construct.hasCustomDraw.each((p) -> p.type.drawCell(dt, p));
+            construct.hasCustomDraw.each(p -> p.type.drawCell(dt, p));
         }
         Draw.reset();
     }
@@ -59,12 +59,12 @@ public class ModularUnitType extends PUUnitType{
         var construct = unit.construct();
         if(construct != null){
             construct.doodads.each(d -> d.drawOutline(dt));
-            construct.hasCustomDraw.each((p) -> {
+            construct.hasCustomDraw.each(p -> {
                 p.type.drawOutline(dt, p);
                 p.type.draw(dt, p, unit);
             });
             construct.doodads.each(d -> d.drawTop(dt));
-            construct.hasCustomDraw.each((p) -> p.type.drawTop(dt, p));
+            construct.hasCustomDraw.each(p -> p.type.drawTop(dt, p));
         }
         Draw.reset();
     }

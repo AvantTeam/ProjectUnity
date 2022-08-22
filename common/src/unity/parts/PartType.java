@@ -88,5 +88,7 @@ public abstract class PartType implements Displayable{
         public float cy(){
             return cy;
         }
+
+        public abstract <T extends Part> T copy();
     }
 }

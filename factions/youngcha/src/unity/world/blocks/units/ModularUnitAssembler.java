@@ -161,7 +161,8 @@ public class ModularUnitAssembler extends PayloadBlock{
                 }
                 currentlyConstructing.clear();
             },
-            ModularUnitEditorDialog.unitInfoViewer, part -> part.visible && part.w <= unitModuleWidth && part.h <= unitModuleHeight
+            ModularUnitEditorDialog.unitInfoViewer,
+            part -> part.visible && part.w <= unitModuleWidth && part.h <= unitModuleHeight
             )
             );
             configureButtonCell.size(50);

@@ -129,6 +129,7 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
     @Override
     protected void place(ModularUnitPartType type, int x, int y){
         var part = type.create(x, y);
+        arc.util.Log.infoList("place", part.type.name, part.x, part.y);
         if(type.root) root = part;
         for(int i = x; i < x + type.w; i++){
             for(int j = y; j < y + type.h; j++) parts[i][j] = part;
@@ -145,7 +146,8 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
     public void displace(int x, int y){
         var part = parts[x][y];
         if(part != null){
-            data.remove(new PartData(part.type.id(), part.x, part.y));
+            arc.util.Log.infoList("displace", part.type.name, part.x, part.y);
+            arc.util.Log.info(data.remove(new PartData(part.type.id(), part.x, part.y)));
             if(part == root) root = null;
             for(int i = part.x; i < part.x + part.type.w; i++){
                 for(int j = part.y; j < part.y + part.type.h; j++) parts[i][j] = null;
@@ -166,11 +168,12 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
 
     @Override
     public ModularUnitConstruct construct(){
-        var copyPartsList = partsList.orderedItems().copy();
+        var copyPartsList = new Seq<ModularUnitPart>(partsList.orderedItems().size);
 
         int maxX = 0, minX = 256;
         int maxY = 0, minY = 256;
         for(var validPart : partsList){
+            copyPartsList.add(validPart.copy());
             maxX = Math.max(validPart.x + validPart.type.w - 1, maxX);
             minX = Math.min(validPart.x, minX);
             maxY = Math.max(validPart.y + validPart.type.h - 1, maxY);
@@ -271,10 +274,14 @@ public class ModularUnitBlueprint extends Blueprint<ModularUnitPartType, Modular
         }
 
         @Override
-        public boolean equals(Object obj){
-            if(this == obj) return true;
-            if(obj instanceof PartData data) return id == data.id && x == data.x && y == data.y;
-            return false;
+        public boolean equals(Object other){
+            if(other == null) return false;
+            if(other == this) return true;
+            if(!(other instanceof PartData data)) return false;
+            var p1 = ModularUnitPartType.getPartFromId(id);
+            var p2 = ModularUnitPartType.getPartFromId(data.id);
+            arc.util.Log.infoList(p1.name, x, y, p2.name, data.x, data.y);
+            return id == data.id && x == data.x && y == data.y;
         }
 
         //Thanks intellij wizard.
