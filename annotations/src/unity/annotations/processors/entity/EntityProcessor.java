@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
+import arc.util.pooling.*;
 import arc.util.pooling.Pool.*;
 import com.squareup.javapoet.*;
 import com.sun.tools.javac.code.*;
