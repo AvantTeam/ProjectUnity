@@ -669,14 +669,18 @@ public class EntityProcessor extends BaseProcessor{
                         builder.addMethod(resetBuilder.build());
                     }
 
+                    MethodSpec.Builder creator = MethodSpec.methodBuilder("create")
+                    .addModifiers(PUBLIC, STATIC)
+                    .returns(ClassName.get(packageName, name));
+                    if(defAnno.pooled()){
+                        creator.addStatement("return $T.obtain($T.class, $T::new)", spec(Pools.class), ClassName.get(packageName, name), ClassName.get(packageName, name));
+                    }else{
+                        creator.addStatement("return new $T()", ClassName.get(packageName, name));
+                    }
+
                     builder
                     .addMethod(MethodSpec.constructorBuilder().addModifiers(PROTECTED).build())
-                    .addMethod(MethodSpec.methodBuilder("create")
-                    .addModifiers(PUBLIC, STATIC)
-                    .returns(ClassName.get(packageName, name))
-                    .addStatement(defAnno.pooled() ? "return Pools.obtain($L.class, " + name + "::new)" : "return new $L()", ClassName.get(packageName, name))
-                    .build()
-                    );
+                    .addMethod(creator.build());
 
                     definitions.add(new EntityDefinition(name, builder, def, typeIsBase ? null : baseClassType, defComps.values().toSeq(), allFieldSpecs.copy()));
                 }
