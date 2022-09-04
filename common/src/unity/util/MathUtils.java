@@ -179,6 +179,42 @@ public final class MathUtils{
         );
     }
 
+    static float curveFunc(float x){
+        return 1f / (Mathf.pow(Math.abs(x * 1.3591409f), Mathf.PI) + 1f);
+    }
+
+    /**
+     * Bad implementation of a curved interpolation.
+     * @author EyeOfDarkness
+     */
+    public static Vec2 curve(float[] pos, int size, float progress, Vec2 out){
+        float offset = progress * ((size - 2) / 2f);
+
+        float l1 = 1f - offset;
+        float l2 = offset - (size - 4) / 2f;
+
+        float scl = 0f;
+        float nx = 0f, ny = 0f;
+        for(int i = 0; i < size; i += 2){
+            float z = curveFunc((i / 2f) - offset);
+            scl += z;
+            nx += pos[i] * z;
+            ny += pos[i + 1] * z;
+        }
+        nx /= scl;
+        ny /= scl;
+
+        if(l1 > 0){
+            nx = Mathf.lerp(nx, pos[0], l1 * l1);
+            ny = Mathf.lerp(ny, pos[1], l1 * l1);
+        }
+        if(l2 > 0){
+            nx = Mathf.lerp(nx, pos[size - 2], l2 * l2);
+            ny = Mathf.lerp(ny, pos[size - 1], l2 * l2);
+        }
+        return out.set(nx, ny);
+    }
+
     /** @author EyeOfDarkness */
     public static float slope(float fin, float bias){
         return (fin < bias ? (fin / bias) : 1f - (fin - bias) / (1f - bias));

@@ -68,6 +68,9 @@ abstract class EndComp implements Unitc, Factionc{
         if(invframes <= 0f){
             recievedDamage = 0f;
         }
+        if(armor < type.armor){
+            armor = Math.max(0, Math.min(type.armor, armor + (type.armor / props.armorRecoveryTime) * Time.delta));
+        }
     }
 
     @Override

@@ -1,7 +1,10 @@
 package unity.content;
 
+import mindustry.entities.pattern.*;
+import mindustry.type.*;
 import unity.entities.prop.*;
 import unity.entities.type.*;
+import unity.entities.type.bullet.*;
 import unity.gen.entities.*;
 import unity.graphics.*;
 import unity.mod.*;
@@ -30,6 +33,19 @@ public final class EndUnitTypes{
                 maxDamageCurve = 90f;
                 invincibilityFrames = 40f;
                 invincibilityTrigger = 150f;
+            }});
+
+            weapons.add(new Weapon(""){{
+                x = 0f;
+                y = 0f;
+                reload = 80f;
+                mirror = false;
+                bullet = new EndTentacleBulletType();
+                inaccuracy = 35f;
+                shoot = new ShootPattern(){{
+                    shotDelay = 4f;
+                    shots = 6;
+                }};
             }});
         }}));
     }

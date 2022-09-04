@@ -10,6 +10,8 @@ public class EndProps extends Props{
     public float invincibilityFrames = 15f, invincibilityTrigger = 35f,
             maxDamage = 10000f, maxDamageCurve = 5000f;
 
+    public float armorRecoveryTime = 5f * 60f;
+
     public float aggroDamage = 1000000f;
     public float maxAggroTime = 5f * 60f;
     public float aggroTimePerDamage = 3f;
