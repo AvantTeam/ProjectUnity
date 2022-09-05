@@ -38,7 +38,7 @@ public final class EndUnitTypes{
             weapons.add(new Weapon(""){{
                 x = 0f;
                 y = 0f;
-                reload = 80f;
+                reload = 120f;
                 mirror = false;
                 bullet = new EndTentacleBulletType();
                 inaccuracy = 35f;

@@ -7,6 +7,8 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import unity.entities.*;
 import unity.entities.PUDamage.*;
@@ -25,11 +27,19 @@ public class EndTentacleBulletType extends EndBulletTypeBase{
         lifetime = 50f;
         collides = false;
         keepVelocity = false;
+        despawnEffect = Fx.none;
     }
 
     @Override
     protected float calculateRange(){
         return estimatedRange;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        drawSize = estimatedRange * 3f;
+        despawnHit = false;
     }
 
     @Override
@@ -42,12 +52,19 @@ public class EndTentacleBulletType extends EndBulletTypeBase{
         d.pos = new float[nodes];
         d.vel = new float[nodes];
         for(int i = 0; i < nodes; i += 2){
-            float speed = (i / (nodes - 2f)) * ((scl * estimatedRange * 1.75f) / lifetime);
+            float speed = (i / (nodes - 2f)) * ((scl * estimatedRange) / lifetime);
             d.pos[i] = b.x;
             d.pos[i + 1] = b.y;
             Tmp.v1.trns(b.rotation() + (i >= (nodes - 2) ? 0f : Mathf.range(15f)), speed * Mathf.random(0.9f, 1.3f), (i > 0 && i < nodes - 2) ? Mathf.range(swaySpeed) : 0f);
             d.vel[i] = Tmp.v1.x;
             d.vel[i + 1] = Tmp.v1.y;
+        }
+        if(b.owner instanceof Posc p){
+            d.x = p.x();
+            d.y = p.y();
+        }
+        if(b.aimX != -1 && b.aimY != -1){
+            d.target = Units.closestTarget(b.team, b.aimX, b.aimY, 15f);
         }
         b.data = d;
     }
@@ -56,14 +73,35 @@ public class EndTentacleBulletType extends EndBulletTypeBase{
     public void update(Bullet b){
         //super.update(b);
         if(!(b.data instanceof EndTentacleData data)) return;
+        if(data.target != null && Units.invalidateTarget(data.target, b.team, b.x, b.y)) data.target = null;
         for(int i = 0; i < data.pos.length; i += 2){
             float[] pos = data.pos;
+
+            if(b.owner instanceof Posc p){
+                float fin = 1f - (i / (data.pos.length - 2f));
+                float dx = (p.x() - data.x) * fin;
+                float dy = (p.y() - data.y) * fin;
+                pos[i] += dx;
+                pos[i + 1] += dy;
+                data.x = p.x();
+                data.y = p.y();
+            }
+
             float x = pos[i] += data.vel[i] * Time.delta;
             float y = pos[i + 1] += data.vel[i + 1] * Time.delta;
 
-            if(i <= (pos.length - 2) && i > 0){
+            if(i >= data.pos.length - 4 && data.target != null){
+                float rot = Angles.angle(x, y, data.target.x(), data.target.y());
+                Tmp.v1.set(data.vel[i], data.vel[i + 1]);
+                float ang = Mathf.clamp(MathUtils.angleDistSigned(Tmp.v1.angle(), rot) / 10f, -7f, 7f) * Time.delta * b.fin();
+                Tmp.v1.rotate(-ang);
+                data.vel[i] = Tmp.v1.x;
+                data.vel[i + 1] = Tmp.v1.y;
+            }
+
+            if(i > 0){
                 Building bd = Vars.world.buildWorld(pos[i], pos[i + 1]);
-                float drg = bd != null ? (bd.block.absorbLasers ? 0.3f : 0.08f) : 0.02f;
+                float drg = bd != null ? (bd.block.absorbLasers ? 0.3f : 0.08f) : ((i < data.pos.length - 4) ? 0.02f : 0f);
 
                 data.vel[i] *= 1f - drg * Time.delta;
                 data.vel[i + 1] *= 1f - drg * Time.delta;
@@ -77,6 +115,8 @@ public class EndTentacleBulletType extends EndBulletTypeBase{
                 }
             }
         }
+        b.x = data.pos[0];
+        b.y = data.pos[1];
         if(b.time >= endTime && b.fdata != 1){
             int seg = (data.pos.length / 2) * collisionSegments;
             float lx = data.pos[0], ly = data.pos[1];
@@ -125,6 +165,8 @@ public class EndTentacleBulletType extends EndBulletTypeBase{
 
     static class EndTentacleData{
         float[] pos, vel;
+        float x, y;
         IntSet collided = new IntSet();
+        Posc target;
     }
 }
