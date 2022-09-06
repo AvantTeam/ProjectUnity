@@ -20,7 +20,7 @@ public class EndTentacleBulletType extends EndBulletTypeBase{
     public float swaySpeed = 2.25f;
     public float endTime = 40f;
     public int maxNode = 5, minNodes = 3;
-    public int segmentsPerNode = 6, collisionSegments = 3;
+    public float segmentsPerNode = 5, collisionSegments = 2.5f;
 
     public EndTentacleBulletType(){
         super(0f, 210f);
@@ -118,7 +118,7 @@ public class EndTentacleBulletType extends EndBulletTypeBase{
         b.x = data.pos[0];
         b.y = data.pos[1];
         if(b.time >= endTime && b.fdata != 1){
-            int seg = (data.pos.length / 2) * collisionSegments;
+            int seg = (int)((data.pos.length / 2) * collisionSegments);
             float lx = data.pos[0], ly = data.pos[1];
             CollideLineData ld = PUDamage.lineData.clear();
             ld.hitBuilding = collidesTiles && collidesGround;
@@ -146,17 +146,20 @@ public class EndTentacleBulletType extends EndBulletTypeBase{
     @Override
     public void draw(Bullet b){
         if(!(b.data instanceof EndTentacleData data)) return;
-        int seg = (data.pos.length / 2) * segmentsPerNode;
+        int seg = (int)((data.pos.length / 2) * segmentsPerNode);
         //Draw.color(Color.black);
         float z = Draw.z();
         float fin = b.time < endTime ? 0f : 1f - ((b.time - endTime) / (lifetime - endTime));
         float fin2 = b.time < endTime ? 1f : 1f - ((b.time - endTime) / (lifetime - endTime));
+        float w = 7f * fin2;
         Tmp.c1.set(Color.black).lerp(EndPal.endMid, fin);
+        Draw.color(Tmp.c1);
+        Fill.circle(data.pos[0], data.pos[1], w / 2);
         DrawUtils.beginLine();
         for(int i = 0; i < seg; i++){
             float f = i / (seg - 1f);
             Vec2 v = MathUtils.curve(data.pos, data.pos.length, f, Tmp.v1);
-            DrawUtils.linePoint(v.x, v.y, Tmp.c1.toFloatBits(), (1f - f) * 7f * fin2, z);
+            DrawUtils.linePoint(v.x, v.y, Tmp.c1.toFloatBits(), (1f - f) * w, z);
             //Lines.linePoint(v);
         }
         DrawUtils.endLine(false);
