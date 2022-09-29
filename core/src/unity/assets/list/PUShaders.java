@@ -5,10 +5,16 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
+import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import unity.graphics.*;
+import unity.util.*;
+
+import java.lang.reflect.*;
 
 import static arc.graphics.gl.Shader.*;
 import static mindustry.Vars.*;
@@ -18,6 +24,7 @@ import static mindustry.graphics.Shaders.*;
 public final class PUShaders{
     public static PlanetObjectShader planet;
     public static PUSurfaceShader eneraphyte, pit, waterpit;
+    public static InvisibilityShader dimensionshift;
 
     private PUShaders(){
         throw new AssertionError();
@@ -30,6 +37,9 @@ public final class PUShaders{
         eneraphyte = new PUSurfaceShader("eneraphyte", "noise");
         pit = new PitShader("pit", 9, "noise", "concrete-blank1", "stone-sheet", "truss");
         waterpit = new PitShader("waterpit", 9, "noise", "concrete-blank1", "stone-sheet");
+        dimensionshift = new InvisibilityShader("dimensionshift");
+
+        RegionBatch.init();
     }
 
     public static <T extends Shader> T preprocess(String vertPreprocess, String fragPreprocess, Prov<T> create){
@@ -164,6 +174,60 @@ public final class PUShaders{
         public void apply(){
             setUniformf("variants", (float)variants);
             super.apply();
+        }
+    }
+
+    public static class InvisibilityShader extends Shader{
+        public float progress;
+        public Color overrideColor = Color.white.cpy();
+        private Batch lastBatch;
+
+        private static final Field csField = ReflectUtils.findf(Batch.class, "customShader"),
+        shaderField = ReflectUtils.findf(Batch.class, "shader");
+        private static Shader baseShader;
+
+        public InvisibilityShader(String fragmentShader){
+            super(file("defaultwmix.vert"), file(fragmentShader + ".frag"));
+        }
+
+        @Override
+        public void apply(){
+            RegionBatch b = (RegionBatch)Core.batch;
+
+            setUniformf("u_progress", progress);
+            setUniformf("u_override_color", overrideColor);
+
+            setUniformf("u_uv", b.u, b.v);
+            setUniformf("u_uv2", b.u2, b.v2);
+            //setUniformf("u_texsize", region.texture.width, region.texture.height);
+            setUniformf("u_texsize", b.getTexture().width, b.getTexture().height);
+        }
+
+        public void updateBaseShader(){
+            if(baseShader == null){
+                try{
+                    baseShader = (Shader)shaderField.get(Core.batch);
+                }catch(Exception e){
+                    baseShader = SpriteBatch.createShader();
+                    Log.err(e);
+                }
+            }
+        }
+
+        public void begin(){
+            updateBaseShader();
+            lastBatch = Core.batch;
+            Mat proj = Draw.proj(), trans = Draw.trans();
+            Core.batch = RegionBatch.batch;
+            Draw.proj(proj);
+            Draw.trans(trans);
+            Draw.shader(this);
+        }
+
+        public void end(){
+            Draw.flush();
+            Core.batch = lastBatch;
+            baseShader.bind();
         }
     }
 }

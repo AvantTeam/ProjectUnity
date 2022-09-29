@@ -17,6 +17,8 @@ final class EntityDefs{
 
     /** End mech + unit */
     @EntityDef({Unitc.class, Mechc.class, Endc.class}) Object endMechUnit;
+    /** End mech + invisible + unit */
+    @EntityDef({Unitc.class, Mechc.class, Invisiblec.class, Endc.class}) Object endInvisibleMechUnit;
 
     private EntityDefs(){
         throw new AssertionError();

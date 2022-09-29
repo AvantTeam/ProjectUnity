@@ -1,7 +1,9 @@
 package unity.content;
 
+import arc.graphics.*;
 import mindustry.entities.pattern.*;
 import mindustry.type.*;
+import unity.assets.list.*;
 import unity.entities.prop.*;
 import unity.entities.type.*;
 import unity.entities.type.bullet.*;
@@ -19,7 +21,7 @@ public final class EndUnitTypes{
         EndProps.add = EndCurse::addUnit;
         EndProps.remove = EndCurse::removeUnit;
 
-        eversion = register(Faction.end, content("eversion", EndMechUnit.class, n -> new PUUnitType(n){{
+        eversion = register(Faction.end, content("eversion", EndInvisibleMechUnit.class, n -> new InvisibleUnitType(n){{
             health = 800f;
             speed = 0.6f;
             hitSize = 13f;
@@ -27,6 +29,9 @@ public final class EndUnitTypes{
             armor = 30f;
             outlineColor = EndPal.endOutline;
             mechLegColor = EndPal.endSolidDark;
+
+            invisibilityShader = PUShaders.dimensionshift;
+            fadeColor = Color.red;
 
             prop(new EndProps(){{
                 maxDamage = 700f;
