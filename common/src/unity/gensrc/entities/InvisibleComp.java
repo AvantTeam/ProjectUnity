@@ -2,7 +2,6 @@ package unity.gensrc.entities;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
 import mindustry.async.PhysicsProcess.*;
 import mindustry.gen.*;
 import unity.annotations.Annotations.*;
@@ -14,8 +13,6 @@ abstract class InvisibleComp implements Hitboxc, Healthc{
     boolean invisible;
     float invisProgress;
     transient boolean invisUpdated;
-
-    transient private float testTime;
 
     @Import boolean dead;
     @Import float x, y;
@@ -39,16 +36,6 @@ abstract class InvisibleComp implements Hitboxc, Healthc{
             invisProgress = Mathf.approachDelta(invisProgress, invisible ? 1f : 0f, 0.05f);
         }
         invisUpdated = false;
-
-        testTime += Time.delta;
-        if(testTime > 2f * 60f){
-            if(testTime > 4 * 60f){
-                updateInvisibility(true, 0.01f);
-            }else{
-                updateInvisibility(false, 0.01f);
-            }
-            if(testTime > 7 * 60f) testTime = 0f;
-        }
     }
 
     void updateInvisibility(boolean visible, float speed){
