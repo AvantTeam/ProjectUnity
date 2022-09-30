@@ -22,7 +22,7 @@ void main(){
     float prog = pow(u_progress, p);
 
     vec4 col = mix(vec4(1.0), u_override_color, u_progress);
-    if(dst > (1.0 - prog) * center.y){
+    if(dst > (1.0 - prog) * max(center.x, center.y)){
         gl_FragColor = vec4(0.0);
     }else{
         gl_FragColor = v_color * col * mix(c, vec4(v_mix_color.rgb, c.a), v_mix_color.a);
