@@ -17,7 +17,7 @@ public class EndBuilderGraph{
 
     public Seq<Building> cores = new Seq<>(), buildings = new Seq<>();
     public IntSet buildingSet = new IntSet(50);
-    int id = ids++;
+    public int id = ids++;
 
     public void addGraph(EndBuilderGraph graph){
         if(graph == this) return;
@@ -72,6 +72,7 @@ public class EndBuilderGraph{
             if(other != null){
                 ((EndBuilderBuilding)other).builderMod().links.removeValue(b.pos());
                 tmpConnections.add(other);
+                ((EndBuilderBuilding)other).builderMod().findConnections(other);
             }
             //as.builderMod().linkBuild[i] = null;
         }

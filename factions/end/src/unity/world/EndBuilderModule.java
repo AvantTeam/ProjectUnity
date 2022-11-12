@@ -11,8 +11,6 @@ import mindustry.world.*;
 import mindustry.world.modules.*;
 import unity.mod.*;
 
-import java.util.*;
-
 public class EndBuilderModule extends BlockModule{
     public EndBuilderGraph graph = new EndBuilderGraph();
     public IntSeq links = new IntSeq(4);
@@ -20,7 +18,8 @@ public class EndBuilderModule extends BlockModule{
     public boolean init;
     public float efficiency = 1f;
 
-    final static Building[] tmpBuilding = new Building[4];
+    final static IntSet buildingSet = new IntSet(4), buildingSet2 = new IntSet(4);
+    final static Seq<Building> buildingSeq = new Seq<>(4);
 
     @Override
     public void write(Writes write){
@@ -60,50 +59,67 @@ public class EndBuilderModule extends BlockModule{
         EndBuilderBuilding eb = (EndBuilderBuilding)b;
         Tile t = b.tile;
 
-        Arrays.fill(tmpBuilding, null);
+        buildingSet.clear();
+        buildingSet2.clear();
+        buildingSeq.clear();
         for(int i = 0; i < links.size; i++){
             Building o = Vars.world.build(links.get(i));
             if(o != null){
-                tmpBuilding[getDirection(b, o)] = o;
+                buildingSet.add(o.pos());
+                buildingSeq.add(o);
             }
         }
         links.clear();
         for(int i = 0; i < 4; i++){
             var dir = Geometry.d4[i];
-            Building prev = tmpBuilding[i], next = null;
+            Building next = null;
             int offset = b.block.size / 2;
 
             for(int j = 1 + offset; j <= eb.tileRange() + offset; j++){
                 Building other = Vars.world.build(t.x + j * dir.x, t.y + j * dir.y);
-                if(other instanceof EndBuilderBuilding && (other.x == b.x || other.y == b.y)){
+                if(other instanceof EndBuilderBuilding && other.isAdded() && (other.x == b.x || other.y == b.y)){
                     next = other;
+                    buildingSet2.add(other.pos());
                     break;
                 }
             }
 
-            if(next != prev){
-                if(prev != null){
-                    links.removeValue(prev.pos());
-                    EndBuilderBuilding as = prev.as();
-                    as.builderMod().links.removeValue(b.pos());
-                    as.builderMod().updateLength(prev);
-
-                    EndBuilderGraph newG = new EndBuilderGraph();
-                    newG.reflow(b);
-                    if(as.builderMod().graph != newG){
-                        EndBuilderGraph og = new EndBuilderGraph();
-                        og.reflow(prev);
+            if(next != null){
+                EndBuilderBuilding as = next.as();
+                int d = getDirection(next, b);
+                int nextPos = next.pos();
+                links.addUnique(nextPos);
+                if(!buildingSet.contains(next.pos())){
+                    IntSeq iseq = as.builderMod().links;
+                    for(int j = 0; j < iseq.size; j++){
+                        Building other = Vars.world.build(iseq.get(j));
+                        if(other != null && getDirection(next, other) == d){
+                            EndBuilderBuilding as2 = other.as();
+                            as2.builderMod().links.removeValue(nextPos);
+                            as.builderMod().links.removeValue(other.pos());
+                            as2.builderMod().updateLength(other);
+                        }
                     }
-                }
-                if(next != null){
-                    EndBuilderBuilding as = next.as();
                     if(!as.builderMod().init){
                         as.builderMod().graph.reflow(next);
                     }
-                    links.addUnique(next.pos());
                     as.builderMod().links.addUnique(b.pos());
-                    as.builderMod().updateLength(next);
                     graph.addGraph(as.builderMod().graph);
+                }
+                as.builderMod().updateLength(next);
+            }
+        }
+        buildingSet.clear();
+        for(Building prev : buildingSeq){
+            if(!buildingSet2.contains(prev.pos())){
+                EndBuilderBuilding as = prev.as();
+                as.builderMod().links.removeValue(b.pos());
+                as.builderMod().updateLength(prev);
+
+                if(!buildingSet.contains(as.builderMod().graph.id)){
+                    EndBuilderGraph newG = new EndBuilderGraph();
+                    newG.reflow(prev);
+                    buildingSet.add(newG.id);
                 }
             }
         }

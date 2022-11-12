@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.Queue;
-import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
@@ -137,15 +136,6 @@ public interface EndBuilderBuilding extends Posc{
         for(int i = 0; i < mod.links.size; i++){
             Building b = Vars.world.build(mod.links.items[i]);
             if(b != null && b.id < id()){
-                //Lines.line(x, y, b.x, b.y, false);
-                /*
-                float rot = angleTo(b);
-                Vec2 v1 = Tmp.v1.trns(rot, as.block.size * 4).add(this);
-                Vec2 v2 = Tmp.v2.trns(rot + 180f, b.block.size * 4).add(b);
-                Fill.circle(v1.x, v1.y, 1.5f);
-                Fill.circle(v2.x, v2.y, 1.5f);
-                Lines.stroke(2f);
-                 */
                 EndBuilders.drawLaser(as, as.block.size * 4, b, b.block.size * 4, 0.5f);
             }
         }
