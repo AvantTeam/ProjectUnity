@@ -2,7 +2,6 @@ package unity.gensrc.entities;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
 import mindustry.ai.*;
 import mindustry.async.PhysicsProcess.*;
 import mindustry.entities.*;

@@ -80,6 +80,7 @@ public class ProjectUnity extends ProjectUnityCommon{
 
             PUPackets.register();
         });
+        EndBuilders.load();
     }
 
     @Override
