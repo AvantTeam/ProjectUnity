@@ -1,6 +1,7 @@
 package unity.mod;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -14,7 +15,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import unity.assets.list.*;
 import unity.entities.prop.*;
+import unity.graphics.*;
 import unity.mod.EndBuilderGraph.*;
 import unity.util.*;
 import unity.world.*;
@@ -29,11 +32,13 @@ public class EndBuilders{
     static boolean valid, inside;
 
     static long lastFrame = -1;
+    static int test = 0;
 
     public static EndBuilders builders;
     public static TextureRegion laserEnd, laser;
 
     EndBuilderData[] teams = new EndBuilderData[Team.all.length];
+    Seq<EndBuilderData> active = new Seq<>();
 
     public EndBuilders(){
         Events.on(EventType.ContentInitEvent.class, e -> {
@@ -42,6 +47,7 @@ public class EndBuilders{
                 laser = Core.atlas.find("unity-end-builder-laser");
             }
         });
+        Events.run(Trigger.draw, this::draw);
         Events.on(EventType.BlockBuildBeginEvent.class, e -> {
             if(e.tile.build instanceof ConstructBuild b){
                 //Log.info("end builder BlockBuildBeginEvent " + e.team);
@@ -73,10 +79,12 @@ public class EndBuilders{
                 t.queueSet.clear();
                 //Log.info("endbuilder reset");
             }
+            active.clear();
         });
         Events.on(EventType.WorldLoadEvent.class, e -> {
+            active.clear();
             for(TeamData data : state.teams.active){
-                this.data(data.team.id);
+                active.add(this.data(data.team.id));
             }
             for(EndBuilderData t : teams){
                 if(t == null) continue;
@@ -165,9 +173,36 @@ public class EndBuilders{
         }
     }
 
+    void draw(){
+        Draw.draw(Layer.flyingUnit + 1f, () -> {
+            Core.camera.bounds(Tmp.r1);
+            renderer.effectBuffer.begin(Color.clear);
+            Draw.color(Color.white);
+            for(EndBuilderData data : active){
+                data.tree.intersect(Tmp.r1, e -> {
+                    Tmp.cr1.set(e.b.x, e.b.y, e.range);
+                    if(((EndBuilderBuilding)e.b).builderValid() && Intersector.overlaps(Tmp.cr1, Tmp.r1)){
+                        Fill.poly(e.b.x, e.b.y, Math.max(Lines.circleVertices(e.range) / 3, 16), e.range);
+                    }
+                });
+            }
+            renderer.effectBuffer.end();
+            PUShaders.endAreaShader.color.set(EndPal.endMid).mul(1f + Mathf.absin(12f, 0.5f));
+            PUShaders.endAreaShader.width = 2f + Mathf.absin(7f, 0.5f);
+            Draw.blit(renderer.effectBuffer, PUShaders.endAreaShader);
+            Draw.reset();
+        });
+    }
+
     void update(){
+        /*
+        if(test < 20){
+            Log.info(Core.graphics.getFrameId());
+            test++;
+        }
         if(Core.graphics.getFrameId() != lastFrame) return;
         lastFrame = Core.graphics.getFrameId();
+        */
         for(TeamData t : state.teams.active){
             EndBuilderData d = data(t.team.id);
             if(!t.plans.isEmpty() && d.lastPlan != t.plans.last()){

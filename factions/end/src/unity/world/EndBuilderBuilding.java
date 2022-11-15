@@ -131,22 +131,26 @@ public interface EndBuilderBuilding extends Posc{
         if(Mathf.zero(Renderer.laserOpacity) || as.isPayload()) return;
         Draw.z(Layer.power - 1f);
         //Draw.color(Color.red, Renderer.laserOpacity);
-        Lines.stroke(2f);
+        Draw.alpha(Renderer.laserOpacity);
+        //Draw.blend(Blending.additive);
+        //Lines.stroke(2f);
 
         for(int i = 0; i < mod.links.size; i++){
             Building b = Vars.world.build(mod.links.items[i]);
             if(b != null && b.id < id()){
-                EndBuilders.drawLaser(as, as.block.size * 4, b, b.block.size * 4, 0.5f);
+                EndBuilders.drawLaser(as, as.block.size * 4, b, b.block.size * 4, 0.75f);
             }
         }
-        Draw.color(Color.red, Renderer.laserOpacity);
+
         if(getTargetUnit() != null){
-            Lines.line(x, y, getTargetUnit().x, getTargetUnit().y, false);
+            float z = Draw.z();
+            Draw.z(z + 0.1f);
+            EndBuilders.drawLaser(as, as.block.size * 4, getTargetUnit(), 0f, 0.75f);
+            Draw.z(z);
         }
+        Draw.color(Color.red, Renderer.laserOpacity);
+        //Draw.blend();
         Lines.stroke(1.5f);
-        if(builderValid()){
-            Lines.circle(x, y, range());
-        }
 
         Draw.reset();
     }

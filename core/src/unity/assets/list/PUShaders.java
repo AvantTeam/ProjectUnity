@@ -25,6 +25,7 @@ public final class PUShaders{
     public static PlanetObjectShader planet;
     public static PUSurfaceShader eneraphyte, pit, waterpit;
     public static InvisibilityShader dimensionshift;
+    public static EndAreaShader endAreaShader;
 
     private PUShaders(){
         throw new AssertionError();
@@ -38,6 +39,7 @@ public final class PUShaders{
         pit = new PitShader("pit", 9, "noise", "concrete-blank1", "stone-sheet", "truss");
         waterpit = new PitShader("waterpit", 9, "noise", "concrete-blank1", "stone-sheet");
         dimensionshift = new InvisibilityShader("dimensionshift");
+        endAreaShader = new EndAreaShader();
 
         RegionBatch.init();
     }
@@ -228,6 +230,26 @@ public final class PUShaders{
             Draw.flush();
             Core.batch = lastBatch;
             baseShader.bind();
+        }
+    }
+
+    public static class EndAreaShader extends Shader{
+        public float width = 2f;
+        public Color color = new Color();
+
+        public EndAreaShader(){
+            super(getShaderFi("screenspace.vert"), file("endareashader.frag"));
+        }
+
+        @Override
+        public void apply(){
+            super.apply();
+            setUniformf("u_color", color);
+            setUniformf("u_offset_x", Mathf.sin(Time.time / 20f) * width);
+            setUniformf("u_offset_y", Mathf.cos(Time.time / 20f) * width);
+
+            //setUniformf("u_texsize", Core.camera.width, Core.camera.height);
+            setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
         }
     }
 }
