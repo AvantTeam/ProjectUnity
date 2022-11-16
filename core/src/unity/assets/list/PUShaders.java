@@ -245,8 +245,8 @@ public final class PUShaders{
         public void apply(){
             super.apply();
             setUniformf("u_color", color);
-            setUniformf("u_offset_x", Mathf.sin(Time.time / 20f) * width);
-            setUniformf("u_offset_y", Mathf.cos(Time.time / 20f) * width);
+            setUniformf("u_offset_x", Mathf.sin(Time.time / 60f) * width);
+            setUniformf("u_offset_y", Mathf.cos(Time.time / 60f) * width);
 
             //setUniformf("u_texsize", Core.camera.width, Core.camera.height);
             setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);

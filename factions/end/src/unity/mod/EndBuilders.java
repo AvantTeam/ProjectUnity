@@ -31,9 +31,6 @@ public class EndBuilders{
     static float dst, dstb;
     static boolean valid, inside;
 
-    static long lastFrame = -1;
-    static int test = 0;
-
     public static EndBuilders builders;
     public static TextureRegion laserEnd, laser;
 
@@ -178,31 +175,25 @@ public class EndBuilders{
             Core.camera.bounds(Tmp.r1);
             renderer.effectBuffer.begin(Color.clear);
             Draw.color(Color.white);
+            float fluc = Mathf.absin(7f, 0.75f);
             for(EndBuilderData data : active){
                 data.tree.intersect(Tmp.r1, e -> {
                     Tmp.cr1.set(e.b.x, e.b.y, e.range);
                     if(((EndBuilderBuilding)e.b).builderValid() && Intersector.overlaps(Tmp.cr1, Tmp.r1)){
-                        Fill.poly(e.b.x, e.b.y, Math.max(Lines.circleVertices(e.range) / 3, 16), e.range);
+                        Draw.color(Color.white, 0.3f + (e.b.potentialEfficiency * ((EndBuilderBuilding)e.b).builderMod().efficiency) * 0.7f);
+                        Fill.poly(e.b.x, e.b.y, Math.max(Lines.circleVertices(e.range) / 3, 16), e.range - fluc / 2f);
                     }
                 });
             }
             renderer.effectBuffer.end();
-            PUShaders.endAreaShader.color.set(EndPal.endMid).mul(1f + Mathf.absin(12f, 0.5f));
-            PUShaders.endAreaShader.width = 2f + Mathf.absin(7f, 0.5f);
+            PUShaders.endAreaShader.color.set(EndPal.endMid).mul(1f + Mathf.absin(12f, 0.75f));
+            PUShaders.endAreaShader.width = 2f + fluc;
             Draw.blit(renderer.effectBuffer, PUShaders.endAreaShader);
             Draw.reset();
         });
     }
 
     void update(){
-        /*
-        if(test < 20){
-            Log.info(Core.graphics.getFrameId());
-            test++;
-        }
-        if(Core.graphics.getFrameId() != lastFrame) return;
-        lastFrame = Core.graphics.getFrameId();
-        */
         for(TeamData t : state.teams.active){
             EndBuilderData d = data(t.team.id);
             if(!t.plans.isEmpty() && d.lastPlan != t.plans.last()){
