@@ -47,10 +47,10 @@ public class EndBuilderModule extends BlockModule{
             if(o != null){
                 int s1 = (b.block.size / 2) + 1, s2 = (o.block.size / 2);
                 if(r < 0) r = 99999f;
-                r = Math.min(r, b.dst(o) - (s1 + s2) * Vars.tilesize);
+                r = Math.max(Math.min(r, b.dst(o) - (s1 + s2) * Vars.tilesize), 0f);
             }
         }
-        if(r > 0){
+        if(r >= 0){
             efficiency = EndBuilders.getEfficiency((int)r / Vars.tilesize, ((EndBuilderBuilding)b).tileRange());
         }
     }

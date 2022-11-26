@@ -18,7 +18,7 @@ import unity.mod.*;
 import unity.world.*;
 
 public class EndConstructorBlock extends Block{
-    public float buildRange = 220f, buildSpeed = 0.6f;
+    public float buildRange = 220f, buildSpeed = 0.4f;
     public int tileRange = 16;
     public TextureRegion topRegion;
     protected UnitType buildType;

@@ -109,6 +109,7 @@ public class ProjectUnity extends ProjectUnityCommon{
         MonolithBlocks.load();
         MonolithPlanets.load();
 
+        EndItems.load();
         EndUnitTypes.load();
         EndBlocks.load();
 

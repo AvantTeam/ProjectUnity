@@ -9,8 +9,8 @@ import unity.mod.*;
 import unity.world.*;
 
 public class EndCoreBlock extends CoreBlock{
-    public float buildRange = 350f, buildSpeed = 2f;
-    public int tileRange = 24;
+    public float buildRange = 350f, buildSpeed = 1f;
+    public int tileRange = 20;
     protected UnitType buildType;
 
     public EndCoreBlock(String name){

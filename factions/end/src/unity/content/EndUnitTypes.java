@@ -65,7 +65,6 @@ public final class EndUnitTypes{
             speed = 8.5f;
             accel = 0.1f;
             hitSize = 13f;
-            mechFrontSway = 0.4f;
             buildSpeed = 0.001f;
             armor = 20f;
 

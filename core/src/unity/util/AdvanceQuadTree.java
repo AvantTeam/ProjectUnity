@@ -94,6 +94,7 @@ public class AdvanceQuadTree<T extends AdvanceQuadTreeObject<T>> extends QuadTre
     public void clear(){
         Object[] items = objects.items;
         for(int i = 0, n = objects.size; i < n; i++){
+            if(items[i] == null) continue;
             ((T)items[i]).tree = null;
             items[i] = null;
         }

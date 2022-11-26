@@ -3,6 +3,7 @@ package unity.mod;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -27,9 +28,9 @@ import static mindustry.Vars.*;
 public class EndBuilders{
     final static BasicPool<EndBuilder> builderPool = new BasicPool<>(EndBuilderGraph.EndBuilder::new);
     //final static Seq<EndBuilder> tmp = new Seq<>();
-    static EndBuilder n, n2;
-    static float dst, dstb;
-    static boolean valid, inside;
+    private static EndBuilder n, n2;
+    private static float dst, dstb;
+    private static boolean valid, inside;
 
     public static EndBuilders builders;
     public static TextureRegion laserEnd, laser;
@@ -114,6 +115,7 @@ public class EndBuilders{
     }
 
     public static void drawLaser(Position a, float aDst, Position b, float bDst, float scl){
+        if(a.within(b, aDst + bDst)) return;
         float rot = a.angleTo(b);
         float vx = Mathf.cosDeg(rot), vy = Mathf.sinDeg(rot);
         Vec2 v1 = Tmp.v1.set(vx, vy).scl(aDst).add(a);
@@ -136,11 +138,13 @@ public class EndBuilders{
 
     public static void drawPlace(Block b, int x, int y, int tileRange, float range){
         int eff = tileRange + b.size / 2;
+        float eff2 = 1f;
         for(int i = 0; i < 4; i++){
             int maxLen = tileRange + b.size / 2;
             var dir = Geometry.d4[i];
             int dx = dir.x, dy = dir.y;
             int offset = b.size / 2;
+            int rr = -1;
             Building dest = null;
 
             for(int j = 1 + offset; j <= tileRange + offset; j++){
@@ -148,6 +152,8 @@ public class EndBuilders{
                 if(other != null && other.team == player.team() && other instanceof EndBuilderBuilding && (other.tileX() == x || other.tileY() == y)){
                     maxLen = j;
                     dest = other;
+                    int s1 = (b.size / 2) + 1, s2 = (other.block.size / 2);
+                    rr = (int)(other.dst(x * tilesize, y * tilesize) / tilesize) - (s1 + s2);
                     break;
                 }
             }
@@ -161,20 +167,29 @@ public class EndBuilders{
             );
             if(dest != null){
                 Drawf.square(dest.x, dest.y, dest.block.size * tilesize/2f + 2.5f, 0f);
+                float efff2 = 1f - getEfficiency(rr, ((EndBuilderBuilding)dest).tileRange());
+                if(efff2 > 0){
+                    dest.block.drawPlaceText("%-" + (efff2 * 100), dest.tileX(), dest.tileY(), false);
+                }
+                eff2 = Math.min(getEfficiency(rr, tileRange), eff2);
             }
-            Drawf.circles(x * tilesize, y * tilesize, range, Pal.placing);
         }
-        float efff = 1f - getEfficiency(eff, tileRange);
-        if(efff > 0){
-            b.drawPlaceText("%-" + (efff * 100), x, y, false);
+        Drawf.circles(x * tilesize, y * tilesize, range, Pal.placing);
+        if(eff2 < 1){
+            b.drawPlaceText("%-" + ((1f - eff2) * 100), x, y, false);
         }
     }
 
     void draw(){
         Draw.draw(Layer.flyingUnit + 1f, () -> {
             Core.camera.bounds(Tmp.r1);
-            renderer.effectBuffer.begin(Color.clear);
+            FrameBuffer buffer = renderer.effectBuffer;
+            buffer.begin(Color.clear);
             Draw.color(Color.white);
+            //Draw.blend(Blending.additive);
+            Gl.blendEquationSeparate(Gl.funcAdd, Gl.max);
+            Blending.normal.apply();
+            //Blending.additive.apply();
             float fluc = Mathf.absin(7f, 0.75f);
             for(EndBuilderData data : active){
                 data.tree.intersect(Tmp.r1, e -> {
@@ -185,10 +200,13 @@ public class EndBuilders{
                     }
                 });
             }
-            renderer.effectBuffer.end();
+            //Draw.blend();
+            //Blending.normal.apply();
+            buffer.end();
+            Gl.blendEquationSeparate(Gl.funcAdd, Gl.funcAdd);
             PUShaders.endAreaShader.color.set(EndPal.endMid).mul(1f + Mathf.absin(12f, 0.75f));
             PUShaders.endAreaShader.width = 2f + fluc;
-            Draw.blit(renderer.effectBuffer, PUShaders.endAreaShader);
+            Draw.blit(buffer, PUShaders.endAreaShader);
             Draw.reset();
         });
     }
