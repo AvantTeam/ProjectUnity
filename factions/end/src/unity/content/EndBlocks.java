@@ -5,9 +5,10 @@ import mindustry.type.*;
 import mindustry.world.Block;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
+import unity.graphics.*;
 import unity.mod.*;
 import unity.world.blocks.*;
-import unity.content.*;
+import unity.world.blocks.production.*;
 
 import static unity.mod.FactionRegistry.register;
 
@@ -19,6 +20,7 @@ public final class EndBlocks{
 
             wallOreOrsusite,
 
+            infraredBore,
             endgame, coreCrypt, endConstructor;
 
     public static void load(){
@@ -36,6 +38,22 @@ public final class EndBlocks{
             wallOre = true;
         }});
 
+        infraredBore = register(Faction.end, new DeepBeamDrill("infrared-bore"){{
+            requirements(Category.production, ItemStack.with(EndItems.orsusite, 40));
+            alwaysUnlocked = true;
+            drillTime = 190f;
+            size = 2;
+            range = 6;
+            tier = 3;
+            laserWidth = 2.5f;
+            pulseIntensity = 0.25f;
+            sparkColor = EndPal.endMid;
+            boostHeatColor = EndPal.endLight;
+
+            consumePower(0.2f);
+            consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
+        }});
+
         endgame = register(Faction.end, new EndGameTurret("endgame"));
 
         coreCrypt = register(Faction.end, new EndCoreBlock("core-crypt"){{
@@ -47,7 +65,7 @@ public final class EndBlocks{
             health = 44000;
             itemCapacity = 5000;
             size = 7;
-            thrusterLength = 48/4f;
+            thrusterLength = 38/4f;
             armor = 35f;
             incinerateNonBuildable = true;
 
@@ -56,13 +74,13 @@ public final class EndBlocks{
         }});
 
         endConstructor = register(Faction.end, new EndConstructorBlock("end-constructor"){{
-            requirements(Category.effect, ItemStack.with(EndItems.orsusite, 40, Items.lead, 10));
+            requirements(Category.effect, ItemStack.with(EndItems.orsusite, 60, Items.lead, 10));
             alwaysUnlocked = true;
 
             health = 120;
             size = 1;
             armor = 10f;
-            buildCostMultiplier = 5f;
+            buildCostMultiplier = 3f;
         }});
     }
 }

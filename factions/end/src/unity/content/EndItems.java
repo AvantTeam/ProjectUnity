@@ -11,6 +11,7 @@ public class EndItems{
     public static void load(){
         orsusite = new PUItem("orsusite", new Color(0x5a545cff)){{
             hardness = 3;
+            healthScaling = 0.125f;
         }};
     }
 }
