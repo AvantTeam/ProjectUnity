@@ -145,17 +145,23 @@ public class EndBuilders{
             int dx = dir.x, dy = dir.y;
             int offset = b.size / 2;
             int rr = -1;
+            boolean valid = true;
             Building dest = null;
 
             for(int j = 1 + offset; j <= EndBuilderModule.maxRange + offset; j++){
                 Building other = world.build(x + j * dir.x, y + j * dir.y);
-                if(other != null && other.team == player.team() && other instanceof EndBuilderBuilding && (other.tileX() == x || other.tileY() == y)){
-                    if(j <= Math.max(tileRange + offset, ((EndBuilderBuilding)other).tileRange() + other.block.size / 2)){
-                        maxLen = j;
+                if(other != null && other.team == player.team() && other instanceof EndBuilderBuilding){
+                    if((other.tileX() == x || other.tileY() == y)){
+                        if(j <= Math.max(tileRange + offset, ((EndBuilderBuilding)other).tileRange() + other.block.size / 2)){
+                            maxLen = j;
+                            dest = other;
+                            int s1 = (b.size / 2) + 1, s2 = (other.block.size / 2);
+                            rr = (int)(other.dst(x * tilesize, y * tilesize) / tilesize) - (s1 + s2);
+                            break;
+                        }
+                    }else{
+                        valid = false;
                         dest = other;
-                        int s1 = (b.size / 2) + 1, s2 = (other.block.size / 2);
-                        rr = (int)(other.dst(x * tilesize, y * tilesize) / tilesize) - (s1 + s2);
-                        break;
                     }
                     /*
                     maxLen = j;
@@ -166,21 +172,34 @@ public class EndBuilders{
                      */
                 }
             }
-            eff = Math.min(eff, maxLen);
+            //eff = Math.min(eff, maxLen);
 
             Drawf.dashLine(Pal.placing,
                     x * tilesize + dx * (tilesize * b.size / 2f + 2),
                     y * tilesize + dy * (tilesize * b.size / 2f + 2),
-                    x * tilesize + dx * (maxLen) * tilesize,
-                    y * tilesize + dy * (maxLen) * tilesize
+                    x * tilesize + dx * maxLen * tilesize,
+                    y * tilesize + dy * maxLen * tilesize
             );
             if(dest != null){
-                Drawf.square(dest.x, dest.y, dest.block.size * tilesize/2f + 2.5f, 0f);
-                float efff2 = 1f - getEfficiency(rr, ((EndBuilderBuilding)dest).tileRange());
-                if(efff2 > 0){
-                    dest.block.drawPlaceText("%-" + (efff2 * 100), dest.tileX(), dest.tileY(), false);
+                if(valid){
+                    Drawf.square(dest.x, dest.y, dest.block.size * tilesize / 2f + 2.5f, 0f);
+                    float efff2 = 1f - getEfficiency(rr, ((EndBuilderBuilding)dest).tileRange());
+                    if(efff2 > 0){
+                        dest.block.drawPlaceText("%-" + (efff2 * 100), dest.tileX(), dest.tileY(), false);
+                    }
+                    eff2 = Math.min(getEfficiency(rr, tileRange), eff2);
+                }else{
+                    float ox = dest.x, oy = dest.y;
+                    int tr = ((EndBuilderBuilding)dest).tileRange() + dest.block.size / 2;
+                    //int tr = EndBuilderModule.maxRange;
+                    for(Point2 d : Geometry.d4){
+                        Drawf.dashLine(Pal.lightishGray,
+                                ox + d.x * (tilesize * dest.block.size / 2f + 2),
+                                oy + d.y * (tilesize * dest.block.size / 2f + 2),
+                                ox + d.x * tr * tilesize,
+                                    oy + d.y * tr * tilesize);
+                    }
                 }
-                eff2 = Math.min(getEfficiency(rr, tileRange), eff2);
             }
         }
         Drawf.circles(x * tilesize, y * tilesize, range, Pal.placing);
