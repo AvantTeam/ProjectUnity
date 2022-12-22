@@ -36,6 +36,7 @@ public class EndConstructorBlock extends Block{
     public void init(){
         super.init();
         clipSize = Math.max(clipSize, buildRange * Vars.tilesize);
+        EndBuilderModule.maxRange = Math.max(EndBuilderModule.maxRange, tileRange);
         buildType = new UnitType("builder-unit-" + name){{
             hidden = true;
             internal = true;

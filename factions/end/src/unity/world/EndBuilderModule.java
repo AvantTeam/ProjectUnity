@@ -18,6 +18,7 @@ public class EndBuilderModule extends BlockModule{
     public boolean init;
     public float efficiency = 1f;
 
+    public static int maxRange = -1;
     final static IntSet buildingSet = new IntSet(4), buildingSet2 = new IntSet(4);
     final static Seq<Building> buildingSeq = new Seq<>(4);
 
@@ -74,13 +75,17 @@ public class EndBuilderModule extends BlockModule{
             var dir = Geometry.d4[i];
             Building next = null;
             int offset = b.block.size / 2;
+            int range = eb.tileRange() + offset;
 
-            for(int j = 1 + offset; j <= eb.tileRange() + offset; j++){
+            for(int j = 1 + offset; j <= maxRange + offset; j++){
                 Building other = Vars.world.build(t.x + j * dir.x, t.y + j * dir.y);
                 if(other instanceof EndBuilderBuilding && other.isAdded() && (other.x == b.x || other.y == b.y)){
-                    next = other;
-                    buildingSet2.add(other.pos());
-                    break;
+                    int range2 = ((EndBuilderBuilding)other).tileRange() + (other.block.size / 2);
+                    if(j <= Math.max(range, range2)){
+                        next = other;
+                        buildingSet2.add(other.pos());
+                        break;
+                    }
                 }
             }
 

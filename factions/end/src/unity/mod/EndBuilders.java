@@ -147,14 +147,23 @@ public class EndBuilders{
             int rr = -1;
             Building dest = null;
 
-            for(int j = 1 + offset; j <= tileRange + offset; j++){
+            for(int j = 1 + offset; j <= EndBuilderModule.maxRange + offset; j++){
                 Building other = world.build(x + j * dir.x, y + j * dir.y);
                 if(other != null && other.team == player.team() && other instanceof EndBuilderBuilding && (other.tileX() == x || other.tileY() == y)){
+                    if(j <= Math.max(tileRange + offset, ((EndBuilderBuilding)other).tileRange() + other.block.size / 2)){
+                        maxLen = j;
+                        dest = other;
+                        int s1 = (b.size / 2) + 1, s2 = (other.block.size / 2);
+                        rr = (int)(other.dst(x * tilesize, y * tilesize) / tilesize) - (s1 + s2);
+                        break;
+                    }
+                    /*
                     maxLen = j;
                     dest = other;
                     int s1 = (b.size / 2) + 1, s2 = (other.block.size / 2);
                     rr = (int)(other.dst(x * tilesize, y * tilesize) / tilesize) - (s1 + s2);
                     break;
+                     */
                 }
             }
             eff = Math.min(eff, maxLen);

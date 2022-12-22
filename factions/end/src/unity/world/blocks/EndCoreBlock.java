@@ -22,6 +22,7 @@ public class EndCoreBlock extends CoreBlock{
     public void init(){
         super.init();
         clipSize = Math.max(clipSize, buildRange * Vars.tilesize);
+        EndBuilderModule.maxRange = Math.max(EndBuilderModule.maxRange, tileRange);
         buildType = new UnitType("builder-unit-" + name){{
             hidden = true;
             internal = true;
