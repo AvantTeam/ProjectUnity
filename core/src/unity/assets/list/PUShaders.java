@@ -26,6 +26,7 @@ public final class PUShaders{
     public static PUSurfaceShader eneraphyte, pit, waterpit;
     public static InvisibilityShader dimensionshift;
     public static EndAreaShader endAreaShader;
+    public static EndAirShader endAirShader;
 
     private PUShaders(){
         throw new AssertionError();
@@ -40,6 +41,7 @@ public final class PUShaders{
         waterpit = new PitShader("waterpit", 9, "noise", "concrete-blank1", "stone-sheet");
         dimensionshift = new InvisibilityShader("dimensionshift");
         endAreaShader = new EndAreaShader();
+        endAirShader = new EndAirShader();
 
         RegionBatch.init();
     }
@@ -250,6 +252,28 @@ public final class PUShaders{
 
             //setUniformf("u_texsize", Core.camera.width, Core.camera.height);
             setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
+        }
+    }
+
+    public static class EndAirShader extends Shader{
+        public float offsetX, offsetY, div;
+        public Texture tex;
+
+        public EndAirShader(){
+            super(getShaderFi("screenspace.vert"), file("endair.frag"));
+        }
+
+        @Override
+        public void apply(){
+            super.apply();
+            setUniformf("u_offset", offsetX, offsetY);
+            setUniformf("u_div", div);
+
+            setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2f, Core.camera.position.y - Core.camera.height / 2f);
+            setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
+            setUniformf("u_camsize", Core.camera.width, Core.camera.height);
+            
+            setUniformf("u_texsize", tex.width, tex.height);
         }
     }
 }

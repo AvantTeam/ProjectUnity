@@ -1,8 +1,10 @@
 package unity.content;
 
+import arc.graphics.g2d.*;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.Block;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 import unity.graphics.*;
@@ -20,7 +22,9 @@ public final class EndBlocks{
 
             wallOreOrsusite,
 
+            heavyDuct,
             infraredBore,
+            essenceConcentrator,
             endgame, coreCrypt, endConstructor;
 
     public static void load(){
@@ -38,6 +42,21 @@ public final class EndBlocks{
             wallOre = true;
         }});
 
+        heavyDuct = register(Faction.end, new Duct("heavy-duct"){
+            {
+                requirements(Category.distribution, ItemStack.with(EndItems.orsusite, 1));
+                health = 140;
+                size = 1;
+                armor = 10f;
+                speed = 5f;
+            }
+
+            @Override
+            public TextureRegion[] icons(){
+                return new TextureRegion[]{botRegions[0], topRegions[0]};
+            }
+        });
+
         infraredBore = register(Faction.end, new DeepBeamDrill("infrared-bore"){{
             requirements(Category.production, ItemStack.with(EndItems.orsusite, 40));
             alwaysUnlocked = true;
@@ -53,6 +72,11 @@ public final class EndBlocks{
             consumePower(0.2f);
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }});
+
+        essenceConcentrator = new EndConcetratorBlock("essence-concentrator"){{
+            requirements(Category.crafting, ItemStack.with(EndItems.orsusite, 10));
+            size = 3;
+        }};
 
         endgame = register(Faction.end, new EndGameTurret("endgame"));
 

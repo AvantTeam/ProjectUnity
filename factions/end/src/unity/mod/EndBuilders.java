@@ -33,6 +33,7 @@ public class EndBuilders{
     private static boolean valid, inside;
 
     public static EndBuilders builders;
+    public static EndEssence essence;
     public static TextureRegion laserEnd, laser;
 
     EndBuilderData[] teams = new EndBuilderData[Team.all.length];
@@ -78,8 +79,15 @@ public class EndBuilders{
                 //Log.info("endbuilder reset");
             }
             active.clear();
+            if(essence != null){
+                essence.reset();
+                essence = null;
+            }
         });
         Events.on(EventType.WorldLoadEvent.class, e -> {
+            //TODO only create instance when a map rule is enabled.
+            if(essence == null) essence = new EndEssence();
+            essence.init();
             active.clear();
             for(TeamData data : state.teams.active){
                 active.add(this.data(data.team.id));
@@ -106,12 +114,16 @@ public class EndBuilders{
             }
         });
         Events.run(Trigger.update, this::update);
+        Events.run(Trigger.draw, () -> {
+            if(essence != null) essence.draw();
+        });
         RestrictedProps.limit = this::limit;
         RestrictedProps.planValid = (bp, team) -> data(team.id).planValid(bp);
     }
 
     public static void load(){
         builders = new EndBuilders();
+        //essence = new EndEssence();
     }
 
     public static void drawLaser(Position a, float aDst, Position b, float bDst, float scl){
@@ -137,7 +149,7 @@ public class EndBuilders{
     }
 
     public static void drawPlace(Block b, int x, int y, int tileRange, float range){
-        int eff = tileRange + b.size / 2;
+        //int eff = tileRange + b.size / 2;
         float eff2 = 1f;
         for(int i = 0; i < 4; i++){
             int maxLen = tileRange + b.size / 2;
@@ -240,6 +252,7 @@ public class EndBuilders{
     }
 
     void update(){
+        if(essence != null) essence.update();
         for(TeamData t : state.teams.active){
             EndBuilderData d = data(t.team.id);
             if(!t.plans.isEmpty() && d.lastPlan != t.plans.last()){
