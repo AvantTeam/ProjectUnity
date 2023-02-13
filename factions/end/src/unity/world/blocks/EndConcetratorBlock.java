@@ -1,40 +1,34 @@
 package unity.world.blocks;
 
-import arc.graphics.g2d.*;
-import mindustry.gen.*;
-import mindustry.world.*;
-import unity.graphics.*;
 import unity.mod.*;
+import unity.world.blocks.essence.*;
 
-public class EndConcetratorBlock extends Block{
-    float maxAmount = 30f;
-    float absorbAmount = 0.5f;
+public class EndConcetratorBlock extends EndEssenceBlock{
+    float absorbAmount = 2f;
 
     public EndConcetratorBlock(String name){
         super(name);
+        essenceCapacity = 60f;
+        flowSpeed = 1f;
+        range = 100f;
+
         solid = true;
         update = true;
     }
+    
+    @Override
+    protected boolean isOutputBlock(){
+        return true;
+    }
 
-    public class EndConcetratorBuilding extends Building{
-        public float essence;
-
+    public class EndConcetratorBuilding extends EndEssenceBuilding{
         public float absorbAmount(){
-            return Math.min(absorbAmount, maxAmount - essence);
+            return Math.min(absorbAmount, essenceCapacity - module.essence);
         }
-
+        
         @Override
-        public void updateTile(){
-            super.updateTile();
-            essence = Math.min(essence, maxAmount);
-        }
-
-        @Override
-        public void draw(){
-            super.draw();
-            Draw.color(EndPal.endMid);
-            Fill.circle(x, y, (essence / maxAmount) * 4f);
-            Draw.color();
+        public boolean isOutput(){
+            return true;
         }
 
         @Override

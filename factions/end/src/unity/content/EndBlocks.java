@@ -10,6 +10,7 @@ import mindustry.world.meta.*;
 import unity.graphics.*;
 import unity.mod.*;
 import unity.world.blocks.*;
+import unity.world.blocks.essence.*;
 import unity.world.blocks.production.*;
 
 import static unity.mod.FactionRegistry.register;
@@ -24,7 +25,7 @@ public final class EndBlocks{
 
             heavyDuct,
             infraredBore,
-            essenceConcentrator,
+            essenceDistributor, essenceConcentrator,
             endgame, coreCrypt, endConstructor;
 
     public static void load(){
@@ -73,9 +74,15 @@ public final class EndBlocks{
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }});
 
+        essenceDistributor = new EndEssenceBlock("essence-distributor"){{
+            requirements(Category.crafting, ItemStack.with(EndItems.orsusite, 5));
+            size = 2;
+        }};
+
         essenceConcentrator = new EndConcetratorBlock("essence-concentrator"){{
             requirements(Category.crafting, ItemStack.with(EndItems.orsusite, 10));
             size = 3;
+            clipSize = 330f * 2f;
         }};
 
         endgame = register(Faction.end, new EndGameTurret("endgame"));

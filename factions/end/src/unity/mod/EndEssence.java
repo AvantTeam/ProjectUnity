@@ -274,18 +274,21 @@ public class EndEssence{
 
         if(updateVelocity) updateVelocities();
         int llen = width * height;
-        for(int i = 0; i < llen; i++){
-            if(pressure[i] > 0f) updateAir(i);
-        }
         if(updateAir){
+            for(int i = 0; i < llen; i++){
+                if(pressure[i] > 0f) updateAir(i);
+            }
+            updateAir = false;
             for(int i = 0; i < llen; i++){
                 float newA = (pressure[i] += nextPressure[i]);
                 if(newA <= 0.0001f){
                     pressure[i] = 0f;
+                }else{
+                    updateAir = true;
                 }
                 nextPressure[i] = 0f;
             }
-            updateAir = false;
+
         }
         for(EssenceSink sink : sinkSeq){
             sink.update();
@@ -485,7 +488,8 @@ public class EndEssence{
                 pressure[pos] -= t;
                 for(int i = 0; i < size; i++){
                     EndConcetratorBuilding b = buildings[i];
-                    b.essence += ((weight[i] * b.absorbAmount()) / mw) * t;
+                    b.module.lastEssence = b.module.essence;
+                    b.module.essence += ((weight[i] * b.absorbAmount()) / mw) * t;
                 }
             }
         }
