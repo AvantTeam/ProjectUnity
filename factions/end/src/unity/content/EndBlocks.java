@@ -1,6 +1,5 @@
 package unity.content;
 
-import arc.graphics.g2d.*;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.Block;
@@ -23,9 +22,9 @@ public final class EndBlocks{
 
             wallOreOrsusite,
 
-            heavyDuct,
+            heavyConveyor,
             infraredBore,
-            essenceDistributor, essenceConcentrator,
+            essenceDuct, essenceConcentrator,
             endgame, coreCrypt, endConstructor;
 
     public static void load(){
@@ -43,6 +42,7 @@ public final class EndBlocks{
             wallOre = true;
         }});
 
+        /*
         heavyDuct = register(Faction.end, new Duct("heavy-duct"){
             {
                 requirements(Category.distribution, ItemStack.with(EndItems.orsusite, 1));
@@ -57,6 +57,16 @@ public final class EndBlocks{
                 return new TextureRegion[]{botRegions[0], topRegions[0]};
             }
         });
+         */
+
+        heavyConveyor = register(Faction.end, new Conveyor("heavy-conveyor"){{
+            requirements(Category.distribution, ItemStack.with(EndItems.orsusite, 1));
+            health = 140;
+            size = 1;
+            armor = 10f;
+            speed = 0.1f;
+            displayedSpeed = (11f / 0.08f) * speed;
+        }});
 
         infraredBore = register(Faction.end, new DeepBeamDrill("infrared-bore"){{
             requirements(Category.production, ItemStack.with(EndItems.orsusite, 40));
@@ -74,9 +84,16 @@ public final class EndBlocks{
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }});
 
+        /*
         essenceDistributor = new EndEssenceBlock("essence-distributor"){{
             requirements(Category.crafting, ItemStack.with(EndItems.orsusite, 5));
             size = 2;
+        }};
+         */
+        essenceDuct = new EssenceConduit("essence-duct"){{
+            requirements(Category.crafting, ItemStack.with(EndItems.orsusite, 1, Items.graphite, 3));
+            size = 1;
+            health = 100;
         }};
 
         essenceConcentrator = new EndConcetratorBlock("essence-concentrator"){{

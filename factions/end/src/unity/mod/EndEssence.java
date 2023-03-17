@@ -11,7 +11,7 @@ import arc.util.*;
 import mindustry.world.*;
 import unity.assets.list.*;
 import unity.assets.list.PUShaders.*;
-import unity.world.blocks.EndConcetratorBlock.*;
+import unity.world.blocks.essence.EndConcetratorBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -39,7 +39,7 @@ public class EndEssence{
 
     static float[] tmpPos = new float[8];
     static FrameBuffer airBuffer;
-    static boolean updateVelocity = true;
+    static boolean updateVelocity = true, test = false;
     static IntIntMap tmpMap = new IntIntMap();
     static IntSeq tmpSeq = new IntSeq();
 
@@ -67,6 +67,12 @@ public class EndEssence{
             addAir(width / 4, height / 4, 200f);
         });
         */
+        if(test){
+            Time.run(4f * 60f, () -> {
+                addAir(width / 2, height / 2, 100f, 50f, 20f);
+                addAir(width / 4, height / 4, 200f);
+            });
+        }
 
         float w1 = width * div, h1 = height * div;
         offX = (w1 - world.width()) * tilesize / 2f;
@@ -379,11 +385,11 @@ public class EndEssence{
         return 1f;
     }
 
-    void addVelocity(int pos, float vx, float vy){
+    public void addVelocity(int pos, float vx, float vy){
         addVelocity(pos, vx, vy, 0f);
     }
     
-    void addVelocity(int pos, float vx, float vy, float pressure){
+    public void addVelocity(int pos, float vx, float vy, float pressure){
         if(!updateVelocity) return;
         nextVelocity[0][pos] += vx;
         nextVelocity[1][pos] += vy;
@@ -391,25 +397,25 @@ public class EndEssence{
         updateV = true;
     }
 
-    int posWorld(float x, float y){
+    public int posWorld(float x, float y){
         int ix = (int)((x + offX) / tilesize) / div;
         int iy = (int)((y + offY) / tilesize) / div;
         if(!inBounds(ix, iy)) return -1;
         return ix + iy * width;
     }
 
-    void addAir(int x, int y, float value, float vx, float vy){
+    public void addAir(int x, int y, float value, float vx, float vy){
         int pos = x + y * width;
         //addAir(pos, value, vx, vy);
         addAir(pos, value);
         addVelocity(pos, vx, vy);
     }
 
-    void addAir(int x, int y, float value){
+    public void addAir(int x, int y, float value){
         addAir(x + y * width, value);
     }
 
-    void addAir(int pos, float value){
+    public void addAir(int pos, float value){
         nextPressure[pos] += value;
         updateAir = true;
     }
@@ -488,8 +494,10 @@ public class EndEssence{
                 pressure[pos] -= t;
                 for(int i = 0; i < size; i++){
                     EndConcetratorBuilding b = buildings[i];
-                    b.module.lastEssence = b.module.essence;
-                    b.module.essence += ((weight[i] * b.absorbAmount()) / mw) * t;
+                    float abs = b.absorbAmount();
+                    //b.module.essence += ((weight[i] * b.absorbAmount()) / mw) * t;
+                    //b.module.essence += (weight[i] / (float)(b.block.size * b.block.size)) * t;
+                    b.module.essence += (((weight[i] / (float)(b.block.size * b.block.size)) * abs) / mw) * t;
                 }
             }
         }

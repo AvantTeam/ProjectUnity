@@ -144,7 +144,8 @@ public interface EndBuilderBuilding extends Posc{
 
         if(getTargetUnit() != null){
             float z = Draw.z();
-            Draw.z(z + 0.1f);
+            //Draw.z(z + 0.1f);
+            Draw.z(Layer.legUnit + 0.1f);
             EndBuilders.drawLaser(as, as.block.size * 4, getTargetUnit(), 0f, 0.75f);
             Draw.z(z);
         }
