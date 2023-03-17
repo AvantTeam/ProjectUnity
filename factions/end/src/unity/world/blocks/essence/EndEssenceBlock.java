@@ -27,16 +27,23 @@ public class EndEssenceBlock extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        addBar("essence", (EndEssenceBuilding2 e) ->
-                new Bar("category.unity-essence", EndPal.endMid, () -> e.module.essence / essenceCapacity));
+        addBar("essence", (EndEssenceBuilding e) ->
+                new Bar("category.unity-essence", EndPal.endMid, () -> e.essence.essence / essenceCapacity));
     }
 
-    public class EndEssenceBuilding2 extends Building implements EndEssenceInterface2{
-        public EndEssenceModule module = new EndEssenceModule();
+    @Override
+    public boolean canReplace(Block other){
+        if(other.alwaysReplace) return true;
+        if(other.privileged) return false;
+        return other instanceof EndEssenceBlock && size >= other.size;
+    }
+
+    public class EndEssenceBuilding extends Building implements EndEssenceInterface{
+        public EndEssenceModule essence = new EndEssenceModule();
 
         @Override
-        public EndEssenceModule mod(){
-            return module;
+        public EndEssenceModule ess(){
+            return essence;
         }
 
         @Override
@@ -44,30 +51,31 @@ public class EndEssenceBlock extends Block{
             return essenceCapacity;
         }
 
-        public void transferEssence(EndEssenceInterface2 next, float amount){
+        public void transferEssence(EndEssenceInterface next, float amount){
             if(amount <= 0) return;
-            float flow = Math.min(Math.min(amount, module.essence), next.capacity() - next.mod().essence);
+            float flow = Math.min(Math.min(amount, essence.essence), next.capacity() - next.ess().essence);
 
-            next.mod().essence += flow;
-            module.essence -= flow;
+            next.ess().essence += flow;
+            essence.essence -= flow;
         }
 
         public void dumpEssence(float scaling){
             int dump = this.cdump;
-            if(module.essence <= 0.0001f) return;
+            if(essence.essence <= 0.0001f) return;
 
             for(int i = 0; i < proximity.size; i++){
                 incrementDump(proximity.size);
                 //Log.info("Essence1");
 
                 Building other = proximity.get((i + dump) % proximity.size);
-                if(other.team == team && other instanceof EndEssenceBuilding2 e && e.acceptEssence(this)){
+                if(other.team == team && other instanceof EndEssenceInterface e && e.acceptEssence(this)){
                     //float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
                     //float fract = liquids.get(liquid) / block.liquidCapacity;
                     //Log.info("EssenceAAAA");
-                    float of = e.efract();
+                    EndEssenceInterface n = e.getEssencesDestination(this);
+                    float of = n.efract();
                     float f = efract() * essencePressure;
-                    if(of < f) transferEssence(e, Mathf.clamp(f - of) * essenceCapacity / scaling);
+                    if(of < f) transferEssence(n, Mathf.clamp(f - of) * essenceCapacity / scaling);
                 }
             }
         }
@@ -77,43 +85,48 @@ public class EndEssenceBlock extends Block{
 
             if(next == null) return;
             if(next.build != null){
-                if(next.build instanceof EndEssenceInterface2 e && e.acceptEssence(this)){
-                    float of = e.efract();
+                if(next.build instanceof EndEssenceInterface e && e.acceptEssence(this)){
+                    EndEssenceInterface n = e.getEssencesDestination(this);
+                    float of = n.efract();
                     float f = efract() * essencePressure;
                     float flow = Mathf.clamp(f - of) * essenceCapacity;
 
-                    transferEssence(e, flow);
+                    transferEssence(n, flow);
                 }
             }else{
-                float leakAmount = module.essence / 1.5f;
+                float leakAmount = essence.essence / 1.5f;
                 EndBuilders.essence.addAir(EndBuilders.essence.posWorld(x, y), leakAmount);
-                module.essence -= leakAmount;
+                essence.essence -= leakAmount;
             }
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            module.read(read);
+            essence.read(read);
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
-            module.write(write);
+            essence.write(write);
         }
     }
 
-    public interface EndEssenceInterface2{
-        EndEssenceModule mod();
+    public interface EndEssenceInterface{
+        EndEssenceModule ess();
         float capacity();
 
         default float efract(){
-            return mod().essence / capacity();
+            return ess().essence / capacity();
         }
 
         default boolean acceptEssence(Building source){
             return true;
+        }
+
+        default EndEssenceInterface getEssencesDestination(EndEssenceInterface source){
+            return this;
         }
     }
 }

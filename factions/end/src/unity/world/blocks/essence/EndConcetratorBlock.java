@@ -16,6 +16,7 @@ public class EndConcetratorBlock extends EndEssenceBlock{
 
         solid = true;
         update = true;
+        privileged = true;
     }
     
     @Override
@@ -24,9 +25,9 @@ public class EndConcetratorBlock extends EndEssenceBlock{
         stats.add(UnityStats.essenceAbsorb, absorbAmount);
     }
 
-    public class EndConcetratorBuilding extends EndEssenceBuilding2{
+    public class EndConcetratorBuilding extends EndEssenceBuilding{
         public float absorbAmount(){
-            return Math.min(absorbAmount, essenceCapacity - module.essence);
+            return Math.min(absorbAmount, essenceCapacity - essence.essence);
         }
 
         @Override

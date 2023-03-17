@@ -1,9 +1,12 @@
 package unity.world.blocks.essence;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
@@ -11,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.liquid.*;
+import unity.content.*;
 import unity.graphics.*;
 
 public class EssenceConduit extends EndEssenceBlock implements Autotiler{
@@ -18,6 +23,7 @@ public class EssenceConduit extends EndEssenceBlock implements Autotiler{
     public TextureRegion bottomRegion;
     public Color baseColor = EndPal.endSolidDarker;
     public int timerFlow = timers++;
+    protected Block junction;
 
     public EssenceConduit(String name){
         super(name);
@@ -28,6 +34,7 @@ public class EssenceConduit extends EndEssenceBlock implements Autotiler{
         noUpdateDisabled = true;
         canOverdrive = false;
         essenceCapacity = 5f;
+        essencePressure = 1.025f;
         //priority = TargetPriority.transport;
     }
 
@@ -39,6 +46,12 @@ public class EssenceConduit extends EndEssenceBlock implements Autotiler{
             regions[i] = Core.atlas.find(name + "-" + i);
         }
         bottomRegion = Core.atlas.find(name + "-bottom");
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        if(junction == null) junction = EndBlocks.essenceJunction;
     }
 
     @Override
@@ -56,10 +69,17 @@ public class EssenceConduit extends EndEssenceBlock implements Autotiler{
     }
 
     @Override
-    public boolean canReplace(Block other){
-        if(other.alwaysReplace) return true;
-        if(other.privileged) return false;
-        return other instanceof EndEssenceBlock && size >= other.size;
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
+        if(junction == null) return this;
+
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof EssenceConduit || req.block instanceof EssenceJunction));
+
+        //return super.getReplacement(req, plans);
+        return cont.get(Geometry.d4(req.rotation)) &&
+                cont.get(Geometry.d4(req.rotation - 2)) &&
+                req.tile() != null &&
+                req.tile().block() instanceof EssenceConduit &&
+                Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junction : this;
     }
 
     @Override
@@ -73,7 +93,7 @@ public class EssenceConduit extends EndEssenceBlock implements Autotiler{
         return otherblock instanceof EndEssenceBlock && (lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock) || !(otherblock instanceof EssenceConduit));
     }
 
-    public class EssenceConduitBuild extends EndEssenceBuilding2{
+    public class EssenceConduitBuild extends EndEssenceBuilding{
         public float smoothEss;
         public int blendbits, xscl = 1, yscl = 1;
 
@@ -103,7 +123,7 @@ public class EssenceConduit extends EndEssenceBlock implements Autotiler{
         public void updateTile(){
             smoothEss = Mathf.lerpDelta(smoothEss, Mathf.clamp(efract()), 0.05f);
 
-            if(module.essence > 0.001f && timer(timerFlow, 1)){
+            if(essence.essence > 0.001f && timer(timerFlow, 1)){
                 essenceFlowForward();
                 noSleep();
             }else{

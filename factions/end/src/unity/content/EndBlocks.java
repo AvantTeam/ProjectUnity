@@ -24,7 +24,8 @@ public final class EndBlocks{
 
             heavyConveyor,
             infraredBore,
-            essenceDuct, essenceConcentrator,
+            essenceDuct, essenceRouter, essenceJunction,
+            essenceConcentrator,
             endgame, coreCrypt, endConstructor;
 
     public static void load(){
@@ -94,6 +95,16 @@ public final class EndBlocks{
             requirements(Category.crafting, ItemStack.with(EndItems.orsusite, 1, Items.graphite, 3));
             size = 1;
             health = 100;
+        }};
+        essenceRouter = new EssenceRouter("essence-router"){{
+            requirements(Category.crafting, ItemStack.with(EndItems.orsusite, 2, Items.graphite, 5));
+            size = 1;
+            health = 120;
+        }};
+        essenceJunction = new EssenceJunction("essence-junction"){{
+            requirements(Category.crafting, ItemStack.with(EndItems.orsusite, 2, Items.graphite, 8));
+            size = 1;
+            health = 120;
         }};
 
         essenceConcentrator = new EndConcetratorBlock("essence-concentrator"){{

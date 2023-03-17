@@ -39,7 +39,7 @@ public class EndEssence{
 
     static float[] tmpPos = new float[8];
     static FrameBuffer airBuffer;
-    static boolean updateVelocity = true, test = false;
+    static boolean updateVelocity = true, test = true;
     static IntIntMap tmpMap = new IntIntMap();
     static IntSeq tmpSeq = new IntSeq();
 
@@ -497,7 +497,7 @@ public class EndEssence{
                     float abs = b.absorbAmount();
                     //b.module.essence += ((weight[i] * b.absorbAmount()) / mw) * t;
                     //b.module.essence += (weight[i] / (float)(b.block.size * b.block.size)) * t;
-                    b.module.essence += (((weight[i] / (float)(b.block.size * b.block.size)) * abs) / mw) * t;
+                    b.essence.essence += (((weight[i] / (float)(b.block.size * b.block.size)) * abs) / mw) * t;
                 }
             }
         }
