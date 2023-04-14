@@ -352,7 +352,7 @@ public abstract class BaseProcessor implements Processor{
 
     @Override
     public SourceVersion getSupportedSourceVersion(){
-        return SourceVersion.RELEASE_17;
+        return SourceVersion.RELEASE_20;
     }
 
     @Override

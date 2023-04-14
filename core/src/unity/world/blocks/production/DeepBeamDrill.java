@@ -339,7 +339,8 @@ public class DeepBeamDrill extends BeamDrill{
             //Log.warn("onProximityUpdate");
         }
 
-        void updateLasers(){
+        @Override
+        protected void updateLasers(){
             for(int i = 0; i < size; i++){
                 if(lasers[i] == null) lasers[i] = new Point2();
                 nearbySide(tileX(), tileY(), rotation, i, lasers[i]);

@@ -433,15 +433,6 @@ public class EntityProcessor extends BaseProcessor{
                         }
                     }
 
-                    builder.addMethod(
-                    MethodSpec.methodBuilder("toString")
-                    .addAnnotation(spec(Override.class))
-                    .returns(spec(String.class))
-                    .addModifiers(PUBLIC)
-                    .addStatement("return $S + $L", name + "#", "id")
-                    .build()
-                    );
-
                     EntityIO io = new EntityIO(this, name, builder, allFieldSpecs, serializer, revDir.child(name));
                     boolean hasIO = defAnno.genIO() && (isSync || defAnno.serialize());
 

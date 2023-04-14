@@ -14,7 +14,7 @@ void main(){
     vec2 pos = (u_campos + u_offset) * u_invsize;
     vec2 T = (((v_texCoords.xy + pos) / u_texsize) * (u_camsize / vec2(u_div)));
     vec4 color = vec4(0.0);
-    if(T.x >= 0 && T.x <= 1 && T.y >= 0 && T.y <= 1){
+    if(T.x >= 0.0 && T.x <= 1.0 && T.y >= 0.0 && T.y <= 1.0){
         float ax = min(T.x * u_texsize.x, 1.0) * min(1.0 - max(0.0, (u_texsize.x * T.x) - (u_texsize.x - 1.0)), 1.0);
         float ay = min(T.y * u_texsize.y, 1.0) * min(1.0 - max(0.0, (u_texsize.y * T.y) - (u_texsize.y - 1.0)), 1.0);
 
