@@ -10,6 +10,10 @@ _Relevant links_:
 [*Miro Board*](https://miro.com/app/board/o9J_lejcuWo=/)  
 [*Trello Board*](https://trello.com/b/oNa7R7bq/project-unity)
 
+## FlameOut Mod
+https://github.com/EyeOfDarkness/FlameOut
+The key is the description with an 'A' in the front.
+
 ## Building
 
 Install JDK 16 or higher. Set `JAVA_HOME` environment variable to where it is located. Clone this repository then change your current working directory to where the cloned repository folder is. If you are compiling for Android, click [here](#Building-for-Android).
