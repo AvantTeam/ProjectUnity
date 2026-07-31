@@ -5,7 +5,6 @@
     "description": "A big-collaboration Mindustry mod created by many authors from the Mindustry modding community.",
     "version": "0.1",
     "minGameVersion": 132.0,
-    "main": "unity.Unity",
-    "java": true,
+    "java": false,
     "hideBrowser": true
 }
